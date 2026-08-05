@@ -78,7 +78,7 @@ Consider a general system written as
 K_{ij}{\dot{z}}_{j} + D_{i} = 0.
 \end{equation}
 
-On a local star-shaped domain, if \(\mathbf{K}\) is nondegenerate and satisfies skew symmetry, the spatial closure condition, and the temporal compatibility condition, then the system admits a regular self-adjoint Birkhoff representation. Equivalently, functions \(F_{i}\) and \(B\) can be found such that the preceding equation holds\cite[Chap.~15]{COMSOLWeakContribution2025}. Define the time-dependent two-form
+On a local star-shaped domain, if \(\mathbf{K}\) is nondegenerate and satisfies skew symmetry, the spatial closure condition, and the temporal compatibility condition, then the system admits a regular self-adjoint Birkhoff representation. Equivalently, functions \(F_{i}\) and \(B\) can be found such that the preceding equation holds\cite{FengQin2010,HairerLubichWanner2006GNI}. Define the time-dependent two-form
 
 \begin{equation}
 \label{eq:symplectic-kam-5-8}
@@ -135,14 +135,14 @@ Under regularity, self-adjointness, analyticity, and nondegeneracy conditions, t
 S\left( \mathbf{Z},h \right) = \sum_{r = 1}^{\infty}S_{r}\left( \mathbf{Z} \right)h^{r}.
 \end{equation}
 
-Truncation at order \(m\) gives an implicit order-\(m\) \(K\left( \mathbf{z},t \right)\)-symplectic method satisfying
+Truncation at order \(m\) gives an implicit order-\(m\) approximately \(K\left( \mathbf{z},t \right)\)-symplectic method satisfying
 
 \begin{equation}
 \label{eq:symplectic-kam-5-15}
 \left( D\Psi_{h} \right)^{T}\mathbf{K}\left( \Psi_{h}\left( \mathbf{z} \right),t + h \right)D\Psi_{h} = \mathbf{K}\left( \mathbf{z},t \right) + O\left( h^{m + 1} \right).
 \end{equation}
 
-This result guarantees structure preservation and the stated order when its hypotheses hold; it does not by itself imply persistence of classical Hamiltonian KAM tori. If a nonstructured residual is superposed, the resulting structural defect must enter the error budget.
+This result guarantees only approximate structure preservation and the stated order when its hypotheses hold; it is exactly \(K\)-symplectic only when the remainder vanishes on the domain of interest, and it does not by itself imply persistence of classical Hamiltonian KAM tori. If a nonstructured residual is superposed, the resulting structural defect must enter the error budget.
 
 \subsection{Invariant-torus computation by the parameterization method}\label{sec:symplectic-kam-5-6}
 

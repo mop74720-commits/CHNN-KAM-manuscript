@@ -167,18 +167,22 @@ The complete structured model on the autonomous backbone is
 
 \begin{equation}
 \label{eq:chnn-4-17}
-\boxed{\dot{\mathbf{Z}} = \mathbf{J}\nabla{\widehat{H}}_{\lambda}\left( \mathbf{Z} \right) + \mathbf{B}\left( {\widehat{\mathbf{Q}}}_{diss,\mu} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + {\widehat{\mathbf{Q}}}_{\partial} + {\widehat{\mathbf{r}}}_{\eta} \right),}
+\boxed{\dot{\mathbf{Z}} = \mathbf{J}\nabla{\widehat{H}}_{\lambda}\left( \mathbf{Z} \right) + \mathbf{B}_{port}\left( {\widehat{\mathbf{Q}}}_{diss,\mu}^{bulk} + {\widehat{\mathbf{Q}}}_{contact} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + {\widehat{\mathbf{Q}}}_{\partial} + {\widehat{\mathbf{r}}}_{\eta} \right),}
 \end{equation}
 
 where
 
 \begin{equation}
 \label{eq:chnn-4-18}
-\mathbf{B} = \begin{bmatrix}
+\mathbf{B}_{port} = \begin{bmatrix}
 \mathbf{0} \\
 \mathbf{I}
 \end{bmatrix}.
 \end{equation}
+
+Here \(\mathbf{B}_{port}\in\mathbb{R}^{2d\times d}\) embeds a physical port input \(\mathbf{u}\in\mathbb{R}^{d}\) only into the momentum-update channel. The full-state port vector \(\mathbf{U}_{port}=\mathbf{B}_{port}\mathbf{u}\in\mathbb{R}^{2d}\) must not be conflated with the physical input \(\mathbf{u}\).
+
+The present work instantiates neither a sampled-data controller nor an online adaptive law, so these equations do not support a sampled-control stability claim. The BDF data-output interval \(\Delta t_{data}\), a future control-sampling period \(\Delta t_{ctrl}\), and the Birkhoff numerical-map step \(h_{Birk}\) are three independent quantities and are not assumed equal. Any future adaptive extension must register the regressor \(\mathbf{Y}(\mathbf{Z},t)\in\mathbb{R}^{d\times r}\), parameter vector \(\widehat{\bm{\theta}}\in\mathbb{R}^{r}\), gain dimensions, transpose or outer-product convention, and parameter-projection constraint together. Its output must first form \(\mathbf{u}\in\mathbb{R}^{d}\) and then enter the momentum channel through \(\mathbf{B}_{port}\mathbf{u}\); it cannot be injected directly into \(\dot{\mathbf{Q}}\). No adaptive-stability conclusion is verifiable until those objects and their implementation are supplied.
 
 The branches have distinct physical meanings.
 
@@ -186,18 +190,18 @@ The branches have distinct physical meanings.
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  \({\widehat{\mathbf{Q}}}_{diss,\mu}\) represents only the passive component whose power with respect to the structural mechanical energy is nonpositive. For the equivalent-viscous subclass, one may take
+  \({\widehat{\mathbf{Q}}}_{diss,\mu}^{bulk}\) represents only the passive bulk/drag component, excluding contact, whose power with respect to the structural mechanical energy is nonpositive. For the equivalent-viscous subclass, one may take
 \end{enumerate}
 
 \begin{equation}
 \label{eq:chnn-4-19}
-{\widehat{\mathbf{Q}}}_{diss,\mu} = - \mathbf{D}_{\mu}\left( \mathbf{Z} \right)\nabla_{\mathbf{P}}{\widehat{H}}_{\lambda},\quad\quad\mathbf{D}_{\mu} = \mathbf{L}_{\mu}\mathbf{L}_{\mu}^{T} \succcurlyeq 0,
+{\widehat{\mathbf{Q}}}_{diss,\mu}^{bulk} = - \mathbf{D}_{\mu}\left( \mathbf{Z} \right)\nabla_{\mathbf{P}}{\widehat{H}}_{\lambda},\quad\quad\mathbf{D}_{\mu} = \mathbf{L}_{\mu}\mathbf{L}_{\mu}^{T} \succcurlyeq 0,
 \end{equation}
 
 \begin{itemize}
 \tightlist
 \item
-  so that \(\nabla_{\mathbf{P}}{\widehat{H}}_{\lambda}^{T}{\widehat{\mathbf{Q}}}_{diss,\mu} \leq 0\). Contact switching, Coulomb friction, and impact may remain separate ports rather than being forced into one smooth matrix representation.\cite{Zhong2020Dissipative}
+  so that \(\nabla_{\mathbf{P}}{\widehat{H}}_{\lambda}^{T}{\widehat{\mathbf{Q}}}_{diss,\mu}^{bulk} \leq 0\). Elastic contact not represented in the potential, contact switching, Coulomb friction, and impact enter the separate nonpotential \({\widehat{\mathbf{Q}}}_{contact}\) port; if elastic contact is already in the potential, it is not counted again, and contact damping or friction does not enter the bulk dissipation head.\cite{Zhong2020Dissipative}
 \end{itemize}
 
 \begin{enumerate}
@@ -235,12 +239,14 @@ The open-port training set is
 
 \begin{equation}
 \label{eq:chnn-4-21}
-\mathcal{D}_{K}^{port} = \left\{ \left( \mathbf{Z}_{i},{\dot{\mathbf{Z}}}_{i},\mathbf{Q}_{diss,i},\mathbf{Q}_{in,i},\mathbf{Q}_{flow,i},\mathbf{Q}_{\partial,i} \right) \right\}.
+\mathcal{D}_{K}^{port} = \left\{ \left( \mathbf{Z}_{i},{\dot{\mathbf{Z}}}_{i},\mathbf{Q}_{diss,i}^{bulk},\mathbf{Q}_{contact,i},\mathbf{Q}_{in,i},\mathbf{Q}_{flow,i},\mathbf{Q}_{\partial,i} \right) \right\}.
 \end{equation}
 
 Samples used for probabilistic transfer to KAM theory may only come from \(\mathcal{D}_{K}^{cons}\). The total training loss of the open-port model cannot be interpreted as a Hamiltonian perturbation.
 
 The P1-series pilots use only three small trajectories---mode1, mode2, and mixed12---in the fixed \(N=2\) basis, with leave-one-whole-trajectory-out partitioning rather than random point splitting across a trajectory. P1 contains \(3\) folds\(\times4\) models\(\times5\) seeds, or \(60\) derivative-training runs; P1.5 contains \(45\) residual and \(15\) physics-only runs; and P1.6 contains \(30\) constrained and \(30\) unconstrained runs. The five seeds are algorithmic repetitions on the same physical trajectories and quantify optimization variability; they are not five independent physical samples. These pilots compare structural assumptions and expose failure modes but do not replace the planned 96-trajectory data set or full-scale P2 training.
+
+All preceding references to \(N=2\) in the pilot denote the \(N_{\mathrm{diag}}=2\) diagnostic basis, not the formal production order \(n_{\mathrm{main}}\) or a modal-sufficiency conclusion.
 
 \subsubsection{Strict Weak-Form and High-Fidelity References}\label{sec:chnn-4-4-2}
 
@@ -277,7 +283,7 @@ Define the port residual
 
 \begin{equation}
 \label{eq:chnn-4-25}
-\mathcal{L}_{port} = \frac{1}{N}\sum_{i = 1}^{N}\left. \  \parallel {\dot{\mathbf{Z}}}_{i} - \mathbf{J}\nabla{\widehat{H}}_{\lambda} - \mathbf{B}\left( {\widehat{\mathbf{Q}}}_{diss,\mu} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + \mathbf{Q}_{\partial} + {\widehat{\mathbf{r}}}_{\eta} \right) \right.\  \parallel_{2}^{2}.
+\mathcal{L}_{port} = \frac{1}{N}\sum_{i = 1}^{N}\left. \  \parallel {\dot{\mathbf{Z}}}_{i} - \mathbf{J}\nabla{\widehat{H}}_{\lambda} - \mathbf{B}_{port}\left( {\widehat{\mathbf{Q}}}_{diss,\mu}^{bulk} + {\widehat{\mathbf{Q}}}_{contact} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + \mathbf{Q}_{\partial} + {\widehat{\mathbf{r}}}_{\eta} \right) \right.\  \parallel_{2}^{2}.
 \end{equation}
 
 The energy-balance loss is
@@ -334,7 +340,7 @@ H_{\theta}\left( \mathbf{x},\bm{\mu} \right) = H_{phys}\left( \mathbf{x},\bm{\mu
 
 \begin{equation}
 \label{eq:chnn-4-32}
-\dot{\mathbf{x}} = \mathbf{J}\nabla_{\mathbf{x}}H_{\theta} + \mathbf{B}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} + \mathbf{Q}_{contact} + \mathbf{r}_{\eta} \right),\quad\quad\mathbf{B} = \begin{bmatrix}
+\dot{\mathbf{x}} = \mathbf{J}\nabla_{\mathbf{x}}H_{\theta} + \mathbf{B}_{port}\left( \mathbf{Q}_{diss}^{bulk} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} + \mathbf{Q}_{contact} + \mathbf{r}_{\eta} \right),\quad\quad\mathbf{B}_{port} = \begin{bmatrix}
 \mathbf{0} \\
 \mathbf{I}
 \end{bmatrix}.
@@ -344,14 +350,14 @@ The passive dissipation head uses
 
 \begin{equation}
 \label{eq:chnn-4-33}
-\mathbf{Q}_{diss} = - \mathbf{D}_{\theta}\nabla_{\mathbf{p}}H_{\theta},\quad\quad\mathbf{D}_{\theta} = \mathbf{L}_{\theta}\mathbf{L}_{\theta}^{T} \succcurlyeq \mathbf{0},
+\mathbf{Q}_{diss}^{bulk} = - \mathbf{D}_{\theta}\nabla_{\mathbf{p}}H_{\theta},\quad\quad\mathbf{D}_{\theta} = \mathbf{L}_{\theta}\mathbf{L}_{\theta}^{T} \succcurlyeq \mathbf{0},
 \end{equation}
 
 which guarantees at the code-structure level that
 
 \begin{equation}
 \label{eq:chnn-4-34}
-\left( \nabla_{\mathbf{p}}H_{\theta} \right)^{T}\mathbf{Q}_{diss} \leq 0.
+\left( \nabla_{\mathbf{p}}H_{\theta} \right)^{T}\mathbf{Q}_{diss}^{bulk} \leq 0.
 \end{equation}
 
 The implementation corresponds to the theory as follows. The canonical-scaling module first transforms the dimensional pair \(\left(\mathbf{q},\mathbf{p}\right)\) into the nondimensional canonical pair \(\left(\mathbf{Q},\mathbf{P}\right)\) and then constructs the complex coordinates. The complex backbone provides both standard complex-linear layers and widely linear layers of the form \(\mathbf{W}\bm{\xi}+\mathbf{V}\overline{\bm{\xi}}+\mathbf{b}\). The Hamiltonian head outputs only a real scalar and uses the gray-box structure \(H_{phys}+\Delta H_{\theta}\). Dissipation, magnetic input, flow, boundary, contact, and residual error are represented by independent generalized-force heads and enter only the momentum equation through \(\mathbf{B}\). The data interface uses \texttt{representation} to distinguish \(\mathbf{p}_{0} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}}\) from \(\mathbf{p} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - \mathbf{b}_{A}\), uses \texttt{model\_level} to distinguish the Kirchhoff Beam, strict weak-form, and high-fidelity reference models, and uses \texttt{conservative\_mask} to isolate conservative samples accessible to the statistical-learning--KAM analysis. The training pipeline implements the three stages ``conservative Hamiltonian--ports--joint fine-tuning'' and provides a real-valued HNN and a black-box vector-field network as comparison baselines.
@@ -400,6 +406,8 @@ The following statistical-learning statements apply only to the conservative tra
 \label{eq:chnn-4-36}
 {\dot{\mathbf{Z}}}_{i} = \mathbf{J}\nabla H_{\star}\left( \mathbf{Z}_{i} \right).
 \end{equation}
+
+Independence, a full-dimensional phase-space density lower bound, and the uniform regularity conditions are assumptions rather than established facts for the current pilot; the three fixed P1/P1.5/P1.6 trajectories with time-correlated sampling cannot be inserted into this theorem as a generalization guarantee.
 
 Realify all complex parameters of the Hamiltonian head as \(\bm{\vartheta}\in\Theta=\lbrack-B,B\rbrack^{P}\), and denote the learning error by
 
@@ -650,7 +658,7 @@ where
 
 \begin{equation}
 \label{eq:chnn-4-63}
-\boxed{X_{res} = X_{data} - \mathbf{J}\nabla{\widehat{H}}_{\lambda} - \mathbf{B}\left( {\widehat{\mathbf{Q}}}_{diss,\mu} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + \mathbf{Q}_{\partial} \right).}
+\boxed{X_{res} = X_{data} - \mathbf{J}\nabla{\widehat{H}}_{\lambda} - \mathbf{B}_{port}\left( {\widehat{\mathbf{Q}}}_{diss,\mu}^{bulk} + {\widehat{\mathbf{Q}}}_{contact} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + \mathbf{Q}_{\partial} \right).}
 \end{equation}
 
 If any quantity has not yet been constructed or verified numerically, subsequent sections list it only as a condition to be tested rather than as an established conclusion.

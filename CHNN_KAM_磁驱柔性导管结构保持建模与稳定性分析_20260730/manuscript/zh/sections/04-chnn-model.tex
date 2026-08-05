@@ -167,18 +167,22 @@ Coquinot---Morrison 的 metriplectic 框架要求同时给出 Poisson 括号、�
 
 \begin{equation}
 \label{eq:chnn-4-17}
-\boxed{\dot{\mathbf{Z}} = \mathbf{J}\nabla{\widehat{H}}_{\lambda}\left( \mathbf{Z} \right) + \mathbf{B}\left( {\widehat{\mathbf{Q}}}_{diss,\mu} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + {\widehat{\mathbf{Q}}}_{\partial} + {\widehat{\mathbf{r}}}_{\eta} \right),}
+\boxed{\dot{\mathbf{Z}} = \mathbf{J}\nabla{\widehat{H}}_{\lambda}\left( \mathbf{Z} \right) + \mathbf{B}_{port}\left( {\widehat{\mathbf{Q}}}_{diss,\mu}^{bulk} + {\widehat{\mathbf{Q}}}_{contact} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + {\widehat{\mathbf{Q}}}_{\partial} + {\widehat{\mathbf{r}}}_{\eta} \right),}
 \end{equation}
 
 其中
 
 \begin{equation}
 \label{eq:chnn-4-18}
-\mathbf{B} = \begin{bmatrix}
+\mathbf{B}_{port} = \begin{bmatrix}
 \mathbf{0} \\
 \mathbf{I}
 \end{bmatrix}.
 \end{equation}
+
+这里 \(\mathbf{B}_{port}\in\mathbb{R}^{2d\times d}\) 只把物理端口输入 \(\mathbf{u}\in\mathbb{R}^{d}\) 嵌入动量更新通道；全状态端口向量 \(\mathbf{U}_{port}=\mathbf{B}_{port}\mathbf{u}\in\mathbb{R}^{2d}\) 不能与物理输入 \(\mathbf{u}\) 混称。
+
+本文当前不实例化离散控制器或在线自适应律，因此不据这些公式宣称采样控制稳定性。BDF 数据输出间隔 \(\Delta t_{data}\)、未来控制采样周期 \(\Delta t_{ctrl}\) 与 Birkhoff 数值映射步长 \(h_{Birk}\) 是三个独立量，不预设相等。若后续引入自适应扩展，必须同时登记 regressor \(\mathbf{Y}(\mathbf{Z},t)\in\mathbb{R}^{d\times r}\)、参数向量 \(\widehat{\bm{\theta}}\in\mathbb{R}^{r}\)、增益维度、转置或外积约定及参数投影约束；其输出应先形成 \(\mathbf{u}\in\mathbb{R}^{d}\)，再经 \(\mathbf{B}_{port}\mathbf{u}\) 进入动量通道，不能直接注入 \(\dot{\mathbf{Q}}\)。在这些对象和实现尚未给出时，不存在可核验的自适应稳定性结论。
 
 各分支具有不同物理含义。
 
@@ -186,18 +190,18 @@ Coquinot---Morrison 的 metriplectic 框架要求同时给出 Poisson 括号、�
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  \({\widehat{\mathbf{Q}}}_{diss,\mu}\) 只表示对结构机械能功率非正的被动核。对等效黏性子类可取
+  \({\widehat{\mathbf{Q}}}_{diss,\mu}^{bulk}\) 只表示不含接触项且对结构机械能功率非正的体内/拖曳被动核。对等效黏性子类可取
 \end{enumerate}
 
 \begin{equation}
 \label{eq:chnn-4-19}
-{\widehat{\mathbf{Q}}}_{diss,\mu} = - \mathbf{D}_{\mu}\left( \mathbf{Z} \right)\nabla_{\mathbf{P}}{\widehat{H}}_{\lambda},\quad\quad\mathbf{D}_{\mu} = \mathbf{L}_{\mu}\mathbf{L}_{\mu}^{T} \succcurlyeq 0,
+{\widehat{\mathbf{Q}}}_{diss,\mu}^{bulk} = - \mathbf{D}_{\mu}\left( \mathbf{Z} \right)\nabla_{\mathbf{P}}{\widehat{H}}_{\lambda},\quad\quad\mathbf{D}_{\mu} = \mathbf{L}_{\mu}\mathbf{L}_{\mu}^{T} \succcurlyeq 0,
 \end{equation}
 
 \begin{itemize}
 \tightlist
 \item
-  从而 \(\nabla_{\mathbf{P}}{\widehat{H}}_{\lambda}^{T}{\widehat{\mathbf{Q}}}_{diss,\mu} \leq 0\)。接触切换、库仑摩擦和冲击可保留为独立端口，不强求由单一光滑矩阵表示\cite{Zhong2020Dissipative}。
+  从而 \(\nabla_{\mathbf{P}}{\widehat{H}}_{\lambda}^{T}{\widehat{\mathbf{Q}}}_{diss,\mu}^{bulk} \leq 0\)。未计入势能的接触弹性、接触切换、库仑摩擦和冲击统一进入独立的 \({\widehat{\mathbf{Q}}}_{contact}\) 非势接触端口；若接触弹性已计入势能，不得再次计入该端口，接触阻尼和摩擦也不得进入体内耗散头\cite{Zhong2020Dissipative}。
 \end{itemize}
 
 \begin{enumerate}
@@ -235,12 +239,14 @@ COMSOL 主训练模型采用三维 Euler--Bernoulli Beam、几何非线性、动
 
 \begin{equation}
 \label{eq:chnn-4-21}
-\mathcal{D}_{K}^{port} = \left\{ \left( \mathbf{Z}_{i},{\dot{\mathbf{Z}}}_{i},\mathbf{Q}_{diss,i},\mathbf{Q}_{in,i},\mathbf{Q}_{flow,i},\mathbf{Q}_{\partial,i} \right) \right\}.
+\mathcal{D}_{K}^{port} = \left\{ \left( \mathbf{Z}_{i},{\dot{\mathbf{Z}}}_{i},\mathbf{Q}_{diss,i}^{bulk},\mathbf{Q}_{contact,i},\mathbf{Q}_{in,i},\mathbf{Q}_{flow,i},\mathbf{Q}_{\partial,i} \right) \right\}.
 \end{equation}
 
 用于 KAM 概率传递的样本只能来自 \(\mathcal{D}_{K}^{cons}\)，不能把开放端口的总训练损失当作 Hamiltonian 小扰动。
 
 P1 系列 pilot 仅使用固定 \(N=2\) 基下的 mode1、mode2 和 mixed12 三条小轨迹，并按 leave-one-whole-trajectory-out 划分，未从同一轨迹随机抽点跨越训练/测试边界。P1 为 \(3\) folds\(\times4\) models\(\times5\) seeds 共 \(60\) 次导数训练；P1.5 为 \(45\) 次 residual 与 \(15\) 次 physics-only 运行；P1.6 为 \(30\) 次约束与 \(30\) 次非约束运行。这里的五个 seed 是同一物理轨迹上的算法重复，只刻画优化不确定性，不能当作五个独立物理样本。上述 pilot 用于比较结构假设和暴露失败模式，不能替代计划的 96 条轨迹数据集或完整规模 P2 训练。
+
+上述 \(N=2\) 表述均指 \(N_{\mathrm{diag}}=2\) 诊断基，不是正式生产阶数 \(n_{\mathrm{main}}\) 或模态充分性结论。
 
 \subsubsection{严格弱形式和高保真对照}\label{sec:chnn-4-4-2}
 
@@ -277,7 +283,7 @@ P1 系列 pilot 仅使用固定 \(N=2\) 基下的 mode1、mode2 和 mixed12 三�
 
 \begin{equation}
 \label{eq:chnn-4-25}
-\mathcal{L}_{port} = \frac{1}{N}\sum_{i = 1}^{N}\left. \  \parallel {\dot{\mathbf{Z}}}_{i} - \mathbf{J}\nabla{\widehat{H}}_{\lambda} - \mathbf{B}\left( {\widehat{\mathbf{Q}}}_{diss,\mu} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + \mathbf{Q}_{\partial} + {\widehat{\mathbf{r}}}_{\eta} \right) \right.\  \parallel_{2}^{2}.
+\mathcal{L}_{port} = \frac{1}{N}\sum_{i = 1}^{N}\left. \  \parallel {\dot{\mathbf{Z}}}_{i} - \mathbf{J}\nabla{\widehat{H}}_{\lambda} - \mathbf{B}_{port}\left( {\widehat{\mathbf{Q}}}_{diss,\mu}^{bulk} + {\widehat{\mathbf{Q}}}_{contact} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + \mathbf{Q}_{\partial} + {\widehat{\mathbf{r}}}_{\eta} \right) \right.\  \parallel_{2}^{2}.
 \end{equation}
 
 能量平衡损失为
@@ -334,7 +340,7 @@ H_{\theta}\left( \mathbf{x},\bm{\mu} \right) = H_{phys}\left( \mathbf{x},\bm{\mu
 
 \begin{equation}
 \label{eq:chnn-4-32}
-\dot{\mathbf{x}} = \mathbf{J}\nabla_{\mathbf{x}}H_{\theta} + \mathbf{B}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} + \mathbf{Q}_{contact} + \mathbf{r}_{\eta} \right),\quad\quad\mathbf{B} = \begin{bmatrix}
+\dot{\mathbf{x}} = \mathbf{J}\nabla_{\mathbf{x}}H_{\theta} + \mathbf{B}_{port}\left( \mathbf{Q}_{diss}^{bulk} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} + \mathbf{Q}_{contact} + \mathbf{r}_{\eta} \right),\quad\quad\mathbf{B}_{port} = \begin{bmatrix}
 \mathbf{0} \\
 \mathbf{I}
 \end{bmatrix}.
@@ -344,14 +350,14 @@ H_{\theta}\left( \mathbf{x},\bm{\mu} \right) = H_{phys}\left( \mathbf{x},\bm{\mu
 
 \begin{equation}
 \label{eq:chnn-4-33}
-\mathbf{Q}_{diss} = - \mathbf{D}_{\theta}\nabla_{\mathbf{p}}H_{\theta},\quad\quad\mathbf{D}_{\theta} = \mathbf{L}_{\theta}\mathbf{L}_{\theta}^{T} \succcurlyeq \mathbf{0},
+\mathbf{Q}_{diss}^{bulk} = - \mathbf{D}_{\theta}\nabla_{\mathbf{p}}H_{\theta},\quad\quad\mathbf{D}_{\theta} = \mathbf{L}_{\theta}\mathbf{L}_{\theta}^{T} \succcurlyeq \mathbf{0},
 \end{equation}
 
 从而在代码结构层面保证
 
 \begin{equation}
 \label{eq:chnn-4-34}
-\left( \nabla_{\mathbf{p}}H_{\theta} \right)^{T}\mathbf{Q}_{diss} \leq 0.
+\left( \nabla_{\mathbf{p}}H_{\theta} \right)^{T}\mathbf{Q}_{diss}^{bulk} \leq 0.
 \end{equation}
 
 实现层与理论层的对应关系如下：正则尺度模块先把有量纲 \(\left( \mathbf{q},\mathbf{p} \right)\) 变换为无量纲正则对 \(\left( \mathbf{Q},\mathbf{P} \right)\)，再构造复坐标；复值主干同时提供标准复线性层和 \(\mathbf{W}\bm{\xi} + \mathbf{V}\overline{\bm{\xi}} + \mathbf{b}\) 型广义复线性层；Hamiltonian 头只输出实标量，并采用 \(H_{phys} + \Delta H_{\theta}\) 灰箱结构；耗散、磁输入、流场、边界、接触和剩余误差分别由独立广义力头表示，且只通过 \(\mathbf{B}\) 进入动量方程；数据接口用 \texttt{representation} 区分 \(\mathbf{p}_{0} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}}\) 与 \(\mathbf{p} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - \mathbf{b}_{A}\)，用 \texttt{model\_level} 区分 Kirchhoff Beam、严格弱形式和高保真对照模型，并以 \texttt{conservative\_mask} 隔离可供统计学习--KAM 分析读取的保守样本。训练流程实现``保守 Hamiltonian--端口--联合微调''三阶段，同时提供实值 HNN 和黑箱向量场网络作为比较基线。
@@ -400,6 +406,8 @@ H_{cons} = H_{0} + \varepsilon H_{1}.
 \label{eq:chnn-4-36}
 {\dot{\mathbf{Z}}}_{i} = \mathbf{J}\nabla H_{\star}\left( \mathbf{Z}_{i} \right).
 \end{equation}
+
+这里的独立同分布、全维相空间密度下界和统一正则性是假设而非当前 pilot 的已证事实；P1/P1.5/P1.6 的三条固定轨迹和时间相关采样不能直接代入该定理形成泛化保证。
 
 把 Hamiltonian 头的全部复参数实化为 \(\bm{\vartheta} \in \Theta = \lbrack - B,B\rbrack^{P}\)，记学习误差
 
@@ -650,7 +658,7 @@ P_{\widehat{\bm{\vartheta}}} = P_{0} + e_{\widehat{\bm{\vartheta}}}.
 
 \begin{equation}
 \label{eq:chnn-4-63}
-\boxed{X_{res} = X_{data} - \mathbf{J}\nabla{\widehat{H}}_{\lambda} - \mathbf{B}\left( {\widehat{\mathbf{Q}}}_{diss,\mu} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + \mathbf{Q}_{\partial} \right).}
+\boxed{X_{res} = X_{data} - \mathbf{J}\nabla{\widehat{H}}_{\lambda} - \mathbf{B}_{port}\left( {\widehat{\mathbf{Q}}}_{diss,\mu}^{bulk} + {\widehat{\mathbf{Q}}}_{contact} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + \mathbf{Q}_{\partial} \right).}
 \end{equation}
 
 若某一量尚未数值构造或验证，后文只把它列为待检验条件，不写成已经成立的结论。

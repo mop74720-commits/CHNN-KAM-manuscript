@@ -549,7 +549,7 @@ d_{f} = \frac{1}{2}\rho_{f}C_{D}D\, \parallel \mathbf{u}_{r\bot} \parallel \geq 
 \left( \dot{\mathbf{r}} - \mathbf{v}_{f} \right)^{T}\mathbf{f}_{drag} = - d_{f} \parallel \mathbf{P}_{\bot}\left( \dot{\mathbf{r}} - \mathbf{v}_{f} \right) \parallel^{2} \leq 0,
 \end{equation}
 
-但该恒等式不能替代结构机械能中的端口分账。因此，在 \(\mathbf{v}_{f} \neq \mathbf{0}\) 时不得把完整二次拖曳整体归入 \(\mathbf{Q}_{diss}\)。由于 \(d_{f}\) 依赖相对速度，上述被动核是逐状态半正定的非线性算子，而不是常阻尼矩阵。
+但该恒等式不能替代结构机械能中的端口分账。因此，在 \(\mathbf{v}_{f} \neq \mathbf{0}\) 时不得把完整二次拖曳整体归入 \(\mathbf{Q}_{diss}^{bulk}\)。由于 \(d_{f}\) 依赖相对速度，上述被动核是逐状态半正定的非线性算子，而不是常阻尼矩阵。
 
 若需要考虑流体对截面自转的阻尼，可另外引入单位参考长度流体力矩，例如
 
@@ -884,10 +884,10 @@ P_{\partial} = \left\lbrack \mathbf{n} \cdot \dot{\mathbf{r}} + \mathbf{m} \cdot
 
 \begin{equation}
 \label{eq:rod-1-105}
-\boxed{\frac{dE}{dt} = P_{\partial} + P_{diss} + P_{in} + P_{flow} + \frac{\partial V_{ext}}{\partial t}.}
+\boxed{\frac{dE}{dt} = P_{\partial} + P_{diss}^{bulk} + P_{contact} + P_{in} + P_{flow} + \frac{\partial V_{ext}}{\partial t}.}
 \end{equation}
 
-其中 \(P_{diss}\) 只包含已经完成输入--耗散拆分的被动部分，包括 \(P_{drag,diss}\)、固定壁条件下的接触法向阻尼与摩擦以及所保留的自转阻尼，并满足 \(P_{diss} \leq 0\)。\(P_{flow}\) 收纳背景流拖曳功率 \(P_{drag,flow}\)、Froude--Krylov 输入以及按所选表示进入端口的反应性流场功率，因而一般不定号；\(P_{in}\) 仅包含非流体的非保守体输入和控制输入。端部驱动只通过 \(P_{\partial}\) 计入。若非自治磁作用已经写成 \(V_{mag}\left( \mathbf{r},\mathbf{R},t \right)\)，其显式时间功率只通过 \(\partial V_{ext}/\partial t\) 计入，不得再次并入 \(P_{in}\)。只有在 \(P_{diss} = P_{in} = P_{flow} = P_{\partial} = 0\) 且势能不显含时间时，扩展机械能才守恒。
+其中 \(P_{diss}^{bulk}\) 只包含已经完成输入--耗散拆分的体内/拖曳被动部分，不包含任何接触项，并满足 \(P_{diss}^{bulk} \leq 0\)。\(P_{contact}\) 是未计入势能的接触弹性、法向接触阻尼、切向摩擦、冲击及自转接触力矩的唯一非势接触端口功率；若接触弹性已经写入势能，则不得再次放入 \(P_{contact}\)，而接触阻尼、摩擦和冲击不得同时出现在 \(P_{diss}^{bulk}\)。\(P_{flow}\) 收纳背景流拖曳功率 \(P_{drag,flow}\)、Froude--Krylov 输入以及按所选表示进入端口的反应性流场功率，因而一般不定号；\(P_{in}\) 仅包含非流体的非保守体输入和控制输入。端部驱动只通过 \(P_{\partial}\) 计入。若非自治磁作用已经写成 \(V_{mag}\left( \mathbf{r},\mathbf{R},t \right)\)，其显式时间功率只通过 \(\partial V_{ext}/\partial t\) 计入，不得再次并入 \(P_{in}\)。只有在 \(P_{diss}^{bulk}=P_{contact}=P_{in}=P_{flow}=P_{\partial}=0\) 且势能不显含时间时，扩展机械能才守恒。
 
 \subsection{本章小结}\label{sec:rod-1-8}
 

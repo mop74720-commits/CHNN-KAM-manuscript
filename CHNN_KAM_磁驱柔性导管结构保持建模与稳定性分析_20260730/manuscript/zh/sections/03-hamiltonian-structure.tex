@@ -121,14 +121,17 @@ V_{cons}\left( \mathbf{q};\bar{\bm{\lambda}} \right): = V_{h}\left( \mathbf{q},t
 
 \begin{equation}
 \label{eq:hamiltonian-canonical-data-contract}
-\boxed{
-q_N=\Pi_{\mathrm{conf},N}(U),\qquad
-p_N=B_N(q_N)^{T}P_{\mathrm{full}},\qquad
-\dot q_N=M_N(q_N)^{-1}p_N,\qquad
-\dot p_N=B_N(q_N)^{T}L.}
+\boxed{\begin{aligned}
+q_N&=\Pi_{\mathrm{conf},N}(U),&
+p_N&=B_N(q_N)^{T}P_{\mathrm{full}},\\
+\dot q_N&=M_N(q_N)^{-1}p_N,&
+\dot p_N&=\dot B_N(q_N)^{T}P_{\mathrm{full}}+B_N(q_N)^{T}\dot P_{\mathrm{full}}.
+\end{aligned}}
 \end{equation}
 
-这里 \(B_N(q_N)\) 是固定平移---\(SO(3)\) 基在当前构形的切向提升，\(P_{\mathrm{full}}\) 与 \(L\) 分别是同一 solver step 的全阶动量和未行缩放载荷，\(M_N=B_N^{T}EB_N\)。量 \(p_{\mathrm{mass}}=M_N\dot q_{\mathrm{native}}\) 仅作为诊断量；只有全阶速度位于固定切空间且时间存储与投影一致时，它才可与 \(B_N^{T}P_{\mathrm{full}}\) 等同。离线比较显示，projected-momentum closure 优于 mass diagnostic；求解器输出语义和三层时间步分析进一步支持\Cref{eq:hamiltonian-canonical-data-contract}所采用的余切投影定义。
+这里 \(B_N(q_N)\) 是固定平移---\(SO(3)\) 基在当前构形的切向提升，\(P_{\mathrm{full}}\) 是全阶动量，且 \(M_N=B_N^{T}EB_N\)。若另行定义 \(L_{\mathrm{full}}:=\dot P_{\mathrm{full}}\)，并已在实现中显式处理 \(\dot B_N^{T}P_{\mathrm{full}}\)，才可将最后一式简写为 \(\dot p_N=\dot B_N^{T}P_{\mathrm{full}}+B_N^{T}L_{\mathrm{full}}\)；不能将其一般地写成 \(B_N^{T}L\)。量 \(p_{\mathrm{mass}}=M_N\dot q_{\mathrm{native}}\) 仅作为诊断量；只有全阶速度位于固定切空间且时间存储与投影一致时，它才可与 \(B_N^{T}P_{\mathrm{full}}\) 等同。当前交付物没有提供 \(U,B_N,E,P_{\mathrm{full}}\) 或输运项实现的可复核源码和原始数组，因此既有 canonical 数值和 force-v2/G3 资格只能保留为待重算的历史结果，不能据此宣称合同已通过。
+
+为固定全文符号，磁感应强度在涉及磁场时记为 \(\mathbf{B}_{mag}\)，端口嵌入统一记为矩阵族 \(\mathbf{B}_{port}^{(r)}=[\mathbf{0};\mathbf{I}_{r}]\in\mathbb{R}^{2r\times r}\)，而复值线性层中的 \(\mathbf{B}\) 仅保留在线性代数局部上下文；在不致混淆时省略上标 \((r)\)。\(\mathbf{J}\) 专用于辛矩阵，截面惯量或扭转常数不得复用该符号；导管长度记为 \(L_{cat}\)，载荷率记为 \(L_{full}=\dot P_{full}\)。在维度上，\(\mathbf{q}\in\mathbb{R}^{n}\) 是全配置坐标，\(\mathbf{Z}=[\mathbf{Q};\mathbf{P}]\in\mathbb{R}^{2d}\) 是约化 CHNN 状态，\(\mathbf{B}_{N}\in\mathbb{R}^{m_f\times N_{\mathrm{diag}}}\)，\(\mathbf{E}\in\mathbb{R}^{m_f\times m_f}\)，\(\mathbf{M}_{N}=\mathbf{B}_{N}^{T}\mathbf{E}\mathbf{B}_{N}\in\mathbb{R}^{N_{\mathrm{diag}}\times N_{\mathrm{diag}}}\)。其中 \(N_{\mathrm{diag}}=2\) 只是诊断阶数，正式生产阶数仍记为尚未确定的 \(n_{\mathrm{main}}\)；全阶端口取 \(r=n\)，约化 CHNN 端口取 \(r=d\)。物理控制量 \(\mathbf{u}\in\mathbb{R}^{d}\) 与全状态嵌入 \(\mathbf{U}_{port}=\mathbf{B}_{port}^{(d)}\mathbf{u}\in\mathbb{R}^{2d}\) 不同。
 
 \subsubsection{Hamiltonian 的构造}\label{sec:hamiltonian-3-2-4}
 
@@ -301,7 +304,7 @@ V_{int,h}\left( \mathbf{q}_{*} + \bm{\eta} \right) \approx V_{int,h}\left( \math
 
 \begin{equation}
 \label{eq:hamiltonian-3-32}
-\boxed{\mathbf{Q}_{port} = \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial}.}
+\boxed{\mathbf{Q}_{port} = \mathbf{Q}_{diss}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial}.}
 \end{equation}
 
 其中：
@@ -309,7 +312,9 @@ V_{int,h}\left( \mathbf{q}_{*} + \bm{\eta} \right) \approx V_{int,h}\left( \math
 \begin{itemize}
 \tightlist
 \item
-  \(\mathbf{Q}_{diss}\) 只包含对结构机械能具有非正功率的被动核；
+  \(\mathbf{Q}_{diss}^{bulk}\) 只包含对结构机械能具有非正功率的体内/拖曳被动核，且不含接触项；
+\item
+  \(\mathbf{Q}_{contact}\) 只包含未进入势能的接触弹性及接触阻尼、摩擦、冲击和接触力矩；
 \item
   \(\mathbf{Q}_{in}\) 包含未进入势能的磁控制、驱动和其他非流体输入；
 \item
@@ -385,7 +390,7 @@ V_{int,h}\left( \mathbf{q}_{*} + \bm{\eta} \right) \approx V_{int,h}\left( \math
 
 \begin{equation}
 \label{eq:hamiltonian-3-40}
-\mathbf{B} = \begin{bmatrix}
+\mathbf{B}_{port} = \begin{bmatrix}
 \mathbf{0} \\
 \mathbf{I}
 \end{bmatrix},
@@ -395,7 +400,7 @@ V_{int,h}\left( \mathbf{q}_{*} + \bm{\eta} \right) \approx V_{int,h}\left( \math
 
 \begin{equation}
 \label{eq:hamiltonian-3-41}
-\boxed{{\dot{\mathbf{z}}}_{0} = \mathbf{J}\nabla_{\mathbf{z}_{0}}H_{cons} + \mathbf{B}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} \right).}
+\boxed{{\dot{\mathbf{z}}}_{0} = \mathbf{J}\nabla_{\mathbf{z}_{0}}H_{cons} + \mathbf{B}_{port}\left( \mathbf{Q}_{diss}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} \right).}
 \end{equation}
 
 因此，该系统属于受迫---耗散 Hamilton 系统，也可视为具有正则 Hamilton 骨架的开放系统。仅当所有端口关闭且 Hamiltonian 自治时，系统才退化为经典闭合保守 Hamilton 系统。若需将耗散环境纳入闭合 Hamilton 描述，则应额外引入储能环境或热浴自由度，而这些自由度不属于\Cref{sec:rod-model,sec:galerkin-discretization}所建立的有限维变量集合。
@@ -505,7 +510,7 @@ Legendre 变换给出
 
 \begin{equation}
 \label{eq:hamiltonian-3-54}
-\boxed{\dot{\mathbf{z}} = \mathbf{J}\nabla_{\mathbf{z}}H\left( \mathbf{z},t \right) + \mathbf{B}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{H} + \mathbf{Q}_{\partial} \right).}
+\boxed{\dot{\mathbf{z}} = \mathbf{J}\nabla_{\mathbf{z}}H\left( \mathbf{z},t \right) + \mathbf{B}_{port}\left( \mathbf{Q}_{diss}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{H} + \mathbf{Q}_{\partial} \right).}
 \end{equation}
 
 在精确表示中，\(\mathbf{g}_{f}\) 已包含于 Hamiltonian，\(\mathbf{Q}_{flow}^{H}\) 不再附加 \(- \mathbf{g}_{f}\)。
@@ -546,14 +551,14 @@ H_{sk}\left( \mathbf{q},\mathbf{p}_{0},t \right) = \frac{1}{2}\mathbf{p}_{0}^{T}
 
 \begin{equation}
 \label{eq:hamiltonian-3-59}
-\boxed{\frac{dH}{dt} = \frac{\partial H}{\partial t} + {\dot{\mathbf{q}}}^{T}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{H} + \mathbf{Q}_{\partial} \right).}
+\boxed{\frac{dH}{dt} = \frac{\partial H}{\partial t} + {\dot{\mathbf{q}}}^{T}\left( \mathbf{Q}_{diss}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{H} + \mathbf{Q}_{\partial} \right).}
 \end{equation}
 
 骨架---端口表示满足
 
 \begin{equation}
 \label{eq:hamiltonian-3-60}
-\boxed{\frac{dH_{sk}}{dt} = \partial_{t}V_{h} + {\dot{\mathbf{q}}}^{T}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{sk} + \mathbf{Q}_{\partial} \right).}
+\boxed{\frac{dH_{sk}}{dt} = \partial_{t}V_{h} + {\dot{\mathbf{q}}}^{T}\left( \mathbf{Q}_{diss}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{sk} + \mathbf{Q}_{\partial} \right).}
 \end{equation}
 
 上述两式分别给出非自治势能、规定流场及多端口作用下的能量变化率，并在相应变量表示中保持动力学等价性。
@@ -595,6 +600,7 @@ H_{sk}\left( \mathbf{q},\mathbf{p}_{0},t \right) = \frac{1}{2}\mathbf{p}_{0}^{T}
 \end{equation}
 
 并在 \(\mathbf{M}_{r} \succ 0\) 时构造约化 Hamiltonian。自治骨架中的约化动量为 \(\mathbf{p}_{r} = \mathbf{M}_{r}\dot{\mathbf{y}}\)；若约化后的规定流场仍产生速度线性项，则应改为 \(\mathbf{p}_{r} = \mathbf{M}_{r}\dot{\mathbf{y}} - \mathbf{b}_{A,r}\)。\Cref{sec:chnn-model,sec:symplectic-kam}只使用该独立坐标正则系统，不能把含乘子 \(\bm{\lambda}_{c}\) 的微分---代数方程直接当作全空间标准 Hamilton 系统。
+当前交付物没有给出实际约束 Jacobian 的秩、约束残差、独立坐标实例化或证明固定 \(N_{\mathrm{diag}}=2\) pilot 属于该正则对象的数值记录。因此本段是理论构造和适用条件，而不是对 pilot 数据已满足正则约化假设的数值认证。
 
 有限剪切刚度 Cosserat 常微分方程保留为 COMSOL 对照、数值正则化和约束收敛验证分支。只有当剪切应变、轨迹、能量和主要频率随剪切刚度增大收敛到 Kirchhoff 结果时，该正则化分支的数据才可替代局部约化数据进入 CHNN 训练。由此既保留完整母模型的优点，也使主计算对象与原始 Kirchhoff 研究意图一致。
 
@@ -665,17 +671,17 @@ V_{drv} = 0,\quad\quad H_{sk} = H_{cons},\quad\quad\partial_{t}H_{sk} = 0,
 
 \begin{equation}
 \label{eq:hamiltonian-3-72}
-\boxed{{\dot{\mathbf{z}}}_{0} = \mathbf{J}\nabla_{\mathbf{z}_{0}}H_{cons} + \mathbf{B}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{sk} + \mathbf{Q}_{\partial} \right).}
+\boxed{{\dot{\mathbf{z}}}_{0} = \mathbf{J}\nabla_{\mathbf{z}_{0}}H_{cons} + \mathbf{B}_{port}\left( \mathbf{Q}_{diss}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{sk} + \mathbf{Q}_{\partial} \right).}
 \end{equation}
 
 \Cref{sec:chnn-model}应分别参数化或监督各端口，而不是让一个无结构残差同时吸收全部物理作用：
 
 \begin{equation}
 \label{eq:hamiltonian-3-73}
-\mathbf{Q}_{port,\theta} = \mathbf{Q}_{diss,\mu} + \mathbf{Q}_{in,\nu} + \mathbf{Q}_{flow,\kappa} + \mathbf{Q}_{\partial} + \mathbf{r}_{\eta}.
+\mathbf{Q}_{port,\theta} = \mathbf{Q}_{diss,\mu}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in,\nu} + \mathbf{Q}_{flow,\kappa} + \mathbf{Q}_{\partial} + \mathbf{r}_{\eta}.
 \end{equation}
 
-其中 \(\mathbf{Q}_{diss,\mu}\) 只承担功率非正的被动核；磁控制、背景流输入和边界驱动保持独立端口；\(\mathbf{r}_{\eta}\) 只承担在已知模型和端口扣除后仍存在的剩余误差。这一分层与耗散 SymODEN 和 port-Hamiltonian 神经网络的结构化建模原则一致\cite{Zhong2020Dissipative,Desai2021PHNN}。
+其中 \(\mathbf{Q}_{diss,\mu}^{bulk}\) 只承担功率非正且不含接触项的体内/拖曳被动核；\(\mathbf{Q}_{contact}\) 单列接触端口；磁控制、背景流输入和边界驱动保持独立端口；\(\mathbf{r}_{\eta}\) 只承担在已知模型和端口扣除后仍存在的剩余误差。这一分层与耗散 SymODEN 和 port-Hamiltonian 神经网络的结构化建模原则一致\cite{Zhong2020Dissipative,Desai2021PHNN}。
 
 若采用非冻结或脉动工况，\(H_{sk} = H_{cons} + V_{drv}\)。此时以下两种表示互斥：
 
@@ -692,12 +698,12 @@ V_{drv} = 0,\quad\quad H_{sk} = H_{cons},\quad\quad\partial_{t}H_{sk} = 0,
 
 \begin{equation}
 \label{eq:hamiltonian-3-74}
-\mathcal{D}_{sk} = \left( \mathbf{Q},\mathbf{P},\bm{\xi},{\dot{\mathbf{z}}}_{0},{\widehat{H}}_{cons},\nabla{\widehat{H}}_{cons},\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{sk},\mathbf{Q}_{\partial} \right),
+\mathcal{D}_{sk} = \left( \mathbf{Q},\mathbf{P},\bm{\xi},{\dot{\mathbf{z}}}_{0},{\widehat{H}}_{cons},\nabla{\widehat{H}}_{cons},\mathbf{Q}_{diss}^{bulk},\mathbf{Q}_{contact},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{sk},\mathbf{Q}_{\partial} \right),
 \end{equation}
 
 \begin{equation}
 \label{eq:hamiltonian-3-75}
-\mathcal{D}_{na} = \left( \mathbf{z},\dot{\mathbf{z}},t,H,\nabla H,\partial_{t}H,\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{H},\mathbf{Q}_{\partial} \right).
+\mathcal{D}_{na} = \left( \mathbf{z},\dot{\mathbf{z}},t,H,\nabla H,\partial_{t}H,\mathbf{Q}_{diss}^{bulk},\mathbf{Q}_{contact},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{H},\mathbf{Q}_{\partial} \right).
 \end{equation}
 
 统计学习---KAM 接口优先使用导数监督的自治保守样本，不把轨迹损失、耗散损失和正则项的总和直接解释为 KAM 扰动大小\cite{Chen2022KAMSLT}。
@@ -850,10 +856,10 @@ Z_{4}\left( \mathbf{I} \right) = \frac{1}{2}\mathbf{I}^{T}\mathbf{A}\mathbf{I},
 
 \begin{equation}
 \label{eq:hamiltonian-3-94}
-F_{h} = \Phi_{h}^{cons}.
+F_{h}^{cons}\neq\Phi_{h}^{cons}\ \text{一般成立},\qquad \delta_{alg}:=\lVert F_{h}^{cons}-\Phi_{h}^{cons}\rVert.
 \end{equation}
 
-\Cref{sec:symplectic-kam}首先验证 \(F_{h}\) 是否为精确辛映射，再使用 Shang 的辛映射／辛算法 KAM 条件和 Haro 等人的参数化方法\cite{FengQin2010,Shang1999KAMAlgorithms,Shang2000KAMMappings,Haro2016Parameterization}。环面嵌入 \(K:\mathbb{T}^{d} \rightarrow \mathcal{M}\) 满足\cite{Haro2016Parameterization}
+这里将后续记号 \(F_h\) 约定为实际数值保守映射 \(F_h^{cons}\)；\(\Phi_h^{cons}\) 仍表示连续 Hamiltonian 的精确流，\(\delta_{alg}\) 是两者之间的算法误差，不能把一般积分器写成精确流。\Cref{sec:symplectic-kam}首先验证 \(F_{h}\) 是否为精确辛映射，再使用 Shang 的辛映射／辛算法 KAM 条件和 Haro 等人的参数化方法\cite{FengQin2010,Shang1999KAMAlgorithms,Shang2000KAMMappings,Haro2016Parameterization}。环面嵌入 \(K:\mathbb{T}^{d} \rightarrow \mathcal{M}\) 满足\cite{Haro2016Parameterization}
 
 \begin{equation}
 \label{eq:hamiltonian-3-95}
@@ -871,7 +877,7 @@ E_{N}\left( \bm{\theta} \right) = F_{h}\left( K_{N}\left( \bm{\theta} \right) \r
 
 \begin{equation}
 \label{eq:hamiltonian-3-97}
-\boxed{X_{res} = X_{data} - \mathbf{J}\nabla H_{\lambda} - \mathbf{B}\left( \mathbf{Q}_{diss,\mu} + \mathbf{Q}_{in,\nu} + \mathbf{Q}_{flow,\kappa} + \mathbf{Q}_{\partial} \right).}
+\boxed{X_{res} = X_{data} - \mathbf{J}\nabla H_{\lambda} - \mathbf{B}_{port}\left( \mathbf{Q}_{diss,\mu}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in,\nu} + \mathbf{Q}_{flow,\kappa} + \mathbf{Q}_{\partial} \right).}
 \end{equation}
 
 这里的``Birkhoff 系统自伴表示''与\Cref{sec:hamiltonian-3-7-3}用于构造 \(H_{0}\) 的``Hamiltonian Birkhoff 正规形''是两个不同概念：前者是一般一阶系统的变分自伴与 \(K\left( \mathbf{z},t \right)\)-辛结构，后者是近椭圆平衡点的 Hamiltonian 正规形。\Cref{sec:symplectic-kam}只对 \(X_{res}\) 检验是否存在正则、自伴 Birkhoff 系统表示。若闭合条件、时间相容条件或非退化条件不满足，则 \(X_{res}\) 保持为一般残差，不能把完整开放系统称为严格 \(K\left( \mathbf{z},t \right)\)-辛系统。显含时间本身也不必然导致非标准辛结构：在正确正则变量和扩展相空间中，精确非自治 Hamiltonian 分支仍应优先按标准辛理论处理。\cite{HairerLubichWanner2006GNI,FengQin2010}
@@ -896,14 +902,14 @@ E_{N}\left( \bm{\theta} \right) = F_{h}\left( K_{N}\left( \bm{\theta} \right) \r
 
 \begin{equation}
 \label{eq:hamiltonian-3-100}
-\nabla_{\mathbf{P}}{\widehat{H}}^{T}\Delta\mathbf{Q}_{HF}^{diss} \leq 0,
+\nabla_{\mathbf{P}}{\widehat{H}}^{T}\Delta\mathbf{Q}_{HF}^{diss,bulk} \leq 0,
 \end{equation}
 
-则可进入耗散修正头。其余不满足闭合性、功率符号或光滑性条件的部分保留为一般模型残差 \(\mathbf{r}_{HF}\)。因此
+则可进入体内/拖曳耗散修正头；接触模型差异单列为 \(\Delta\mathbf{Q}_{HF}^{contact}\)，不得并入该耗散头。其余不满足闭合性、功率符号或光滑性条件的部分保留为一般模型残差 \(\mathbf{r}_{HF}\)。因此
 
 \begin{equation}
 \label{eq:hamiltonian-3-101}
-\boxed{\Delta X_{HF} = \mathbf{J}\nabla\Delta H_{HF} + \mathbf{B}\Delta\mathbf{Q}_{HF}^{diss} + \mathbf{B}\Delta\mathbf{Q}_{HF}^{port} + \mathbf{r}_{HF}.}
+\boxed{\Delta X_{HF} = \mathbf{J}\nabla\Delta H_{HF} + \mathbf{B}_{port}\Delta\mathbf{Q}_{HF}^{diss,bulk} + \mathbf{B}_{port}\Delta\mathbf{Q}_{HF}^{contact} + \mathbf{B}_{port}\Delta\mathbf{Q}_{HF}^{port} + \mathbf{r}_{HF}.}
 \end{equation}
 
 以上分解是待辨识、待验证的结构投影，不是对任意高保真差异自动成立的恒等式。用于 KAM 的模型误差只取保守闭合分量及其在统一函数范数中的界；剪切耗散、接触切换和局部实体效应不得未经证明并入 \(H_{1}\)。
@@ -914,7 +920,10 @@ E_{N}\left( \bm{\theta} \right) = F_{h}\left( K_{N}\left( \bm{\theta} \right) \r
 
 \begin{equation}
 \label{eq:hamiltonian-3-102}
-\mathcal{I}_{CHNN} = \left( \mathbf{Q},\mathbf{P},\bm{\xi},{\widehat{H}}_{phys},\nabla{\widehat{H}}_{phys},\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow},\mathbf{Q}_{\partial},model\_ level,representation \right),
+\begin{aligned}
+\mathcal{I}_{CHNN}={}&\bigl(\mathbf{Q},\mathbf{P},\bm{\xi},{\widehat{H}}_{phys},\nabla{\widehat{H}}_{phys},\mathbf{Q}_{diss}^{bulk},\mathbf{Q}_{contact},\\
+&\mathbf{Q}_{in},\mathbf{Q}_{flow},\mathbf{Q}_{\partial},model\_ level,representation\bigr),
+\end{aligned}
 \end{equation}
 
 \begin{equation}
@@ -942,7 +951,7 @@ E_{N}\left( \bm{\theta} \right) = F_{h}\left( K_{N}\left( \bm{\theta} \right) \r
 
 \begin{equation}
 \label{eq:hamiltonian-3-106}
-\boxed{{\dot{\mathbf{z}}}_{0} = \mathbf{J}\nabla H_{cons} + \mathbf{B}\mathbf{Q}_{port},\quad\quad\frac{dH_{cons}}{dt} = {\dot{\mathbf{q}}}^{T}\mathbf{Q}_{port}.}
+\boxed{{\dot{\mathbf{z}}}_{0} = \mathbf{J}\nabla H_{cons} + \mathbf{B}_{port}\mathbf{Q}_{port},\quad\quad\frac{dH_{cons}}{dt} = {\dot{\mathbf{q}}}^{T}\mathbf{Q}_{port}.}
 \end{equation}
 
 构形相关质量矩阵在 Hamilton 动量方程中的贡献与\Cref{sec:galerkin-discretization}的几何惯性向量 \(\mathbf{g}_{M}\) 等价。非线性保守势能可表示为恢复力的路径无关线积分；在等效黏性阻尼条件下，能量变化率相应化为外部输入功率与耗散功率之和。

@@ -121,14 +121,17 @@ For the fixed \(N\)-dimensional reduced manifold \(\mathcal{Q}_{N}\), the config
 
 \begin{equation}
 \label{eq:hamiltonian-canonical-data-contract}
-\boxed{
-q_N=\Pi_{\mathrm{conf},N}(U),\qquad
-p_N=B_N(q_N)^{T}P_{\mathrm{full}},\qquad
-\dot q_N=M_N(q_N)^{-1}p_N,\qquad
-\dot p_N=B_N(q_N)^{T}L.}
+\boxed{\begin{aligned}
+q_N&=\Pi_{\mathrm{conf},N}(U),&
+p_N&=B_N(q_N)^{T}P_{\mathrm{full}},\\
+\dot q_N&=M_N(q_N)^{-1}p_N,&
+\dot p_N&=\dot B_N(q_N)^{T}P_{\mathrm{full}}+B_N(q_N)^{T}\dot P_{\mathrm{full}}.
+\end{aligned}}
 \end{equation}
 
-Here, \(B_N(q_N)\) is the current-configuration tangent lift of the fixed translational--\(SO(3)\) basis; \(P_{\mathrm{full}}\) and \(L\) are, respectively, the full-order momentum and the unscaled load at the same solver step; and \(M_N=B_N^{T}EB_N\). The quantity \(p_{\mathrm{mass}}=M_N\dot q_{\mathrm{native}}\) is used only as a diagnostic. It equals \(B_N^{T}P_{\mathrm{full}}\) only when the full-order velocity lies in the fixed tangent space and the temporal storage and projection are consistent. Offline comparison shows better closure for the projected momentum than for the mass diagnostic, while the solver-output semantics and three-level time-step analysis further support the cotangent projection used in \Cref{eq:hamiltonian-canonical-data-contract}.
+Here, \(B_N(q_N)\) is the current-configuration tangent lift of the fixed translational--\(SO(3)\) basis, \(P_{\mathrm{full}}\) is the full-order momentum, and \(M_N=B_N^{T}EB_N\). If \(L_{\mathrm{full}}:=\dot P_{\mathrm{full}}\) is defined separately and the implementation explicitly accounts for \(\dot B_N^{T}P_{\mathrm{full}}\), the last equation may be written as \(\dot p_N=\dot B_N^{T}P_{\mathrm{full}}+B_N^{T}L_{\mathrm{full}}\); it cannot in general be reduced to \(B_N^{T}L\). The quantity \(p_{\mathrm{mass}}=M_N\dot q_{\mathrm{native}}\) is used only as a diagnostic. It equals \(B_N^{T}P_{\mathrm{full}}\) only when the full-order velocity lies in the fixed tangent space and the temporal storage and projection are consistent. The current delivery contains no auditable implementation or raw arrays for \(U,B_N,E,P_{\mathrm{full}}\), or the transport term. The existing canonical, force-v2, and G3 numbers therefore remain historical values pending recomputation and do not qualify the contract.
+
+To register notation unambiguously, the magnetic induction is denoted \(\mathbf{B}_{mag}\) whenever the magnetic field is meant, while port embedding is denoted by the matrix family \(\mathbf{B}_{port}^{(r)}=[\mathbf{0};\mathbf{I}_{r}]\in\mathbb{R}^{2r\times r}\); \(\mathbf{B}\) in a complex-valued linear layer is local to that algebraic context, and the superscript \((r)\) is omitted when unambiguous. \(\mathbf{J}\) is reserved for the symplectic matrix, and section inertia or torsional constants use separate names. The catheter length is \(L_{cat}\), and the load-rate notation is \(L_{full}=\dot P_{full}\). In dimensions, \(\mathbf{q}\in\mathbb{R}^{n}\) is the full configuration coordinate, \(\mathbf{Z}=[\mathbf{Q};\mathbf{P}]\in\mathbb{R}^{2d}\) is the reduced CHNN state, \(\mathbf{B}_{N}\in\mathbb{R}^{m_f\times N_{\mathrm{diag}}}\), \(\mathbf{E}\in\mathbb{R}^{m_f\times m_f}\), and \(\mathbf{M}_{N}=\mathbf{B}_{N}^{T}\mathbf{E}\mathbf{B}_{N}\in\mathbb{R}^{N_{\mathrm{diag}}\times N_{\mathrm{diag}}}\). Here \(N_{\mathrm{diag}}=2\) is diagnostic only; the formal production order remains the undetermined \(n_{\mathrm{main}}\). The full-order port uses \(r=n\), whereas the reduced CHNN port uses \(r=d\). The physical control \(\mathbf{u}\in\mathbb{R}^{d}\) differs from the full-state embedding \(\mathbf{U}_{port}=\mathbf{B}_{port}^{(d)}\mathbf{u}\in\mathbb{R}^{2d}\).
 
 \subsubsection{Construction of the Hamiltonian}\label{sec:hamiltonian-3-2-4}
 
@@ -301,7 +304,7 @@ Following the mutually exclusive power accounting established in \Cref{sec:rod-m
 
 \begin{equation}
 \label{eq:hamiltonian-3-32}
-\boxed{\mathbf{Q}_{port} = \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial}.}
+\boxed{\mathbf{Q}_{port} = \mathbf{Q}_{diss}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial}.}
 \end{equation}
 
 where:
@@ -309,7 +312,9 @@ where:
 \begin{itemize}
 \tightlist
 \item
-  \(\mathbf{Q}_{diss}\) contains only passive components whose power with respect to the structural mechanical energy is nonpositive;
+  \(\mathbf{Q}_{diss}^{bulk}\) contains only passive bulk/drag components whose power with respect to the structural mechanical energy is nonpositive and excludes contact;
+\item
+  \(\mathbf{Q}_{contact}\) contains only elastic contact not represented in the potential together with contact damping, friction, impact, and contact couples;
 \item
   \(\mathbf{Q}_{in}\) contains magnetic control, actuation, and other nonfluid inputs that have not been included in the potential;
 \item
@@ -385,7 +390,7 @@ Define
 
 \begin{equation}
 \label{eq:hamiltonian-3-40}
-\mathbf{B} = \begin{bmatrix}
+\mathbf{B}_{port} = \begin{bmatrix}
 \mathbf{0} \\
 \mathbf{I}
 \end{bmatrix},
@@ -395,7 +400,7 @@ The complete forced--dissipative system on the autonomous backbone is then
 
 \begin{equation}
 \label{eq:hamiltonian-3-41}
-\boxed{{\dot{\mathbf{z}}}_{0} = \mathbf{J}\nabla_{\mathbf{z}_{0}}H_{cons} + \mathbf{B}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} \right).}
+\boxed{{\dot{\mathbf{z}}}_{0} = \mathbf{J}\nabla_{\mathbf{z}_{0}}H_{cons} + \mathbf{B}_{port}\left( \mathbf{Q}_{diss}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} \right).}
 \end{equation}
 
 The system is therefore a forced--dissipative Hamiltonian system, or equivalently an open system with a canonical Hamiltonian backbone. It reduces to a classical closed conservative Hamiltonian system only when every port is closed and the Hamiltonian is autonomous. A closed Hamiltonian representation of the dissipative environment would require additional energy-storage or heat-bath degrees of freedom, which are not part of the finite-dimensional variable set constructed in \Cref{sec:rod-model,sec:galerkin-discretization}.
@@ -505,7 +510,7 @@ The complete forced system is
 
 \begin{equation}
 \label{eq:hamiltonian-3-54}
-\boxed{\dot{\mathbf{z}} = \mathbf{J}\nabla_{\mathbf{z}}H\left( \mathbf{z},t \right) + \mathbf{B}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{H} + \mathbf{Q}_{\partial} \right).}
+\boxed{\dot{\mathbf{z}} = \mathbf{J}\nabla_{\mathbf{z}}H\left( \mathbf{z},t \right) + \mathbf{B}_{port}\left( \mathbf{Q}_{diss}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{H} + \mathbf{Q}_{\partial} \right).}
 \end{equation}
 
 In the exact representation, \(\mathbf{g}_{f}\) is already contained in the Hamiltonian, so \(\mathbf{Q}_{flow}^{H}\) does not include an additional \(- \mathbf{g}_{f}\).
@@ -546,14 +551,14 @@ The exact representation satisfies
 
 \begin{equation}
 \label{eq:hamiltonian-3-59}
-\boxed{\frac{dH}{dt} = \frac{\partial H}{\partial t} + {\dot{\mathbf{q}}}^{T}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{H} + \mathbf{Q}_{\partial} \right).}
+\boxed{\frac{dH}{dt} = \frac{\partial H}{\partial t} + {\dot{\mathbf{q}}}^{T}\left( \mathbf{Q}_{diss}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{H} + \mathbf{Q}_{\partial} \right).}
 \end{equation}
 
 The backbone--port representation satisfies
 
 \begin{equation}
 \label{eq:hamiltonian-3-60}
-\boxed{\frac{dH_{sk}}{dt} = \partial_{t}V_{h} + {\dot{\mathbf{q}}}^{T}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{sk} + \mathbf{Q}_{\partial} \right).}
+\boxed{\frac{dH_{sk}}{dt} = \partial_{t}V_{h} + {\dot{\mathbf{q}}}^{T}\left( \mathbf{Q}_{diss}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{sk} + \mathbf{Q}_{\partial} \right).}
 \end{equation}
 
 These two expressions give the energy rates under nonautonomous potentials, prescribed flow, and multiple ports, and remain dynamically equivalent in their respective variable representations.
@@ -594,7 +599,7 @@ The ideal constraint reaction satisfies \({\dot{\mathbf{q}}}^{T}\mathbf{G}^{T}\b
 \mathbf{C}\left( \mathbf{y} \right) = \frac{\partial\bm{\chi}}{\partial\mathbf{y}},\quad\quad\mathbf{M}_{r}\left( \mathbf{y} \right) = \mathbf{C}^{T}\mathbf{M}\left( \bm{\chi}\left( \mathbf{y} \right) \right)\mathbf{C},
 \end{equation}
 
-When \(\mathbf{M}_{r}\succ0\), construct the reduced Hamiltonian. The reduced momentum of the autonomous backbone is \(\mathbf{p}_{r}=\mathbf{M}_{r}\dot{\mathbf{y}}\). If the reduced prescribed-flow model still contains a velocity-linear term, use instead \(\mathbf{p}_{r}=\mathbf{M}_{r}\dot{\mathbf{y}}-\mathbf{b}_{A,r}\). \Cref{sec:chnn-model,sec:symplectic-kam} use only this independent-coordinate canonical system; the differential--algebraic equations containing the multiplier \(\bm{\lambda}_{c}\) cannot be treated directly as a standard Hamiltonian system on the full space.
+When \(\mathbf{M}_{r}\succ0\), construct the reduced Hamiltonian. The reduced momentum of the autonomous backbone is \(\mathbf{p}_{r}=\mathbf{M}_{r}\dot{\mathbf{y}}\). If the reduced prescribed-flow model still contains a velocity-linear term, use instead \(\mathbf{p}_{r}=\mathbf{M}_{r}\dot{\mathbf{y}}-\mathbf{b}_{A,r}\). \Cref{sec:chnn-model,sec:symplectic-kam} use only this independent-coordinate canonical system; the differential--algebraic equations containing the multiplier \(\bm{\lambda}_{c}\) cannot be treated directly as a standard Hamiltonian system on the full space. The current delivery contains no numerical record of the actual constraint-Jacobian rank, constraint residuals, independent-coordinate instantiation, or evidence that the fixed \(N_{\mathrm{diag}}=2\) pilot belongs to this regular object. This paragraph therefore states a theoretical construction and scope condition, not a numerical certification for the pilot.
 
 The finite-shear-stiffness Cosserat ordinary differential equations are retained for COMSOL comparison, numerical regularization, and constraint-convergence analysis. Data from this regularized branch may replace locally reduced data in CHNN training only when the shear strains, trajectories, energies, and principal frequencies converge to the Kirchhoff results as the shear stiffness increases. This strategy preserves the advantages of the complete parent model while keeping the primary computational object consistent with the original Kirchhoff research objective.
 
@@ -665,17 +670,17 @@ and
 
 \begin{equation}
 \label{eq:hamiltonian-3-72}
-\boxed{{\dot{\mathbf{z}}}_{0} = \mathbf{J}\nabla_{\mathbf{z}_{0}}H_{cons} + \mathbf{B}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{sk} + \mathbf{Q}_{\partial} \right).}
+\boxed{{\dot{\mathbf{z}}}_{0} = \mathbf{J}\nabla_{\mathbf{z}_{0}}H_{cons} + \mathbf{B}_{port}\left( \mathbf{Q}_{diss}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{sk} + \mathbf{Q}_{\partial} \right).}
 \end{equation}
 
 \Cref{sec:chnn-model} should parameterize or supervise the ports separately rather than allowing a single unstructured residual to absorb every physical contribution:
 
 \begin{equation}
 \label{eq:hamiltonian-3-73}
-\mathbf{Q}_{port,\theta} = \mathbf{Q}_{diss,\mu} + \mathbf{Q}_{in,\nu} + \mathbf{Q}_{flow,\kappa} + \mathbf{Q}_{\partial} + \mathbf{r}_{\eta}.
+\mathbf{Q}_{port,\theta} = \mathbf{Q}_{diss,\mu}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in,\nu} + \mathbf{Q}_{flow,\kappa} + \mathbf{Q}_{\partial} + \mathbf{r}_{\eta}.
 \end{equation}
 
-Here, \(\mathbf{Q}_{diss,\mu}\) represents only the passive component with nonpositive power; magnetic control, background-flow input, and boundary actuation remain separate ports; and \(\mathbf{r}_{\eta}\) represents only the residual remaining after the known model and known ports have been removed. This hierarchy is consistent with the structured modeling principles of dissipative SymODEN and port-Hamiltonian neural networks.\cite{Zhong2020Dissipative,Desai2021PHNN}
+Here, \(\mathbf{Q}_{diss,\mu}^{bulk}\) represents only the passive bulk/drag component with nonpositive power and excludes contact; \(\mathbf{Q}_{contact}\) remains a separate contact port; magnetic control, background-flow input, and boundary actuation remain separate ports; and \(\mathbf{r}_{\eta}\) represents only the residual remaining after the known model and known ports have been removed. This hierarchy is consistent with the structured modeling principles of dissipative SymODEN and port-Hamiltonian neural networks.\cite{Zhong2020Dissipative,Desai2021PHNN}
 
 For nonfrozen or pulsatile operating conditions, \(H_{sk}=H_{cons}+V_{drv}\). The following two representations are mutually exclusive:
 
@@ -692,12 +697,12 @@ Under a general prescribed flow, use \(\mathbf{p}=\mathbf{M}\dot{\mathbf{q}}-\ma
 
 \begin{equation}
 \label{eq:hamiltonian-3-74}
-\mathcal{D}_{sk} = \left( \mathbf{Q},\mathbf{P},\bm{\xi},{\dot{\mathbf{z}}}_{0},{\widehat{H}}_{cons},\nabla{\widehat{H}}_{cons},\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{sk},\mathbf{Q}_{\partial} \right),
+\mathcal{D}_{sk} = \left( \mathbf{Q},\mathbf{P},\bm{\xi},{\dot{\mathbf{z}}}_{0},{\widehat{H}}_{cons},\nabla{\widehat{H}}_{cons},\mathbf{Q}_{diss}^{bulk},\mathbf{Q}_{contact},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{sk},\mathbf{Q}_{\partial} \right),
 \end{equation}
 
 \begin{equation}
 \label{eq:hamiltonian-3-75}
-\mathcal{D}_{na} = \left( \mathbf{z},\dot{\mathbf{z}},t,H,\nabla H,\partial_{t}H,\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{H},\mathbf{Q}_{\partial} \right).
+\mathcal{D}_{na} = \left( \mathbf{z},\dot{\mathbf{z}},t,H,\nabla H,\partial_{t}H,\mathbf{Q}_{diss}^{bulk},\mathbf{Q}_{contact},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{H},\mathbf{Q}_{\partial} \right).
 \end{equation}
 
 The statistical-learning--KAM interface preferentially uses derivative-supervised autonomous conservative samples and does not interpret the sum of trajectory loss, dissipation loss, and regularization terms directly as the KAM perturbation size.\cite{Chen2022KAMSLT}
@@ -850,10 +855,10 @@ For the autonomous conservative branch, a structure-preserving integrator produc
 
 \begin{equation}
 \label{eq:hamiltonian-3-94}
-F_{h} = \Phi_{h}^{cons}.
+F_{h}^{cons}\neq\Phi_{h}^{cons}\ \text{in general},\qquad \delta_{alg}:=\lVert F_{h}^{cons}-\Phi_{h}^{cons}\rVert.
 \end{equation}
 
-\Cref{sec:symplectic-kam} first verifies whether \(F_{h}\) is an exact symplectic map and then applies the KAM conditions for symplectic maps and symplectic algorithms due to Shang together with the parameterization method of Haro et al.\cite{FengQin2010,Shang1999KAMAlgorithms,Shang2000KAMMappings,Haro2016Parameterization} The torus embedding \(K:\mathbb{T}^{d}\rightarrow\mathcal{M}\) satisfies\cite{Haro2016Parameterization}
+Here \(F_h\) is used below as shorthand for the actual numerical conservative map \(F_h^{cons}\); \(\Phi_h^{cons}\) remains the exact flow of the continuous Hamiltonian, and \(\delta_{alg}\) is their algorithmic difference, so a general integrator must not be identified with the exact flow. \Cref{sec:symplectic-kam} first verifies whether \(F_{h}\) is an exact symplectic map and then applies the KAM conditions for symplectic maps and symplectic algorithms due to Shang together with the parameterization method of Haro et al.\cite{FengQin2010,Shang1999KAMAlgorithms,Shang2000KAMMappings,Haro2016Parameterization} The torus embedding \(K:\mathbb{T}^{d}\rightarrow\mathcal{M}\) satisfies\cite{Haro2016Parameterization}
 
 \begin{equation}
 \label{eq:hamiltonian-3-95}
@@ -871,7 +876,7 @@ For the complete data vector field, the known conservative backbone and known po
 
 \begin{equation}
 \label{eq:hamiltonian-3-97}
-\boxed{X_{res} = X_{data} - \mathbf{J}\nabla H_{\lambda} - \mathbf{B}\left( \mathbf{Q}_{diss,\mu} + \mathbf{Q}_{in,\nu} + \mathbf{Q}_{flow,\kappa} + \mathbf{Q}_{\partial} \right).}
+\boxed{X_{res} = X_{data} - \mathbf{J}\nabla H_{\lambda} - \mathbf{B}_{port}\left( \mathbf{Q}_{diss,\mu}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in,\nu} + \mathbf{Q}_{flow,\kappa} + \mathbf{Q}_{\partial} \right).}
 \end{equation}
 
 The ``self-adjoint Birkhoff-system representation'' used here and the ``Hamiltonian Birkhoff normal form'' used to construct \(H_{0}\) in \Cref{sec:hamiltonian-3-7-3} are distinct concepts. The former concerns the variational self-adjointness and \(K\left( \mathbf{z},t \right)\)-symplectic structure of a general first-order system, whereas the latter is the Hamiltonian normal form near an elliptic equilibrium. \Cref{sec:symplectic-kam} tests only whether \(X_{res}\) admits a regular self-adjoint Birkhoff-system representation. If the closure, time-compatibility, or nondegeneracy conditions fail, \(X_{res}\) remains a general residual and the complete open system cannot be called a strict \(K\left( \mathbf{z},t \right)\)-symplectic system. Explicit time dependence alone also does not necessarily imply a nonstandard symplectic structure: in appropriate canonical variables and extended phase space, the exact nonautonomous Hamiltonian branch should still be treated preferentially with standard symplectic theory.\cite{HairerLubichWanner2006GNI,FengQin2010}
@@ -896,14 +901,14 @@ then that component may enter the conservative correction head in \Cref{sec:chnn
 
 \begin{equation}
 \label{eq:hamiltonian-3-100}
-\nabla_{\mathbf{P}}{\widehat{H}}^{T}\Delta\mathbf{Q}_{HF}^{diss} \leq 0,
+\nabla_{\mathbf{P}}{\widehat{H}}^{T}\Delta\mathbf{Q}_{HF}^{diss,bulk} \leq 0,
 \end{equation}
 
-it may enter the dissipative correction head. Components that do not satisfy closure, power-sign, or smoothness conditions remain in the general model residual \(\mathbf{r}_{HF}\). Thus,
+it may enter the bulk/drag dissipative correction head. Contact-model discrepancy remains in the separate \(\Delta\mathbf{Q}_{HF}^{contact}\) channel and must not be merged into that head. Components that do not satisfy closure, power-sign, or smoothness conditions remain in the general model residual \(\mathbf{r}_{HF}\). Thus,
 
 \begin{equation}
 \label{eq:hamiltonian-3-101}
-\boxed{\Delta X_{HF} = \mathbf{J}\nabla\Delta H_{HF} + \mathbf{B}\Delta\mathbf{Q}_{HF}^{diss} + \mathbf{B}\Delta\mathbf{Q}_{HF}^{port} + \mathbf{r}_{HF}.}
+\boxed{\Delta X_{HF} = \mathbf{J}\nabla\Delta H_{HF} + \mathbf{B}_{port}\Delta\mathbf{Q}_{HF}^{diss,bulk} + \mathbf{B}_{port}\Delta\mathbf{Q}_{HF}^{contact} + \mathbf{B}_{port}\Delta\mathbf{Q}_{HF}^{port} + \mathbf{r}_{HF}.}
 \end{equation}
 
 This decomposition is a structural projection to be identified and validated, not an identity that holds automatically for an arbitrary high-fidelity discrepancy. The model error used in KAM analysis consists only of the conservatively closed component and its bound in the common function norm. Shear dissipation, contact switching, and local solid effects must not be included in \(H_{1}\) without proof.
@@ -914,7 +919,10 @@ The preceding derivations yield three interfaces required by the subsequent stru
 
 \begin{equation}
 \label{eq:hamiltonian-3-102}
-\mathcal{I}_{CHNN} = \left( \mathbf{Q},\mathbf{P},\bm{\xi},{\widehat{H}}_{phys},\nabla{\widehat{H}}_{phys},\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow},\mathbf{Q}_{\partial},model\_ level,representation \right),
+\begin{aligned}
+\mathcal{I}_{CHNN}={}&\bigl(\mathbf{Q},\mathbf{P},\bm{\xi},{\widehat{H}}_{phys},\nabla{\widehat{H}}_{phys},\mathbf{Q}_{diss}^{bulk},\mathbf{Q}_{contact},\\
+&\mathbf{Q}_{in},\mathbf{Q}_{flow},\mathbf{Q}_{\partial},model\_ level,representation\bigr),
+\end{aligned}
 \end{equation}
 
 \begin{equation}
@@ -942,7 +950,7 @@ and the forced--dissipative canonical equations are
 
 \begin{equation}
 \label{eq:hamiltonian-3-106}
-\boxed{{\dot{\mathbf{z}}}_{0} = \mathbf{J}\nabla H_{cons} + \mathbf{B}\mathbf{Q}_{port},\quad\quad\frac{dH_{cons}}{dt} = {\dot{\mathbf{q}}}^{T}\mathbf{Q}_{port}.}
+\boxed{{\dot{\mathbf{z}}}_{0} = \mathbf{J}\nabla H_{cons} + \mathbf{B}_{port}\mathbf{Q}_{port},\quad\quad\frac{dH_{cons}}{dt} = {\dot{\mathbf{q}}}^{T}\mathbf{Q}_{port}.}
 \end{equation}
 
 The contribution of the configuration-dependent mass matrix in the Hamiltonian momentum equation is equivalent to the geometric-inertia vector \(\mathbf{g}_{M}\) in \Cref{sec:galerkin-discretization}. A nonlinear conservative potential can be represented as a path-independent line integral of the restoring force; under equivalent viscous damping, the energy rate reduces to the sum of external-input power and dissipative power.

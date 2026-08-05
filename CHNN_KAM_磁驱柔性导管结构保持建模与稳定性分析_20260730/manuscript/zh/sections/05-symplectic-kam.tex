@@ -78,7 +78,7 @@ Birkhoff 方程写为
 K_{ij}{\dot{z}}_{j} + D_{i} = 0.
 \end{equation}
 
-在局部星形区域内，若 \(\mathbf{K}\) 非退化并满足反对称性、空间闭合条件和时间相容条件，则系统具有正则、自伴 Birkhoff 表示；等价地，可找到 \(F_{i}\) 与 \(B\) 使上述方程成立\cite[第15章]{COMSOLWeakContribution2025}。定义时变二形式
+在局部星形区域内，若 \(\mathbf{K}\) 非退化并满足反对称性、空间闭合条件和时间相容条件，则系统具有正则、自伴 Birkhoff 表示；等价地，可找到 \(F_{i}\) 与 \(B\) 使上述方程成立\cite{FengQin2010,HairerLubichWanner2006GNI}。定义时变二形式
 
 \begin{equation}
 \label{eq:symplectic-kam-5-8}
@@ -135,14 +135,14 @@ K_{ij}{\dot{z}}_{j} + D_{i} = 0.
 S\left( \mathbf{Z},h \right) = \sum_{r = 1}^{\infty}S_{r}\left( \mathbf{Z} \right)h^{r}.
 \end{equation}
 
-截断至 \(m\) 阶得到隐式 \(m\) 阶 \(K\left( \mathbf{z},t \right)\)-辛格式，并满足
+截断至 \(m\) 阶得到隐式 \(m\) 阶近似 \(K\left( \mathbf{z},t \right)\)-辛格式，并满足
 
 \begin{equation}
 \label{eq:symplectic-kam-5-15}
 \left( D\Psi_{h} \right)^{T}\mathbf{K}\left( \Psi_{h}\left( \mathbf{z} \right),t + h \right)D\Psi_{h} = \mathbf{K}\left( \mathbf{z},t \right) + O\left( h^{m + 1} \right).
 \end{equation}
 
-该结论保证条件成立时的结构保持和阶数，不自动推出经典 Hamiltonian KAM 环面持续性。若再叠加非结构残差，结构缺陷应进入误差预算。
+该结论只保证条件成立时的近似结构保持和阶数；只有余项在所考察域内严格为零时才可称为精确 \(K\)-辛，不自动推出经典 Hamiltonian KAM 环面持续性。若再叠加非结构残差，结构缺陷应进入误差预算。
 
 \subsection{参数化方法计算不变环面}\label{sec:symplectic-kam-5-6}
 
