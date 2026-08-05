@@ -13,6 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / "build"
+DIAGNOSTIC_BUILD = BUILD / "diagnostic"
 RELEASE = ROOT / "release"
 PROVENANCE = ROOT / "FIGURE_TABLE_PROVENANCE.csv"
 
@@ -85,7 +86,15 @@ def run_tex_toolchain(entry: str, outdir: Path) -> None:
 
     def run_tex_pass() -> None:
         print("+", " ".join(tex_args))
-        result = subprocess.run(tex_args, cwd=ROOT, check=False)
+        result = subprocess.run(
+            tex_args,
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+        )
         if result.returncode == 0:
             return
         log = log_path.read_text(encoding="utf-8", errors="replace") if log_path.exists() else ""
@@ -95,12 +104,17 @@ def run_tex_toolchain(entry: str, outdir: Path) -> None:
             "Fatal error occurred",
             "! LaTeX Error",
         )
-        if any(pattern in log for pattern in hard_errors) or not (outdir / f"{stem}.pdf").exists():
-            raise subprocess.CalledProcessError(result.returncode, tex_args)
-        print(
-            "WARNING: XeLaTeX returned nonzero after producing a PDF without a "
-            "logged TeX fatal error; continuing to accommodate the local MiKTeX host warning."
-        )
+        output = f"{result.stdout}\n{result.stderr}"
+        host_warning = "unsupported version of Windows" in output
+        if (
+            any(pattern in log for pattern in hard_errors)
+            or not (outdir / f"{stem}.pdf").exists()
+            or not host_warning
+        ):
+            raise subprocess.CalledProcessError(
+                result.returncode, tex_args, output=result.stdout, stderr=result.stderr
+            )
+        print("WARNING: XeLaTeX returned only the allow-listed MiKTeX host warning.")
 
     run_tex_pass()
     aux_stem = (outdir / stem).relative_to(ROOT)
@@ -133,6 +147,7 @@ def check_assets_and_provenance(*, allow_mismatch: bool) -> None:
                     missing.append(f"{tex_path.relative_to(ROOT)} -> {asset}")
 
     mismatches: list[str] = []
+    source_issues: list[str] = []
     if PROVENANCE.exists():
         with PROVENANCE.open(encoding="utf-8", newline="") as handle:
             for row in csv.DictReader(handle):
@@ -145,6 +160,20 @@ def check_assets_and_provenance(*, allow_mismatch: bool) -> None:
                 digest = hashlib.sha256(path.read_bytes()).hexdigest().upper()
                 if expected and digest != expected:
                     mismatches.append(f"{asset_path}: expected {expected}, got {digest}")
+                source_paths = [item.strip() for item in row.get("formal_source_paths", "").split(";") if item.strip()]
+                source_hashes = [item.strip().upper() for item in row.get("formal_source_sha256", "").split(";") if item.strip()]
+                for index, source_path in enumerate(source_paths):
+                    source = ROOT / source_path
+                    if not source.exists():
+                        source_issues.append(f"{asset_path} source missing: {source_path}")
+                        continue
+                    if index < len(source_hashes):
+                        source_digest = hashlib.sha256(source.read_bytes()).hexdigest().upper()
+                        if source_digest != source_hashes[index]:
+                            source_issues.append(
+                                f"{asset_path} source hash mismatch: {source_path}: "
+                                f"expected {source_hashes[index]}, got {source_digest}"
+                            )
     else:
         mismatches.append("FIGURE_TABLE_PROVENANCE.csv is missing")
 
@@ -158,15 +187,28 @@ def check_assets_and_provenance(*, allow_mismatch: bool) -> None:
     if mismatches:
         print("WARNING: provenance mismatches allowed for this diagnostic build:")
         print("\n".join(mismatches))
+    if source_issues and not allow_mismatch:
+        raise RuntimeError(
+            "Formal provenance source check failed:\n" + "\n".join(sorted(set(source_issues)))
+        )
+    if source_issues:
+        print("WARNING: formal provenance source issues allowed for this diagnostic build:")
+        print("\n".join(sorted(set(source_issues))))
 
 
-def build_language(language: str, *, clean: bool, check: bool, allow_provenance_mismatch: bool) -> Path:
+def build_language(
+    language: str,
+    *,
+    clean: bool,
+    check: bool,
+    diagnostic: bool,
+    allow_provenance_mismatch: bool,
+) -> Path:
     profile = PROFILES[language]
-    outdir = BUILD / language
+    outdir = (DIAGNOSTIC_BUILD if diagnostic else BUILD) / language
     if clean and outdir.exists():
         shutil.rmtree(outdir)
     outdir.mkdir(parents=True, exist_ok=True)
-    RELEASE.mkdir(parents=True, exist_ok=True)
 
     check_assets_and_provenance(allow_mismatch=allow_provenance_mismatch)
 
@@ -182,9 +224,6 @@ def build_language(language: str, *, clean: bool, check: bool, allow_provenance_
     if not pdf.exists():
         raise RuntimeError(f"Expected output missing: {pdf}")
 
-    release_pdf = RELEASE / profile["release"]
-    shutil.copy2(pdf, release_pdf)
-
     if check:
         log_path = outdir / f"{stem}.log"
         log = log_path.read_text(encoding="utf-8", errors="replace")
@@ -199,8 +238,26 @@ def build_language(language: str, *, clean: bool, check: bool, allow_provenance_
                 print(f"[{language}] Post-build BibTeX check failed: " + "; ".join(bib_warnings), file=sys.stderr)
             raise RuntimeError(f"Post-build checks failed for {language}")
 
-    print(f"Built [{language}]: {release_pdf.relative_to(ROOT)}")
-    return release_pdf
+    print(f"Built [{'diagnostic' if diagnostic else 'formal'} {language}]: {pdf.relative_to(ROOT)}")
+    return pdf
+
+
+def promote_release(language_pdfs: list[tuple[str, Path]]) -> None:
+    """Promote all checked bilingual PDFs only after every language has passed."""
+    RELEASE.mkdir(parents=True, exist_ok=True)
+    staged: list[tuple[Path, Path]] = []
+    try:
+        for language, pdf in language_pdfs:
+            target = RELEASE / PROFILES[language]["release"]
+            temporary = RELEASE / f".{target.name}.staging"
+            shutil.copy2(pdf, temporary)
+            staged.append((temporary, target))
+        for temporary, target in staged:
+            temporary.replace(target)
+    finally:
+        for temporary, _ in staged:
+            if temporary.exists():
+                temporary.unlink()
 
 
 def main() -> int:
@@ -209,21 +266,40 @@ def main() -> int:
     parser.add_argument("--clean", action="store_true", help="remove generated files before building")
     parser.add_argument("--no-check", action="store_true", help="skip post-build log checks")
     parser.add_argument(
+        "--diagnostic",
+        action="store_true",
+        help="write a clearly isolated diagnostic build under build/diagnostic",
+    )
+    parser.add_argument(
         "--allow-provenance-mismatch",
         action="store_true",
         help="allow known frozen-table hash drift for diagnostic PDF generation",
     )
     args = parser.parse_args()
 
+    if args.allow_provenance_mismatch and not args.diagnostic:
+        parser.error("--allow-provenance-mismatch requires --diagnostic and never writes release PDFs")
+    if args.no_check and not args.diagnostic:
+        parser.error("--no-check requires --diagnostic and never writes release PDFs")
+
     languages = ("zh", "en") if args.language == "both" else (args.language,)
     try:
+        built: list[tuple[str, Path]] = []
         for language in languages:
-            build_language(
-                language,
-                clean=args.clean,
-                check=not args.no_check,
-                allow_provenance_mismatch=args.allow_provenance_mismatch,
+            built.append(
+                (
+                    language,
+                    build_language(
+                        language,
+                        clean=args.clean,
+                        check=not args.no_check,
+                        diagnostic=args.diagnostic,
+                        allow_provenance_mismatch=args.allow_provenance_mismatch,
+                    ),
+                )
             )
+        if not args.diagnostic:
+            promote_release(built)
     except (subprocess.CalledProcessError, RuntimeError) as exc:
         print(str(exc), file=sys.stderr)
         return 4

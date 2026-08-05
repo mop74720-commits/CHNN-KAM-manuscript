@@ -8,6 +8,9 @@ All variables are dimensionless unless explicitly stated otherwise.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date
+import json
+from pathlib import Path
 from typing import Callable
 
 import numpy as np
@@ -150,7 +153,7 @@ def conservative_order_test() -> dict[str, float]:
     }
 
 
-def dissipative_structure_test() -> dict[str, float]:
+def dissipative_structure_test() -> dict[str, object]:
     model = Oscillator(mass=1.0, stiffness=2.0, damping_rate=0.15)
     z = np.array([0.7, -0.2])
     h = 0.05
@@ -173,19 +176,49 @@ def dissipative_structure_test() -> dict[str, float]:
         "midpoint_discrete_conformal_defect": structure_defect(midpoint_jac, rho_h),
         "strang_exact_conformal_defect": structure_defect(strang_jac, exact_factor),
         "midpoint_power_balance_error": abs(measured_energy_change - predicted_energy_change),
+        "finite_difference_sweep": {
+            str(eps): {
+                "midpoint_defect": structure_defect(
+                    finite_difference_jacobian(midpoint_step, z, 0.0, h, model, eps=eps), rho_h
+                ),
+                "strang_defect": structure_defect(
+                    finite_difference_jacobian(conformal_strang_step, z, 0.0, h, model, eps=eps), exact_factor
+                ),
+            }
+            for eps in (1.0e-2, 1.0e-3, 1.0e-4, 1.0e-5, 1.0e-6, 1.0e-7, 1.0e-8, 1.0e-9)
+        },
     }
 
 
 def run_all() -> dict[str, object]:
-    return {
+    result = {
         "complex_round_trip_error": complex_round_trip(np.array([0.37, -1.2])),
         "conservative": conservative_order_test(),
         "dissipative": dissipative_structure_test(),
     }
+    if result["complex_round_trip_error"] >= 1.0e-12:
+        raise AssertionError("complex round-trip error exceeds the skeleton threshold")
+    if result["conservative"]["observed_order"] <= 1.5:
+        raise AssertionError("midpoint observed order is below the skeleton threshold")
+    if result["conservative"]["max_quadratic_energy_drift"] >= 1.0e-10:
+        raise AssertionError("quadratic energy drift exceeds the skeleton threshold")
+    if result["dissipative"]["midpoint_power_balance_error"] >= 1.0e-12:
+        raise AssertionError("discrete power balance exceeds the skeleton threshold")
+    sweep = result["dissipative"]["finite_difference_sweep"]
+    if not all(np.isfinite(value) for row in sweep.values() for value in row.values()):
+        raise AssertionError("finite-difference structure sweep produced a non-finite value")
+    return result
 
 
 if __name__ == "__main__":
-    import json
-
-    print(json.dumps(run_all(), indent=2, sort_keys=True))
+    output = run_all()
+    output["environment"] = {
+        "date": date.today().isoformat(),
+        "scope": "V1--V3 NumPy verification skeleton",
+    }
+    result_path = Path(__file__).with_name("verification_results.json")
+    temporary = result_path.with_suffix(".json.tmp")
+    temporary.write_text(json.dumps(output, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    temporary.replace(result_path)
+    print(json.dumps(output, indent=2, sort_keys=True))
 

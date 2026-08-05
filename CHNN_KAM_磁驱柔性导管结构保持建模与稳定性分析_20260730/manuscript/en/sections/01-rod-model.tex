@@ -388,10 +388,10 @@ In the air or vacuum region surrounding an infinitesimal magnetic catheter segme
 
 \begin{equation}
 \label{eq:rod-1-43}
-\mathbf{T}_{M} = \frac{1}{\mu_{0}}\left( \mathbf{B} \otimes \mathbf{B} - \frac{1}{2}\left| \mathbf{B} \right|^{2}\mathbf{I} \right),
+\mathbf{T}_{M} = \frac{1}{\mu_{0}}\left( \mathbf{B}_{mag} \otimes \mathbf{B}_{mag} - \frac{1}{2}\left| \mathbf{B}_{mag} \right|^{2}\mathbf{I} \right),
 \end{equation}
 
-where \(\mathbf{B}\) is the magnetic flux density and \(\mu_{0}\) is the permeability of free space. For a segment of reference length \(\Delta S\), the magnetic force per unit reference length and the magnetic couple about the centerline are defined by
+where \(\mathbf{B}_{mag}\) is the magnetic flux density and \(\mu_{0}\) is the permeability of free space. For a segment of reference length \(\Delta S\), the magnetic force per unit reference length and the magnetic couple about the centerline are defined by
 
 \begin{equation}
 \label{eq:rod-1-44}
@@ -412,18 +412,18 @@ When a magnetic segment can be represented by a dipole approximation, let \(\bm{
 \bm{\mu}(S,t) = \mathbf{R}(S,t)\bm{\mu}_{0}^{b}(S).
 \end{equation}
 
-For a prescribed external magnetic field \(\mathbf{B}\left( \mathbf{r},t \right)\), the magnetic potential energy is
+For a prescribed external magnetic field \(\mathbf{B}_{mag}\left( \mathbf{r},t \right)\), the magnetic potential energy is
 
 \begin{equation}
 \label{eq:rod-1-47}
-V_{mag} = - \int_{0}^{L}\bm{\mu} \cdot \mathbf{B}\left( \mathbf{r},t \right)\, dS.
+V_{mag} = - \int_{0}^{L}\bm{\mu} \cdot \mathbf{B}_{mag}\left( \mathbf{r},t \right)\, dS.
 \end{equation}
 
 The associated magnetic force and couple are
 
 \begin{equation}
 \label{eq:rod-1-48}
-\mathbf{f}_{mag} = \nabla_{\mathbf{r}}\left( \bm{\mu} \cdot \mathbf{B} \right),\quad\quad\mathbf{l}_{mag} = \bm{\mu} \times \mathbf{B}.
+\mathbf{f}_{mag} = \nabla_{\mathbf{r}}\left( \bm{\mu} \cdot \mathbf{B}_{mag} \right),\quad\quad\mathbf{l}_{mag} = \bm{\mu} \times \mathbf{B}_{mag}.
 \end{equation}
 
 The Maxwell-stress integral and the magnetic-dipole potential are two scale-dependent representations of the same magnetic action. One should be selected as the primary load model according to the required fidelity; they must not be superposed and counted twice.

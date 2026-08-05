@@ -6,7 +6,7 @@
 
 \input{tables/tab_canonical_diagnostic_chain_zh}
 
-诊断过程依次检查比较对象、模态混合、降阶截断、余切动量定义、求解器输出语义和固定基初值。跨轨迹比较产生的假阳性说明，闭合误差必须在同一物理轨迹和同一时间采样上计算。单模态重复工况仍可能出现异常，因而不能把误差直接归因于模态混合。增大降阶表示后，异常并未表现出由 \(N=2\) 截断主导的特征；相比 \(M_N\dot q_{\mathrm{native}}\)，投影动量给出更好的闭合。
+诊断过程依次检查比较对象、模态混合、降阶截断、余切动量定义、求解器输出语义和固定基初值。跨轨迹比较产生的假阳性说明，闭合误差必须在同一物理轨迹和同一时间采样上计算。单模态重复工况仍可能出现异常，因而不能把误差直接归因于模态混合。增大降阶表示后，异常并未表现出由 \(N_{\mathrm{diag}}=2\) 诊断截断主导的特征；相比 \(M_N\dot q_{\mathrm{native}}\)，投影动量给出更好的闭合。
 
 generalized-alpha 的内部 stage 不能通过公共 API 直接取得，因此不能保证导出的位移、速度和载荷来自同一内部求解阶段。二阶 BDF 的 \texttt{tsteps} 输出用于获得同一 solver step 的状态和向量场标签。该选择不意味着 BDF 是辛积分器，也不把离散轨迹解释为辛映射。
 
@@ -16,14 +16,14 @@ generalized-alpha 的内部 stage 不能通过公共 API 直接取得，因此�
 
 \subsection{Canonical 映射与闭合量}
 
-固定 \(N=2\) 基下采用
+固定 \(N_{\mathrm{diag}}=2\) 诊断基下采用
 \begin{align}
-q &= \Pi_{\mathrm{conf}}(U), &
-p &= B^{T}P_{\mathrm{full}}, \\
-\dot q &= M_N^{-1}p, &
-\dot p &= B^{T}L .
+q &= \Pi_{\mathrm{conf},N}(U), &
+p &= B_N(q)^{T}P_{\mathrm{full}}, \\
+\dot q &= M_N(q)^{-1}p, &
+\dot p &= \dot B_N(q)^{T}P_{\mathrm{full}}+B_N(q)^{T}\dot P_{\mathrm{full}} .
 \end{align}
-其中 \(q\) 属于构形坐标，\(p\) 属于对应的余切坐标。闭合误差分别比较导出的 \(\dot q\) 与 \(M_N^{-1}p\)、导出的 \(\dot p\) 与 \(B^{T}L\)，并同时考察 \(q\)、\(p\) 和 total energy 的时间离散收敛。
+其中 \(q\in\mathbb{R}^{N_{\mathrm{diag}}}\) 属于诊断构形坐标，\(p\in T_q^*\mathcal{Q}_{N}\) 属于对应余切坐标，\(B_N,\dot B_N\in\mathbb{R}^{m_f\times N_{\mathrm{diag}}}\)，且 \(P_{\mathrm{full}},\dot P_{\mathrm{full}}\in\mathbb{R}^{m_f}\)。若另定义 \(L_{\mathrm{full}}:=\dot P_{\mathrm{full}}\)，最后一式可写为 \(\dot p=\dot B_N^{T}P_{\mathrm{full}}+B_N^{T}L_{\mathrm{full}}\)，但不能删去输运项。闭合误差分别比较导出的 \(\dot q\) 与 \(M_N^{-1}p\)、导出的 \(\dot p\) 与上述含输运项的动量率，并同时考察 \(q\)、\(p\) 和 total energy 的时间离散收敛。
 
 三层时间步计算采用 coarse/middle/fine 网格。若相邻两层误差分别为 \(e_h\) 和 \(e_{h/2}\)，观察阶定义为
 \[

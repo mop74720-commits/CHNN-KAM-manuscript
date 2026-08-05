@@ -11,7 +11,7 @@
 
 数值实现通过了源文件编译、可编辑安装、组件与接口测试以及合成数据训练流程检验。独立进程中的 13 个回归测试文件连续运行三轮均未出现失败。这些测试用于检查软件实现的一致性，不作为模型科学性能的证据。
 
-COMSOL--Galerkin bridge 包含 stationary 导出、mesh-40/80 模态现实性检查、前 12 阶生产基以及三条 \(1\,\mathrm{s}\) 候选轨迹。原扰动能量判据采用 \(0.5\%\) 阈值，仅 mode2 满足；若采用探索性的 \(1\%\) 阈值，则三条轨迹均满足。force-v2 在公共支持 indices \(2\ldots998\) 和固定 \(p[2]\) 锚点下，以独立的 \(2\%\) 联合 L2 阈值检验力闭合，三条轨迹均满足。\Cref{tab:bridge-gate-summary,fig:bridge-gate-separation}分别报告这些判据，避免把能量门与力门合并解释。
+COMSOL--Galerkin bridge 包含 stationary 导出、mesh-40/80 模态现实性检查、前 12 个候选模态以及三条 \(1\,\mathrm{s}\) 候选轨迹。原扰动能量判据采用 \(0.5\%\) 阈值，仅 mode2 满足；若采用探索性的 \(1\%\) 阈值，则三条轨迹均满足。force-v2 在公共支持 indices \(2\ldots998\) 和固定 \(p[2]\) 锚点下，以独立的 \(2\%\) 联合 L2 阈值检验力闭合，三条轨迹均满足。\Cref{tab:bridge-gate-summary,fig:bridge-gate-separation}分别报告这些判据，避免把能量门与力门合并解释。
 
 \input{tables/tab_bridge_gate_summary_zh}
 
@@ -42,11 +42,11 @@ P1.6 的 \(30/30\) 个硬约束模型均以零数值残差满足 \(f(0)\) 和零
 
 \subsubsection{Canonical 数据合同诊断与时间步收敛}\label{sec:numerical-6-3-contract}
 
-初始检查中，跨轨迹比较造成了一次假阳性；采用同轨迹比较后，mode1 满足判据，而 mixed 仍未满足。重复的单一 mode1 工况同样可能出现闭合误差，说明模态混合不是异常的必要条件。进一步比较排除了 \(N=2\) 截断不足这一解释，并显示投影动量的闭合优于 \(M_N\dot q_{\mathrm{native}}\)。generalized-alpha 的内部 stage 无法通过公共 API 直接取得，因此不能保证坐标、动量和力标签属于同一内部求解阶段；改用二阶 BDF 的 \texttt{tsteps} 输出后，可以保存同一 solver step 上的 canonical 状态。这里的 BDF 仅用于状态采样和向量场标签生成，并未被证明为辛积分器。
+初始检查中，跨轨迹比较造成了一次假阳性；采用同轨迹比较后，mode1 满足判据，而 mixed 仍未满足。重复的单一 mode1 工况同样可能出现闭合误差，说明模态混合不是异常的必要条件。进一步比较排除了 \(N_{\mathrm{diag}}=2\) 诊断截断不足这一解释，并显示投影动量的闭合优于 \(M_N\dot q_{\mathrm{native}}\)。generalized-alpha 的内部 stage 无法通过公共 API 直接取得，因此不能保证坐标、动量和力标签属于同一内部求解阶段；改用二阶 BDF 的 \texttt{tsteps} 输出后，可以保存同一 solver step 上的 canonical 状态。这里的 BDF 仅用于状态采样和向量场标签生成，并未被证明为辛积分器。
 
 随后发现，mixed 初值没有应用固定基的 normalization/sign transform。对位移与速度统一实施该变换后，离线初值一致性检查 \(12/12\) 满足，mixed 短时间窗的 canonical 闭合也满足预设条件。初始的双层时间步比较中，G2 从 \(0.00147337\) 增至 \(0.00155680\)，未满足预设的单调收敛判据，因此进一步引入第三层时间步进行澄清。
 
-三层计算直接比较 \(q\)、\(p_{\mathrm{projected}}\)、\(M_N^{-1}p\)、\(B^{T}L\) 与 total energy，观察收敛阶为 \(1.64186\)--\(2.00088\)，各量均表现出稳定收敛。随后在 \(1\,\mathrm{s}\) mode1\_phi\_pio2 工况上，G2、G3 点态、G3 impulse 和扰动能量峰峰漂移分别为 \(0.00146226\)、\(0.000221162\)、\(0.0000563606\) 和 \(0.00307057<0.005\)，均满足预设阈值。\Cref{tab:canonical-time-step,fig:b0-r2-convergence-orders}给出相应数值。
+历史三层表格中的动量率行现标为含输运项的 \(\dot p_N\) proxy；由于尚未交付 \(B_N,\dot B_N,P_{\mathrm{full}}\) 原始数组和实现，该行不能作为 canonical 合同的新验证。冻结记录报告的观察阶范围为 \(1.64186\)--\(2.00088\)，随后 \(1\,\mathrm{s}\) mode1\_phi\_pio2 工况报告 G2、G3 点态、G3 impulse 和扰动能量峰峰漂移分别为 \(0.00146226\)、\(0.000221162\)、\(0.0000563606\) 和 \(0.00307057<0.005\)。这些历史数值仍待输运修正映射实现后重算；\Cref{tab:canonical-time-step,fig:b0-r2-convergence-orders}给出冻结记录。
 
 \input{tables/tab_r2_qualification_zh}
 

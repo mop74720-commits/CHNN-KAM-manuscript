@@ -53,7 +53,7 @@ For a nonautonomous Hamiltonian \(H\left( \mathbf{Z},t \right)\), introduce the 
 
 and integrate with respect to the extended canonical symplectic form. A transition to the formulation of the next subsection is needed only when the variables are noncanonical or when the system possesses a special Birkhoff representation.
 
-The order-2 BDF scheme used for canonical data processing is not a symplectic stepper of the type defined in this section. It supplies only an observable \texttt{tsteps} sequence for COMSOL solver-step state sampling and canonical vector-field label generation. Three-level observed convergence and satisfaction of the predefined G0--G6 thresholds show only that the data contract is suitable for subsequent amplitude-sentinel experiments. Neither BDF energy drift nor second-order convergence is used to infer symplecticity; a subsequent KAM computation must use a separately proven symplectic map and quantify its discretization defect.
+The order-2 BDF scheme used for canonical data processing is not a symplectic stepper of the type defined in this section. It supplies only an observable \texttt{tsteps} sequence for COMSOL solver-step state sampling and canonical vector-field label generation. The frozen single-sentinel record can at most be a candidate input to a later A1 qualification experiment; it does not establish G0--G6 qualification across modes, amplitudes, or operating conditions. Neither BDF energy drift nor second-order convergence is used to infer symplecticity; a subsequent KAM computation must use a separately proven symplectic map and quantify its discretization defect.
 
 \subsection{Self-adjoint representation of a Birkhoff system}\label{sec:symplectic-kam-5-3}
 
@@ -79,6 +79,13 @@ K_{ij}{\dot{z}}_{j} + D_{i} = 0.
 \end{equation}
 
 On a local star-shaped domain, if \(\mathbf{K}\) is nondegenerate and satisfies skew symmetry, the spatial closure condition, and the temporal compatibility condition, then the system admits a regular self-adjoint Birkhoff representation. Equivalently, functions \(F_{i}\) and \(B\) can be found such that the preceding equation holds\cite{FengQin2010,HairerLubichWanner2006GNI}. Define the time-dependent two-form
+
+For clarity, the closure and compatibility conditions used here are
+\[
+\partial_{z_k}K_{ij}+\partial_{z_i}K_{jk}+\partial_{z_j}K_{ki}=0,\qquad
+\partial_t K_{ij}=\partial_{z_j}D_i-\partial_{z_i}D_j,
+\]
+on the same local domain, together with \(K_{ij}=-K_{ji}\) and \(\inf_{\mathcal{D}}\sigma_{min}(K)>0\). The present manuscript does not instantiate these conditions numerically.
 
 \begin{equation}
 \label{eq:symplectic-kam-5-8}

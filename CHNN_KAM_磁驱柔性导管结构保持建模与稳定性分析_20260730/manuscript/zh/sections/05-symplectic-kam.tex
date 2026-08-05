@@ -53,7 +53,7 @@ Hamiltonian Birkhoff 正规形用于第三、四部分构造 \(H_{0} + \varepsil
 
 在扩展标准辛形式上积分。只有在变量本身非正则或系统满足特殊 Birkhoff 表示时，才需要转入下一节。
 
-canonical 数据处理所用的 BDF order-2 不是本节所述辛步进器。它只为 COMSOL solver-step 状态采样和 canonical 向量场标签生成提供可观察的 \texttt{tsteps} 序列；三层观察收敛及 G0--G6 满足预设阈值仅说明数据合同适用于后续幅值哨兵实验。本文不从 BDF 的能量漂移或二阶收敛推断辛性，后续 KAM 计算必须采用另行证明的辛映射并评估其离散缺陷。
+canonical 数据处理所用的 BDF order-2 不是本节所述辛步进器。它只为 COMSOL solver-step 状态采样和 canonical 向量场标签生成提供可观察的 \texttt{tsteps} 序列；冻结的单一哨兵记录至多可作为后续 A1 资格实验的候选输入，不认证跨 mode、幅值或工况的 G0--G6 资格。本文不从 BDF 的能量漂移或二阶收敛推断辛性，后续 KAM 计算必须采用另行证明的辛映射并评估其离散缺陷。
 
 \subsection{Birkhoff 系统自伴表示}\label{sec:symplectic-kam-5-3}
 
@@ -78,7 +78,12 @@ Birkhoff 方程写为
 K_{ij}{\dot{z}}_{j} + D_{i} = 0.
 \end{equation}
 
-在局部星形区域内，若 \(\mathbf{K}\) 非退化并满足反对称性、空间闭合条件和时间相容条件，则系统具有正则、自伴 Birkhoff 表示；等价地，可找到 \(F_{i}\) 与 \(B\) 使上述方程成立\cite{FengQin2010,HairerLubichWanner2006GNI}。定义时变二形式
+在局部星形区域内，若 \(\mathbf{K}\) 非退化并满足反对称性、空间闭合条件和时间相容条件，则系统具有正则、自伴 Birkhoff 表示；等价地，可找到 \(F_{i}\) 与 \(B\) 使上述方程成立\cite{FengQin2010,HairerLubichWanner2006GNI}。为避免条件只停留在名称上，本文采用
+\[
+\partial_{z_k}K_{ij}+\partial_{z_i}K_{jk}+\partial_{z_j}K_{ki}=0,\qquad
+\partial_t K_{ij}=\partial_{z_j}D_i-\partial_{z_i}D_j,
+\]
+并同时要求 \(K_{ij}=-K_{ji}\) 及 \(\inf_{\mathcal{D}}\sigma_{min}(K)>0\)。当前稿件尚未对这些条件给出数值实例化。
 
 \begin{equation}
 \label{eq:symplectic-kam-5-8}

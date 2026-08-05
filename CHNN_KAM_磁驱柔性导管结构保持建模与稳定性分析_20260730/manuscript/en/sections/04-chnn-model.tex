@@ -244,9 +244,9 @@ The open-port training set is
 
 Samples used for probabilistic transfer to KAM theory may only come from \(\mathcal{D}_{K}^{cons}\). The total training loss of the open-port model cannot be interpreted as a Hamiltonian perturbation.
 
-The P1-series pilots use only three small trajectories---mode1, mode2, and mixed12---in the fixed \(N=2\) basis, with leave-one-whole-trajectory-out partitioning rather than random point splitting across a trajectory. P1 contains \(3\) folds\(\times4\) models\(\times5\) seeds, or \(60\) derivative-training runs; P1.5 contains \(45\) residual and \(15\) physics-only runs; and P1.6 contains \(30\) constrained and \(30\) unconstrained runs. The five seeds are algorithmic repetitions on the same physical trajectories and quantify optimization variability; they are not five independent physical samples. These pilots compare structural assumptions and expose failure modes but do not replace the planned 96-trajectory data set or full-scale P2 training.
+The P1-series pilots use only three small trajectories---mode1, mode2, and mixed12---in the fixed \(N_{\mathrm{diag}}=2\) diagnostic basis, with leave-one-whole-trajectory-out partitioning rather than random point splitting across a trajectory. P1 contains \(3\) folds\(\times4\) models\(\times5\) seeds, or \(60\) derivative-training runs; P1.5 contains \(45\) residual and \(15\) physics-only runs; and P1.6 contains \(30\) constrained and \(30\) unconstrained runs. The five seeds are algorithmic repetitions on the same physical trajectories and quantify optimization variability; they are not five independent physical samples. These pilots compare structural assumptions and expose failure modes but do not replace the planned 96-trajectory data set or full-scale P2 training.
 
-All preceding references to \(N=2\) in the pilot denote the \(N_{\mathrm{diag}}=2\) diagnostic basis, not the formal production order \(n_{\mathrm{main}}\) or a modal-sufficiency conclusion.
+All preceding references to a two-coordinate pilot denote the \(N_{\mathrm{diag}}=2\) diagnostic basis, not the formal production order \(n_{\mathrm{main}}\) or a modal-sufficiency conclusion.
 
 \subsubsection{Strict Weak-Form and High-Fidelity References}\label{sec:chnn-4-4-2}
 
@@ -290,14 +290,14 @@ The energy-balance loss is
 
 \begin{equation}
 \label{eq:chnn-4-26}
-\mathcal{L}_{E} = \frac{1}{N}\sum_{i = 1}^{N}\left| \frac{d{\widehat{H}}_{\lambda}}{d\tau} - \nabla_{\mathbf{P}}{\widehat{H}}_{\lambda}^{T}\left( {\widehat{\mathbf{Q}}}_{diss,\mu} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + \mathbf{Q}_{\partial} + {\widehat{\mathbf{r}}}_{\eta} \right) - \partial_{\tau}{\widehat{H}}_{\lambda} \right|^{2}.
+\mathcal{L}_{E} = \frac{1}{N}\sum_{i = 1}^{N}\left| \frac{d{\widehat{H}}_{\lambda}}{d\tau} - \nabla_{\mathbf{P}}{\widehat{H}}_{\lambda}^{T}\left( {\widehat{\mathbf{Q}}}_{diss,\mu}^{bulk} + {\widehat{\mathbf{Q}}}_{contact} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + \mathbf{Q}_{\partial} + {\widehat{\mathbf{r}}}_{\eta} \right) - \partial_{\tau}{\widehat{H}}_{\lambda} \right|^{2}.
 \end{equation}
 
-The dissipation-sign constraint is imposed only on \({\widehat{\mathbf{Q}}}_{diss,\mu}\):
+The energy balance therefore accounts for bulk dissipation power and contact power exactly once. The dissipation-sign constraint is imposed only on the bulk component \({\widehat{\mathbf{Q}}}_{diss,\mu}^{bulk}\); contact damping, friction, and impact power are tracked by the separate \({\widehat{\mathbf{Q}}}_{contact}\) channel and are not included in this passivity term:
 
 \begin{equation}
 \label{eq:chnn-4-27}
-\mathcal{L}_{pass} = \frac{1}{N}\sum_{i = 1}^{N}\left\lbrack \max\left\{ 0,\nabla_{\mathbf{P}}{\widehat{H}}_{\lambda}^{T}{\widehat{\mathbf{Q}}}_{diss,\mu} \right\} \right\rbrack^{2}.
+\mathcal{L}_{pass} = \frac{1}{N}\sum_{i = 1}^{N}\left\lbrack \max\left\{ 0,\nabla_{\mathbf{P}}{\widehat{H}}_{\lambda}^{T}{\widehat{\mathbf{Q}}}_{diss,\mu}^{bulk} \right\} \right\rbrack^{2}.
 \end{equation}
 
 \subsubsection{Trajectory, Gauge, and Symplectic-Structure Losses}\label{sec:chnn-4-5-3}
@@ -360,7 +360,7 @@ which guarantees at the code-structure level that
 \left( \nabla_{\mathbf{p}}H_{\theta} \right)^{T}\mathbf{Q}_{diss}^{bulk} \leq 0.
 \end{equation}
 
-The implementation corresponds to the theory as follows. The canonical-scaling module first transforms the dimensional pair \(\left(\mathbf{q},\mathbf{p}\right)\) into the nondimensional canonical pair \(\left(\mathbf{Q},\mathbf{P}\right)\) and then constructs the complex coordinates. The complex backbone provides both standard complex-linear layers and widely linear layers of the form \(\mathbf{W}\bm{\xi}+\mathbf{V}\overline{\bm{\xi}}+\mathbf{b}\). The Hamiltonian head outputs only a real scalar and uses the gray-box structure \(H_{phys}+\Delta H_{\theta}\). Dissipation, magnetic input, flow, boundary, contact, and residual error are represented by independent generalized-force heads and enter only the momentum equation through \(\mathbf{B}\). The data interface uses \texttt{representation} to distinguish \(\mathbf{p}_{0} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}}\) from \(\mathbf{p} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - \mathbf{b}_{A}\), uses \texttt{model\_level} to distinguish the Kirchhoff Beam, strict weak-form, and high-fidelity reference models, and uses \texttt{conservative\_mask} to isolate conservative samples accessible to the statistical-learning--KAM analysis. The training pipeline implements the three stages ``conservative Hamiltonian--ports--joint fine-tuning'' and provides a real-valued HNN and a black-box vector-field network as comparison baselines.
+The implementation corresponds to the theory as follows. The canonical-scaling module first transforms the dimensional pair \(\left(\mathbf{q},\mathbf{p}\right)\) into the nondimensional canonical pair \(\left(\mathbf{Q},\mathbf{P}\right)\) and then constructs the complex coordinates. The complex backbone provides both standard complex-linear layers and widely linear layers of the form \(\mathbf{W}\bm{\xi}+\mathbf{V}\overline{\bm{\xi}}+\mathbf{b}\). The Hamiltonian head outputs only a real scalar and uses the gray-box structure \(H_{phys}+\Delta H_{\theta}\). Dissipation, magnetic input, flow, boundary, contact, and residual error are represented by independent generalized-force heads and enter only the momentum equation through \(\mathbf{B}_{port}\). The data interface uses \texttt{representation} to distinguish \(\mathbf{p}_{0} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}}\) from \(\mathbf{p} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - \mathbf{b}_{A}\), uses \texttt{model\_level} to distinguish the Kirchhoff Beam, strict weak-form, and high-fidelity reference models, and uses \texttt{conservative\_mask} to isolate conservative samples accessible to the statistical-learning--KAM analysis. The training pipeline implements the three stages ``conservative Hamiltonian--ports--joint fine-tuning'' and provides a real-valued HNN and a black-box vector-field network as comparison baselines.
 
 The software passed the following structural-consistency tests:
 

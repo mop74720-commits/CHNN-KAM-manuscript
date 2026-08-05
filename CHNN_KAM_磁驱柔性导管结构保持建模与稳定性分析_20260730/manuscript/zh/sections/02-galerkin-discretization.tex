@@ -972,7 +972,7 @@ e_{n}^{freq} = \max_{1 \leq j \leq m}\frac{\left| \omega_{j}^{(n + 1)} - \omega_
 
 其中 \(\mathbf{q}^{(n)}\in\mathbb{R}^{n}\)、\(\mathbf{q}^{(n+1)}\in\mathbb{R}^{n+1}\)，\(\Pi_{n+1\rightarrow n}\in\mathbb{R}^{n\times(n+1)}\)；两条轨迹必须对应同一物理工况和同一时间网格。若分母为零，改报未归一化的绝对误差。并以能量和扭转量定义同类指标。正式生产阶数记为 \(n_{\mathrm{main}}\)，取为所有指定指标首次同时低于容差的位置。正文在尚未完成该计算时只能保留 \(n_{\mathrm{main}}\) 为待确定参数，不能把某一经验阶数写成已经证明充分。
 
-本文采用固定的 \(N_{\mathrm{diag}}=2\) 基检验 canonical 数据映射。该基取自 mesh-80 的近频簇，经有限元一致质量度量正交归一，并固定符号、归一化和自由度行序；它定义 P1 系列及后续数据一致性分析所用的 paired-coordinate contract。完整 bridge 同时保留前 12 个候选生产模态及 mesh-40/80 交叉比较，因此 \(N_{\mathrm{diag}}=2\) 不替代上文 \(n_{\mathrm{main}}\) 的收敛判据，也不构成高保真充分性结论。
+本文采用固定的 \(N_{\mathrm{diag}}=2\) 诊断基检验 canonical 数据映射。该基取自 mesh-80 的近频簇，经有限元一致质量度量正交归一，并固定符号、归一化和自由度行序；它定义 P1 系列及后续数据一致性分析所用的 paired-coordinate contract。完整 bridge 同时保留前 12 个候选模态及 mesh-40/80 交叉比较，因此 \(N_{\mathrm{diag}}=2\) 不替代上文 \(n_{\mathrm{main}}\) 的收敛判据，也不构成高保真充分性结论。
 
 \subsection{数值实现与有限维模型输出}\label{sec:galerkin-2-11}
 

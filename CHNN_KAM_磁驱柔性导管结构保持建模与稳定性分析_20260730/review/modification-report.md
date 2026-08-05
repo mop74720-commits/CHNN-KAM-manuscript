@@ -68,3 +68,36 @@
 3. P1/P2 的 fold manifest、归一化、早停、参数量、预算和硬件记录。
 4. 约束 Jacobian 秩、约束残差与 \(N_{\mathrm{diag}}=2\) pilot 的正则坐标对应。
 5. 接触端口和控制输入在正式代码中是否仅进入动量通道且不重复计功。
+
+## 8. 第二轮返工（PR #1 第一次独立复审后）
+
+### 8.1 基线与编号说明
+
+- 返工基线：`fix/first-review@04596a741daa62ceece61d87f46105562901d3fd`。
+- PR：#1，保持 Draft；未创建新 PR，未修改或合并 `main`。
+- 本节保留第 1--7 节的第一次修改记录，不覆盖历史状态。
+- 用户第二轮指令将 provenance release 门列为 A-12、bulk/contact 分账列为 A-13；PR 独立复审正文分别将这两项列为 A-13、A-15。本节按用户给出的五个 FAIL 任务名报告，并在证据栏保留实际对象，避免用编号差异掩盖内容。
+
+### 8.2 五个 FAIL 的返工记录
+
+| 返工项 | 修改文件与位置 | 实际修改内容 | 验证命令与结果 | 当前状态 | 剩余风险 |
+|---|---|---|---|---|---|
+| A-01 canonical 合同 | `frontmatter/zh/abstract-en.tex`；双语第 01--04、06 章；`backmatter/appendices-{zh,en}.tex`；`tables/tab_canonical_diagnostic_chain_{zh,en}.tex`；`tables/tab_r2_qualification_{zh,en}.tex` | 全部有效输入统一为 `p=B_N(q)^T P_full` 与 `dot p=dot B_N(q)^T P_full+B_N(q)^T dot P_full`；定义空间和维度；删除一般情形下的 `B^T L`；将旧 G3/R2 数值明确标为待原始数组重算的冻结历史记录 | `rg` 全源检索旧 `B^T L`、裸 `N=2` 和旧资格句：0 命中；双语审计通过；诊断编译通过 | PARTIAL | 缺 `B_N,dot B_N,P_full`、force-v2/G3 原始数组和正式实现，不能完成机器重算 |
+| A-12 provenance release 门 | `tools/build.py` | `--allow-provenance-mismatch` 与 `--no-check` 均只能用于显式诊断构建；诊断 PDF 仅写 `build/diagnostic/{zh,en}`；正式双语 PDF 在全部检查通过后才原子提升；编译器非零仅允许精确匹配的 MiKTeX 宿主告警；增加 formal source path/hash 检查 | 正式门 `python tools/build.py --language both --clean`：exit 4，release 哈希不变；绕过尝试仅加 allow 开关：exit 2，release 哈希不变；隔离诊断门：exit 0，release 哈希不变 | FIXED | release/diagnostic 隔离和 fail-closed 行为已验证；12 个资产哈希及上游 source 问题仍由 A-03 保持 PARTIAL |
+| A-13 bulk/contact 分账 | 双语第 04 章式 (4-25)--(4-27)、(4-32)--(4-34) | 动力学和能量损失统一使用 `Q_diss^bulk+Q_contact+Q_in+Q_flow+Q_partial+r_eta`；`L_pass` 只约束 `Q_diss^bulk`；接触阻尼、摩擦和冲击功率只进入独立 contact 通道一次 | 双语语义审计通过；全文检索确认式 (4-26)/(4-27) 不再使用旧 `Q_diss`；双语诊断编译通过 | PARTIAL | 正式端口实现和逐样本功率数组未交付，无法执行机器单计功断言 |
+| A-15 双语合同唯一性 | `frontmatter/{zh,en}/abstract.tex`、`frontmatter/zh/abstract-en.tex`；双语第 01--06 章；双语附录和诊断表 | 磁场统一为 `B_mag`、端口嵌入统一为 `B_port`、载荷率为 `L_full`、诊断阶数为 `N_diag`、正式阶数为待定 `n_main`；删除“前 12 个生产模态”和多幅值资格平行定义 | `audit_semantics.py --language zh/en`、`audit_bilingual.py` 均 exit 0；旧合同语义检索 0 命中；双语 PDF 构建成功 | PARTIAL | 审计工具不证明未交付代码对象一致；`n_main` 仍未由正式收敛实验选择 |
+| A-16 失败位置及联动 | 双语第 03 章式 (3-91)/(3-94)；双语第 05 章式 (5-7) 附近；双语第 06 章及表格 | 明确 `F_h^cons:=F_{lambda,h}`，消除 `delta_alg` 的二次对象；写出 Birkhoff 空间闭合和时间相容条件；同步 canonical、bulk/contact 和符号迁移的联动位置 | 双语语义/结构审计与编译通过；无重复 label、未解析引用或 Overfull | PARTIAL | 具体辛映射、Birkhoff 结构、余项范数及实现记录仍未交付 |
+
+### 8.3 独立复审中的 PARTIAL 与 BLOCKED
+
+- PARTIAL 保持：A-03、A-07、A-08、A-11、A-14、A-17。A-08 已统一数值映射对象；A-11 已补写闭合/相容公式；A-17 已修正 README/KNOWN_ISSUES，验证骨架增加断言、有限差分步长扫描并原子生成 JSON。缺正式机器输出或实现的验收条件仍未关闭。
+- BLOCKED 保持：A-02、A-04、A-05、A-06、A-09。未交付正式源码、原始数组、指标函数、fold manifest、model card、约束秩/残差和坐标变换记录，未虚构数据解除阻塞。
+- A-10 保持独立复审的 VERIFIED 结论，本轮未改动其定理边界。
+
+### 8.4 第二轮构建与门结果
+
+- 正式 provenance 门：exit 4；检测到 12 个资产哈希失配，未刷新；失败前后 `release/CHNN_KAM_Manuscript_{ZH,EN}.pdf` 哈希均不变。
+- 非诊断绕过尝试：`--allow-provenance-mismatch` 未配 `--diagnostic` 时 exit 2；release 哈希不变。
+- 诊断 provenance 门：`python tools/build.py --language both --clean --diagnostic --allow-provenance-mismatch` exit 0；中文 PDF 57 页，英文 PDF 69 页，均位于 `build/diagnostic`；release 哈希不变。
+- 日志检查：无未解析 citation/reference、重复 label、缺失图片/表格、Overfull、缺字或致命错误；BibTeX 无警告；英文保留 3 处 Underfull `\\hbox`。
+- 骨架验证：`python code/verification_skeleton.py` exit 0；断言通过，并原子更新 `code/verification_results.json`。有限差分缺陷在过小步长受舍入放大，未作单调下降结论。

@@ -388,10 +388,10 @@ V_{int} = \int_{0}^{L}W\, dS.
 
 \begin{equation}
 \label{eq:rod-1-43}
-\mathbf{T}_{M} = \frac{1}{\mu_{0}}\left( \mathbf{B} \otimes \mathbf{B} - \frac{1}{2}\left| \mathbf{B} \right|^{2}\mathbf{I} \right),
+\mathbf{T}_{M} = \frac{1}{\mu_{0}}\left( \mathbf{B}_{mag} \otimes \mathbf{B}_{mag} - \frac{1}{2}\left| \mathbf{B}_{mag} \right|^{2}\mathbf{I} \right),
 \end{equation}
 
-其中，\(\mathbf{B}\) 为磁感应强度，\(\mu_{0}\) 为真空磁导率。对参考长度为 \(\Delta S\) 的微段，单位参考长度磁力和关于中心线的磁力矩分别定义为
+其中，\(\mathbf{B}_{mag}\) 为磁感应强度，\(\mu_{0}\) 为真空磁导率。对参考长度为 \(\Delta S\) 的微段，单位参考长度磁力和关于中心线的磁力矩分别定义为
 
 \begin{equation}
 \label{eq:rod-1-44}
@@ -412,18 +412,18 @@ V_{int} = \int_{0}^{L}W\, dS.
 \bm{\mu}(S,t) = \mathbf{R}(S,t)\bm{\mu}_{0}^{b}(S).
 \end{equation}
 
-给定外磁场 \(\mathbf{B}\left( \mathbf{r},t \right)\) 时，磁势能可写为
+给定外磁场 \(\mathbf{B}_{mag}\left( \mathbf{r},t \right)\) 时，磁势能可写为
 
 \begin{equation}
 \label{eq:rod-1-47}
-V_{mag} = - \int_{0}^{L}\bm{\mu} \cdot \mathbf{B}\left( \mathbf{r},t \right)\, dS.
+V_{mag} = - \int_{0}^{L}\bm{\mu} \cdot \mathbf{B}_{mag}\left( \mathbf{r},t \right)\, dS.
 \end{equation}
 
 相应磁力和磁力矩为
 
 \begin{equation}
 \label{eq:rod-1-48}
-\mathbf{f}_{mag} = \nabla_{\mathbf{r}}\left( \bm{\mu} \cdot \mathbf{B} \right),\quad\quad\mathbf{l}_{mag} = \bm{\mu} \times \mathbf{B}.
+\mathbf{f}_{mag} = \nabla_{\mathbf{r}}\left( \bm{\mu} \cdot \mathbf{B}_{mag} \right),\quad\quad\mathbf{l}_{mag} = \bm{\mu} \times \mathbf{B}_{mag}.
 \end{equation}
 
 Maxwell 应力积分和磁偶极势能是同一磁作用的两种尺度表述，应根据模型精度选择其一作为主载荷模型，不能重复叠加。

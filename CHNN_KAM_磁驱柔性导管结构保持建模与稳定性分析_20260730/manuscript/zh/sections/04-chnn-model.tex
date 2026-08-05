@@ -244,9 +244,9 @@ COMSOL 主训练模型采用三维 Euler--Bernoulli Beam、几何非线性、动
 
 用于 KAM 概率传递的样本只能来自 \(\mathcal{D}_{K}^{cons}\)，不能把开放端口的总训练损失当作 Hamiltonian 小扰动。
 
-P1 系列 pilot 仅使用固定 \(N=2\) 基下的 mode1、mode2 和 mixed12 三条小轨迹，并按 leave-one-whole-trajectory-out 划分，未从同一轨迹随机抽点跨越训练/测试边界。P1 为 \(3\) folds\(\times4\) models\(\times5\) seeds 共 \(60\) 次导数训练；P1.5 为 \(45\) 次 residual 与 \(15\) 次 physics-only 运行；P1.6 为 \(30\) 次约束与 \(30\) 次非约束运行。这里的五个 seed 是同一物理轨迹上的算法重复，只刻画优化不确定性，不能当作五个独立物理样本。上述 pilot 用于比较结构假设和暴露失败模式，不能替代计划的 96 条轨迹数据集或完整规模 P2 训练。
+P1 系列 pilot 仅使用固定 \(N_{\mathrm{diag}}=2\) 诊断基下的 mode1、mode2 和 mixed12 三条小轨迹，并按 leave-one-whole-trajectory-out 划分，未从同一轨迹随机抽点跨越训练/测试边界。P1 为 \(3\) folds\(\times4\) models\(\times5\) seeds 共 \(60\) 次导数训练；P1.5 为 \(45\) 次 residual 与 \(15\) 次 physics-only 运行；P1.6 为 \(30\) 次约束与 \(30\) 次非约束运行。这里的五个 seed 是同一物理轨迹上的算法重复，只刻画优化不确定性，不能当作五个独立物理样本。上述 pilot 用于比较结构假设和暴露失败模式，不能替代计划的 96 条轨迹数据集或完整规模 P2 训练。
 
-上述 \(N=2\) 表述均指 \(N_{\mathrm{diag}}=2\) 诊断基，不是正式生产阶数 \(n_{\mathrm{main}}\) 或模态充分性结论。
+上述双坐标 pilot 表述均指 \(N_{\mathrm{diag}}=2\) 诊断基，不是正式生产阶数 \(n_{\mathrm{main}}\) 或模态充分性结论。
 
 \subsubsection{严格弱形式和高保真对照}\label{sec:chnn-4-4-2}
 
@@ -290,14 +290,14 @@ P1 系列 pilot 仅使用固定 \(N=2\) 基下的 mode1、mode2 和 mixed12 三�
 
 \begin{equation}
 \label{eq:chnn-4-26}
-\mathcal{L}_{E} = \frac{1}{N}\sum_{i = 1}^{N}\left| \frac{d{\widehat{H}}_{\lambda}}{d\tau} - \nabla_{\mathbf{P}}{\widehat{H}}_{\lambda}^{T}\left( {\widehat{\mathbf{Q}}}_{diss,\mu} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + \mathbf{Q}_{\partial} + {\widehat{\mathbf{r}}}_{\eta} \right) - \partial_{\tau}{\widehat{H}}_{\lambda} \right|^{2}.
+\mathcal{L}_{E} = \frac{1}{N}\sum_{i = 1}^{N}\left| \frac{d{\widehat{H}}_{\lambda}}{d\tau} - \nabla_{\mathbf{P}}{\widehat{H}}_{\lambda}^{T}\left( {\widehat{\mathbf{Q}}}_{diss,\mu}^{bulk} + {\widehat{\mathbf{Q}}}_{contact} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + \mathbf{Q}_{\partial} + {\widehat{\mathbf{r}}}_{\eta} \right) - \partial_{\tau}{\widehat{H}}_{\lambda} \right|^{2}.
 \end{equation}
 
-耗散符号约束只施加于 \({\widehat{\mathbf{Q}}}_{diss,\mu}\)：
+能量平衡因此把体内耗散功率和接触功率各计一次。耗散符号约束只施加于体内分量 \({\widehat{\mathbf{Q}}}_{diss,\mu}^{bulk}\)；接触阻尼、摩擦和冲击功率由独立的 \({\widehat{\mathbf{Q}}}_{contact}\) 通道记录，不进入该被动约束：
 
 \begin{equation}
 \label{eq:chnn-4-27}
-\mathcal{L}_{pass} = \frac{1}{N}\sum_{i = 1}^{N}\left\lbrack \max\left\{ 0,\nabla_{\mathbf{P}}{\widehat{H}}_{\lambda}^{T}{\widehat{\mathbf{Q}}}_{diss,\mu} \right\} \right\rbrack^{2}.
+\mathcal{L}_{pass} = \frac{1}{N}\sum_{i = 1}^{N}\left\lbrack \max\left\{ 0,\nabla_{\mathbf{P}}{\widehat{H}}_{\lambda}^{T}{\widehat{\mathbf{Q}}}_{diss,\mu}^{bulk} \right\} \right\rbrack^{2}.
 \end{equation}
 
 \subsubsection{轨迹、规范与辛结构损失}\label{sec:chnn-4-5-3}
@@ -360,7 +360,7 @@ H_{\theta}\left( \mathbf{x},\bm{\mu} \right) = H_{phys}\left( \mathbf{x},\bm{\mu
 \left( \nabla_{\mathbf{p}}H_{\theta} \right)^{T}\mathbf{Q}_{diss}^{bulk} \leq 0.
 \end{equation}
 
-实现层与理论层的对应关系如下：正则尺度模块先把有量纲 \(\left( \mathbf{q},\mathbf{p} \right)\) 变换为无量纲正则对 \(\left( \mathbf{Q},\mathbf{P} \right)\)，再构造复坐标；复值主干同时提供标准复线性层和 \(\mathbf{W}\bm{\xi} + \mathbf{V}\overline{\bm{\xi}} + \mathbf{b}\) 型广义复线性层；Hamiltonian 头只输出实标量，并采用 \(H_{phys} + \Delta H_{\theta}\) 灰箱结构；耗散、磁输入、流场、边界、接触和剩余误差分别由独立广义力头表示，且只通过 \(\mathbf{B}\) 进入动量方程；数据接口用 \texttt{representation} 区分 \(\mathbf{p}_{0} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}}\) 与 \(\mathbf{p} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - \mathbf{b}_{A}\)，用 \texttt{model\_level} 区分 Kirchhoff Beam、严格弱形式和高保真对照模型，并以 \texttt{conservative\_mask} 隔离可供统计学习--KAM 分析读取的保守样本。训练流程实现``保守 Hamiltonian--端口--联合微调''三阶段，同时提供实值 HNN 和黑箱向量场网络作为比较基线。
+实现层与理论层的对应关系如下：正则尺度模块先把有量纲 \(\left( \mathbf{q},\mathbf{p} \right)\) 变换为无量纲正则对 \(\left( \mathbf{Q},\mathbf{P} \right)\)，再构造复坐标；复值主干同时提供标准复线性层和 \(\mathbf{W}\bm{\xi} + \mathbf{V}\overline{\bm{\xi}} + \mathbf{b}\) 型广义复线性层；Hamiltonian 头只输出实标量，并采用 \(H_{phys} + \Delta H_{\theta}\) 灰箱结构；耗散、磁输入、流场、边界、接触和剩余误差分别由独立广义力头表示，且只通过 \(\mathbf{B}_{port}\) 进入动量方程；数据接口用 \texttt{representation} 区分 \(\mathbf{p}_{0} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}}\) 与 \(\mathbf{p} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - \mathbf{b}_{A}\)，用 \texttt{model\_level} 区分 Kirchhoff Beam、严格弱形式和高保真对照模型，并以 \texttt{conservative\_mask} 隔离可供统计学习--KAM 分析读取的保守样本。训练流程实现``保守 Hamiltonian--端口--联合微调''三阶段，同时提供实值 HNN 和黑箱向量场网络作为比较基线。
 
 软件实现通过了以下结构一致性检验：
 

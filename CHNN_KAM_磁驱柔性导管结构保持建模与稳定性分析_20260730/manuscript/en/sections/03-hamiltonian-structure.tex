@@ -858,7 +858,7 @@ For the autonomous conservative branch, a structure-preserving integrator produc
 F_{h}^{cons}\neq\Phi_{h}^{cons}\ \text{in general},\qquad \delta_{alg}:=\lVert F_{h}^{cons}-\Phi_{h}^{cons}\rVert.
 \end{equation}
 
-Here \(F_h\) is used below as shorthand for the actual numerical conservative map \(F_h^{cons}\); \(\Phi_h^{cons}\) remains the exact flow of the continuous Hamiltonian, and \(\delta_{alg}\) is their algorithmic difference, so a general integrator must not be identified with the exact flow. \Cref{sec:symplectic-kam} first verifies whether \(F_{h}\) is an exact symplectic map and then applies the KAM conditions for symplectic maps and symplectic algorithms due to Shang together with the parameterization method of Haro et al.\cite{FengQin2010,Shang1999KAMAlgorithms,Shang2000KAMMappings,Haro2016Parameterization} The torus embedding \(K:\mathbb{T}^{d}\rightarrow\mathcal{M}\) satisfies\cite{Haro2016Parameterization}
+For the remainder, define \(F_{h}^{cons}:=F_{\lambda,h}\) as the same conservative numerical map used in \Cref{eq:hamiltonian-3-91}; \(\Phi_h^{cons}\) remains the exact flow of the continuous Hamiltonian, and \(\delta_{alg}\) is their algorithmic difference. A general integrator must not be identified with the exact flow. \Cref{sec:symplectic-kam} first verifies whether \(F_{h}^{cons}\) is an exact symplectic map and then applies the KAM conditions for symplectic maps and symplectic algorithms due to Shang together with the parameterization method of Haro et al.\cite{FengQin2010,Shang1999KAMAlgorithms,Shang2000KAMMappings,Haro2016Parameterization} The torus embedding \(K:\mathbb{T}^{d}\rightarrow\mathcal{M}\) satisfies\cite{Haro2016Parameterization}
 
 \begin{equation}
 \label{eq:hamiltonian-3-95}
