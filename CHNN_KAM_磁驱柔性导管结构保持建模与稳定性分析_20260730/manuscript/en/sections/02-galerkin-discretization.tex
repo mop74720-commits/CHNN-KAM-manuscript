@@ -1,0 +1,1109 @@
+% Migrated from the Word baseline; do not duplicate content in other section files.
+\section{Joint Translational--Rotational Galerkin Discretization}\label{sec:galerkin-discretization}
+
+\subsection{Discretization principles}\label{sec:galerkin-2-1}
+
+\Cref{sec:rod-model} established the complete coupled weak form with \(\mathbf{r}(S,t)\) and \(\mathbf{R}(S,t) \in SO(3)\) as the primary fields. Rather than reducing it to a fourth-order centerline-only equation, this section performs a joint Galerkin discretization directly in the translational space and in a local coordinate chart of the rotation group.
+
+The discretization follows five principles. First, the centerline position and cross-sectional orientation retain independent generalized coordinates. Second, rotation matrices cannot be superposed linearly as ordinary vectors and must be updated through the exponential map or an equivalent multiplicative rule. Third, the mass--inertia matrix must be derived from the complete three-dimensional material-point kinetic energy rather than assumed a priori to be constant or configuration dependent. Fourth, geometric inertial terms must follow rigorously from the Euler--Lagrange derivative of the discrete kinetic energy. Fifth, internal forces are obtained from the gradient of the discrete potential, while boundary forces and moments enter the generalized forces naturally through the weak form.\cite{Sola2018MicroLie,MarsdenRatiu1999MechanicsSymmetry,HairerLubichWanner2006GNI}
+
+\subsection{Joint finite-dimensional approximation}\label{sec:galerkin-2-2}
+
+\subsubsection{Translational approximation}\label{sec:galerkin-2-2-1}
+
+Let \(\mathbf{N}(S)\) be matrix-valued basis functions satisfying the essential translational boundary conditions. Approximate the centerline by
+
+\begin{equation}
+\label{eq:galerkin-2-1}
+\mathbf{r}_{h}(S,t) = \mathbf{r}_{0}(S) + \mathbf{N}(S)\mathbf{a}(t),
+\end{equation}
+
+where \(\mathbf{a}(t) \in \mathbb{R}^{n_{a}}\) contains the translational generalized coordinates. Hence,
+
+\begin{equation}
+\label{eq:galerkin-2-2}
+{\dot{\mathbf{r}}}_{h} = \mathbf{N}\dot{\mathbf{a}},\quad\quad\mathbf{r}_{h,S} = \mathbf{r}_{0,S} + \mathbf{N}_{,S}\mathbf{a}.
+\end{equation}
+
+If the essential boundary conditions are time dependent, a known lifting function may be added to the approximation; its first and second time derivatives are treated as prescribed generalized loads. To emphasize the structural formulation, the boundary conditions are assumed homogeneous below.
+
+\subsubsection{Approximation of cross-sectional orientation}\label{sec:galerkin-2-2-2}
+
+Let \(\mathbf{R}_{0}(S)\) be the reference orientation. In a neighborhood of the reference state, use exponential coordinates for the rotation vector:
+
+\begin{equation}
+\label{eq:galerkin-2-3}
+\mathbf{R}_{h}(S,t) = \mathbf{R}_{0}(S)\exp\left( \widehat{\bm{\theta}_{h}(S,t)} \right),
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-4}
+\bm{\theta}_{h}(S,t) = \bm{\Psi}(S)\mathbf{b}(t),
+\end{equation}
+
+where \(\mathbf{b}(t) \in \mathbb{R}^{n_{b}}\) contains the rotational generalized coordinates and \(\bm{\Psi}(S)\) is a matrix-valued basis satisfying the essential rotational boundary conditions. Define
+
+\begin{equation}
+\label{eq:galerkin-2-5}
+\mathbf{E}_{h} = \exp\left( \widehat{\bm{\theta}_{h}} \right).
+\end{equation}
+
+so that
+
+\begin{equation}
+\label{eq:galerkin-2-6}
+\mathbf{R}_{h} = \mathbf{R}_{0}\mathbf{E}_{h}.
+\end{equation}
+
+Exponential coordinates form a local chart on \(SO(3)\). Provided that the rotational neighborhood does not cross the singular set of the exponential map, this parameterization is smooth and one-to-one and is suitable for finite-dimensional modal truncation and local nonlinear analysis. Global time integration through large rotations may instead employ chart switching or unit quaternions without changing the underlying mechanical derivation.
+
+\subsubsection{Right Jacobian and angular velocity}\label{sec:galerkin-2-2-3}
+
+Let \(\theta = \parallel \bm{\theta}_{h} \parallel\). The right Jacobian of the rotation vector is defined by
+
+\begin{equation}
+\label{eq:galerkin-2-7}
+\mathbf{J}_{r}\left( \bm{\theta}_{h} \right) = \mathbf{I} - \frac{1 - \cos\theta}{\theta^{2}}\widehat{\bm{\theta}_{h}} + \frac{\theta - \sin\theta}{\theta^{3}}{\widehat{\bm{\theta}_{h}}}^{\, 2}.
+\end{equation}
+
+As \(\theta \rightarrow 0\), continuous extension gives
+
+\begin{equation}
+\label{eq:galerkin-2-8}
+\mathbf{J}_{r}\left( \bm{\theta}_{h} \right) = \mathbf{I} - \frac{1}{2}\widehat{\bm{\theta}_{h}} + \frac{1}{6}{\widehat{\bm{\theta}_{h}}}^{\, 2} + O\left( \theta^{3} \right).
+\end{equation}
+
+The exact differential relation of the exponential map gives the material angular velocity
+
+\begin{equation}
+\label{eq:galerkin-2-9}
+\bm{\omega}_{h} = \mathbf{J}_{r}\left( \bm{\theta}_{h} \right){\dot{\bm{\theta}}}_{h} = \mathbf{J}_{r}\left( \bm{\theta}_{h} \right)\bm{\Psi}\dot{\mathbf{b}}.
+\end{equation}
+
+Define the angular-velocity matrix
+
+\begin{equation}
+\label{eq:galerkin-2-10}
+\mathbf{B}_{\omega}\left( S,\mathbf{b} \right) = \mathbf{J}_{r}\left( \bm{\theta}_{h} \right)\bm{\Psi}(S),
+\end{equation}
+
+Then
+
+\begin{equation}
+\label{eq:galerkin-2-11}
+\bm{\omega}_{h} = \mathbf{B}_{\omega}\left( S,\mathbf{b} \right)\dot{\mathbf{b}}.
+\end{equation}
+
+Thus, \(\bm{\omega}_{h} = \bm{\Psi}\dot{\mathbf{b}}\) cannot in general be assumed; that relation is only a zeroth-order small-rotation approximation.
+
+\subsubsection{Joint generalized coordinates and virtual variables}\label{sec:galerkin-2-2-4}
+
+Define the complete generalized coordinate vector
+
+\begin{equation}
+\label{eq:galerkin-2-12}
+\mathbf{q} = \begin{bmatrix}
+\mathbf{a} \\
+\mathbf{b}
+\end{bmatrix} \in \mathbb{R}^{n},\quad\quad n = n_{a} + n_{b}.
+\end{equation}
+
+The translational virtual displacement is
+
+\begin{equation}
+\label{eq:galerkin-2-13}
+\delta\mathbf{r}_{h} = \mathbf{N}\,\delta\mathbf{a}.
+\end{equation}
+
+From \(\delta\mathbf{R}_{h} = \mathbf{R}_{h}\widehat{\bm{\eta}_{h}}\), the material virtual rotation satisfies
+
+\begin{equation}
+\label{eq:galerkin-2-14}
+\bm{\eta}_{h} = \mathbf{J}_{r}\left( \bm{\theta}_{h} \right)\delta\bm{\theta}_{h} = \mathbf{B}_{\omega}\left( S,\mathbf{b} \right)\delta\mathbf{b}.
+\end{equation}
+
+Accordingly, the translational and rotational test functions are \(\mathbf{N}\) and \(\mathbf{B}_{\omega}\), respectively, and both enter the coupled Galerkin condition.
+
+For \(\mathbf{q} = \mathbf{0}\) to represent a stress-free reference configuration, the reference centerline, reference orientation, and reference strains must satisfy the compatibility relations
+
+\begin{equation}
+\label{eq:galerkin-2-15}
+\bm{\nu}_{0}(S) = \mathbf{R}_{0}^{T}(S)\mathbf{r}_{0,S}(S),
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-16}
+{\widehat{\bm{\kappa}}}_{0}(S) = \mathbf{R}_{0}^{T}(S)\mathbf{R}_{0,S}(S).
+\end{equation}
+
+If these relations are not satisfied, \(\mathbf{q} = \mathbf{0}\) describes a pre-extended, pre-sheared, pre-bent, or pre-twisted configuration, with the corresponding initial force and moment generated automatically by \(V_{int,h}\). The equilibrium state, tangent stiffness, and center of the KAM expansion must use the same reference convention.
+
+\subsection{Discrete strains and potential energy}\label{sec:galerkin-2-3}
+
+\subsubsection{Shear--extension strain}\label{sec:galerkin-2-3-1}
+
+The discrete shear--extension strain is
+
+\begin{equation}
+\label{eq:galerkin-2-17}
+\bm{\nu}_{h}\left( \mathbf{q} \right) = \mathbf{R}_{h}^{T}\mathbf{r}_{h,S} = \mathbf{E}_{h}^{T}\mathbf{R}_{0}^{T}\left( \mathbf{r}_{0,S} + \mathbf{N}_{,S}\mathbf{a} \right).
+\end{equation}
+
+Its virtual variation can be written as
+
+\begin{equation}
+\label{eq:galerkin-2-18}
+\delta\bm{\nu}_{h} = \mathbf{R}_{h}^{T}\mathbf{N}_{,S}\delta\mathbf{a} - \bm{\eta}_{h} \times \bm{\nu}_{h}.
+\end{equation}
+
+Thus, there exists a strain--generalized-coordinate matrix \(\mathbf{B}_{\nu}\left( S,\mathbf{q} \right)\) such that
+
+\begin{equation}
+\label{eq:galerkin-2-19}
+\delta\bm{\nu}_{h} = \mathbf{B}_{\nu}\left( S,\mathbf{q} \right)\delta\mathbf{q}.
+\end{equation}
+
+Explicitly,
+
+\begin{equation}
+\label{eq:galerkin-2-20}
+\mathbf{B}_{\nu} = \begin{bmatrix}
+\mathbf{R}_{h}^{T}\mathbf{N}_{,S} & \widehat{\bm{\nu}_{h}}\mathbf{B}_{\omega}
+\end{bmatrix},
+\end{equation}
+
+because \(- \bm{\eta}_{h} \times \bm{\nu}_{h} = \widehat{\bm{\nu}_{h}}\bm{\eta}_{h}\).
+
+\subsubsection{Curvature--torsion strain}\label{sec:galerkin-2-3-2}
+
+Define the curvature--torsion vector of the reference orientation by
+
+\begin{equation}
+\label{eq:galerkin-2-21}
+\widehat{\bm{\kappa}_{R}} = \mathbf{R}_{0}^{T}\mathbf{R}_{0,S}.
+\end{equation}
+
+From \(\mathbf{R}_{h} = \mathbf{R}_{0}\mathbf{E}_{h}\), one obtains
+
+\begin{equation}
+\label{eq:galerkin-2-22}
+\mathbf{R}_{h}^{T}\mathbf{R}_{h,S} = \mathbf{E}_{h}^{T}\widehat{\bm{\kappa}_{R}}\mathbf{E}_{h} + \mathbf{E}_{h}^{T}\mathbf{E}_{h,S}.
+\end{equation}
+
+Hence, the discrete curvature--torsion vector is
+
+\begin{equation}
+\label{eq:galerkin-2-23}
+\boxed{\bm{\kappa}_{h}\left( \mathbf{q} \right) = \mathbf{E}_{h}^{T}\bm{\kappa}_{R} + \mathbf{J}_{r}\left( \bm{\theta}_{h} \right)\bm{\theta}_{h,S}}
+\end{equation}
+
+where
+
+\begin{equation}
+\label{eq:galerkin-2-24}
+\bm{\theta}_{h,S} = \bm{\Psi}_{,S}\mathbf{b}.
+\end{equation}
+
+The corresponding virtual variation satisfies
+
+\begin{equation}
+\label{eq:galerkin-2-25}
+\delta\bm{\kappa}_{h} = \bm{\eta}_{h,S} + \bm{\kappa}_{h} \times \bm{\eta}_{h}.
+\end{equation}
+
+Therefore, there exists \(\mathbf{B}_{\kappa}\left( S,\mathbf{q} \right)\) such that
+
+\begin{equation}
+\label{eq:galerkin-2-26}
+\delta\bm{\kappa}_{h} = \mathbf{B}_{\kappa}\left( S,\mathbf{q} \right)\delta\mathbf{q}.
+\end{equation}
+
+In assembly, \(\mathbf{B}_{\kappa}\) may be obtained by analytic differentiation of the preceding expression or by evaluating the Jacobian of \(\bm{\kappa}_{h}\left( \mathbf{q} \right)\) through automatic differentiation. In either implementation, the independent torsional contribution \(\kappa_{h3}\) must be retained.
+
+\subsubsection{Discrete internal potential energy}\label{sec:galerkin-2-3-3}
+
+Substituting the discrete strains into the potential energy of \Cref{sec:rod-model}, the discrete internal potential energy can be decomposed as
+
+\begin{equation}
+\label{eq:galerkin-2-27}
+V_{int,h}\left( \mathbf{q} \right) = V_{\nu,h}\left( \mathbf{q} \right) + V_{\kappa,h}\left( \mathbf{q} \right),
+\end{equation}
+
+where
+
+\begin{equation}
+\label{eq:galerkin-2-28}
+V_{\nu,h}\left( \mathbf{q} \right) = \frac{1}{2}\int_{0}^{L}\left( \bm{\nu}_{h} - \bm{\nu}_{0} \right)^{T}\mathbf{K}_{\nu}\left( \bm{\nu}_{h} - \bm{\nu}_{0} \right)\, dS,
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-29}
+V_{\kappa,h}\left( \mathbf{q} \right) = \frac{1}{2}\int_{0}^{L}\left( \bm{\kappa}_{h} - \bm{\kappa}_{0} \right)^{T}\mathbf{K}_{\kappa}\left( \bm{\kappa}_{h} - \bm{\kappa}_{0} \right)\, dS.
+\end{equation}
+
+The discrete internal generalized force is
+
+\begin{equation}
+\label{eq:galerkin-2-30}
+\mathbf{f}_{int}\left( \mathbf{q} \right) = \nabla_{\mathbf{q}}V_{int,h}\left( \mathbf{q} \right).
+\end{equation}
+
+Using the virtual-work expression, it can be written as
+
+\begin{equation}
+\label{eq:galerkin-2-31}
+\mathbf{f}_{int} = \int_{0}^{L}\left\lbrack \mathbf{B}_{\nu}^{T}\mathbf{n}_{b} + \mathbf{B}_{\kappa}^{T}\mathbf{m}_{b} \right\rbrack dS.
+\end{equation}
+
+This expression contains the restoring forces associated with extension, shear, bending about two axes, and torsion. In general, \(\mathbf{f}_{int}\) is a nonlinear vector-valued function of \(\mathbf{q}\) and cannot be written a priori as a constant stiffness matrix multiplied by \(\mathbf{q}\).
+
+\subsection{Complete discrete kinetic energy and mass--inertia matrix}\label{sec:galerkin-2-4}
+
+\subsubsection{Material-point velocity matrix}\label{sec:galerkin-2-4-1}
+
+The discrete material-point position is
+
+\begin{equation}
+\label{eq:galerkin-2-32}
+\mathbf{x}_{h}\left( S,\bm{\xi},t \right) = \mathbf{r}_{h}(S,t) + \mathbf{R}_{h}(S,t)\bm{\xi}.
+\end{equation}
+
+and its velocity is
+
+\begin{equation}
+\label{eq:galerkin-2-33}
+{\dot{\mathbf{x}}}_{h} = \mathbf{N}\dot{\mathbf{a}} - \mathbf{R}_{h}\widehat{\bm{\xi}}\mathbf{B}_{\omega}\dot{\mathbf{b}}.
+\end{equation}
+
+Define the material-point velocity matrix
+
+\begin{equation}
+\label{eq:galerkin-2-34}
+\mathbf{B}_{x}\left( S,\bm{\xi},\mathbf{q} \right) = \begin{bmatrix}
+\mathbf{N} & - \mathbf{R}_{h}\widehat{\bm{\xi}}\mathbf{B}_{\omega}
+\end{bmatrix},
+\end{equation}
+
+Then
+
+\begin{equation}
+\label{eq:galerkin-2-35}
+{\dot{\mathbf{x}}}_{h} = \mathbf{B}_{x}\left( S,\bm{\xi},\mathbf{q} \right)\dot{\mathbf{q}}.
+\end{equation}
+
+\subsubsection{\texorpdfstring{Rigorous definition of the mass--inertia matrix \(\mathbf{M}\left( \mathbf{q} \right)\)}{Rigorous definition of the mass--inertia matrix M(q)}}\label{sec:galerkin-2-4-2}
+
+The discrete kinetic energy is
+
+\begin{equation}
+\label{eq:galerkin-2-36}
+T_{h}\left( \mathbf{q},\dot{\mathbf{q}} \right) = \frac{1}{2}\int_{0}^{L}{\int_{A(S)}^{}\rho}{\dot{\mathbf{x}}}_{h}^{T}{\dot{\mathbf{x}}}_{h}\, dA\, dS.
+\end{equation}
+
+Substitution of the velocity matrix gives
+
+\begin{equation}
+\label{eq:galerkin-2-37}
+\boxed{T_{h}\left( \mathbf{q},\dot{\mathbf{q}} \right) = \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}}}
+\end{equation}
+
+where
+
+\begin{equation}
+\label{eq:galerkin-2-38}
+\boxed{\mathbf{M}\left( \mathbf{q} \right) = \int_{0}^{L}{\int_{A(S)}^{}\rho}\mathbf{B}_{x}^{T}\mathbf{B}_{x}\, dA\, dS}
+\end{equation}
+
+is the mass--inertia matrix derived rigorously from the complete three-dimensional translational--rotational kinetic energy.
+
+\subsubsection{Block form of the mass--inertia matrix}\label{sec:galerkin-2-4-3}
+
+With \(\mathbf{q} = \left( \mathbf{a}^{T},\mathbf{b}^{T} \right)^{T}\), write
+
+\begin{equation}
+\label{eq:galerkin-2-39}
+\mathbf{M}\left( \mathbf{q} \right) = \begin{bmatrix}
+\mathbf{M}_{aa} & \mathbf{M}_{ab}\left( \mathbf{q} \right) \\
+\mathbf{M}_{ba}\left( \mathbf{q} \right) & \mathbf{M}_{bb}\left( \mathbf{q} \right)
+\end{bmatrix}.
+\end{equation}
+
+Using \(\mu,\mathbf{c}_{\rho},\mathbf{J}_{c}\) defined in \Cref{sec:rod-model}, the blocks are
+
+\begin{equation}
+\label{eq:galerkin-2-40}
+\mathbf{M}_{aa} = \int_{0}^{L}\mu\mathbf{N}^{T}\mathbf{N}\, dS,
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-41}
+\mathbf{M}_{ab}\left( \mathbf{q} \right) = - \int_{0}^{L}\mathbf{N}^{T}\mathbf{R}_{h}\widehat{\mathbf{c}_{\rho}}\mathbf{B}_{\omega}\, dS,
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-42}
+\mathbf{M}_{ba}\left( \mathbf{q} \right) = \mathbf{M}_{ab}^{T}\left( \mathbf{q} \right),
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-43}
+\boxed{\mathbf{M}_{bb}\left( \mathbf{q} \right) = \int_{0}^{L}\mathbf{B}_{\omega}^{T}\mathbf{J}_{c}\mathbf{B}_{\omega}\, dS}
+\end{equation}
+
+Thus,
+
+\begin{equation}
+\label{eq:galerkin-2-44}
+\mathbf{M}_{bb}\left( \mathbf{q} \right) = \int_{0}^{L}\bm{\Psi}^{T}\mathbf{J}_{r}^{T}\left( \bm{\theta}_{h} \right)\mathbf{J}_{c}\mathbf{J}_{r}\left( \bm{\theta}_{h} \right)\bm{\Psi}\, dS.
+\end{equation}
+
+Whether the mass matrix depends on the configuration is therefore not an a priori assumption; it is determined jointly by the centerline definition, orientation parameterization, cross-sectional mass distribution, and attached components.
+
+\subsubsection{Mass centerline and eccentric attachments}\label{sec:galerkin-2-4-4}
+
+Consistently with \Cref{sec:rod-model}, the centerline of the base catheter is taken to pass through the mass center of each cross section, so the distributed rod satisfies
+
+\begin{equation}
+\label{eq:galerkin-2-45}
+\mathbf{c}_{\rho} = \mathbf{0},
+\end{equation}
+
+and the translational--rotational cross block of the base rod vanishes:
+
+\begin{equation}
+\label{eq:galerkin-2-46}
+\mathbf{M}_{ab} = \mathbf{M}_{ba} = \mathbf{0}.
+\end{equation}
+
+In this case,
+
+\begin{equation}
+\label{eq:galerkin-2-47}
+\mathbf{M}_{str}\left( \mathbf{q} \right) = \begin{bmatrix}
+\mathbf{M}_{aa} & \mathbf{0} \\
+\mathbf{0} & \mathbf{M}_{bb}\left( \mathbf{b} \right)
+\end{bmatrix}.
+\end{equation}
+
+However, \(\mathbf{M}_{bb}\) still depends on the rotational generalized coordinates through \(\mathbf{J}_{r}\left( \bm{\theta}_{h} \right)\), and the complete structural mass--inertia matrix therefore generally remains \(\mathbf{M}_{str}\left( \mathbf{q} \right)\).
+
+If the center of mass of a magnetic tip, sensor, or other attached component is offset from the centerline, its kinetic energy must be added separately. Let the center-of-mass position of the attachment be
+
+\begin{equation}
+\label{eq:galerkin-2-48}
+\mathbf{x}_{e} = \mathbf{r}_{h}\left( S_{e} \right) + \mathbf{R}_{h}\left( S_{e} \right)\bm{\rho}_{e},
+\end{equation}
+
+If its mass is \(m_{e}\) and its material-frame rotary inertia is \(\mathbf{J}_{e}\), then
+
+\begin{equation}
+\label{eq:galerkin-2-49}
+T_{e} = \frac{1}{2}m_{e}\left| {\dot{\mathbf{x}}}_{e} \right|^{2} + \frac{1}{2}\bm{\omega}_{e}^{T}\mathbf{J}_{e}\bm{\omega}_{e}.
+\end{equation}
+
+Let \(\mathbf{B}_{e}\left( \mathbf{q} \right)\) map \(\dot{\mathbf{q}}\) to the attachment velocity. Then
+
+\begin{equation}
+\label{eq:galerkin-2-50}
+T_{e} = \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}_{e}\left( \mathbf{q} \right)\dot{\mathbf{q}},\quad\quad\mathbf{M}_{e} = \mathbf{B}_{e}^{T}\mathbf{M}_{e}^{rig}\mathbf{B}_{e}.
+\end{equation}
+
+This contribution generally produces a nonzero translational--rotational coupling block. Thus, use of the mass centerline for the base rod does not imply that the cross-mass block of the complete system must vanish.
+
+\subsubsection{Scope of the small-rotation constant-mass approximation}\label{sec:galerkin-2-4-5}
+
+When \(\parallel \bm{\theta}_{h} \parallel \ll 1\), if only
+
+\begin{equation}
+\label{eq:galerkin-2-51}
+\mathbf{J}_{r}\left( \bm{\theta}_{h} \right) \approx \mathbf{I},
+\end{equation}
+
+is retained, then
+
+\begin{equation}
+\label{eq:galerkin-2-52}
+\mathbf{M}_{bb} \approx \int_{0}^{L}\bm{\Psi}^{T}\mathbf{J}_{c}\bm{\Psi}\, dS,
+\end{equation}
+
+becomes constant. This is a zeroth-order small-rotation inertial approximation rather than a general property of the complete model. The principal model retains the exact \(\mathbf{J}_{r}\) and \(\mathbf{M}\left( \mathbf{q} \right)\).
+
+\subsubsection{Energy-consistent discretization of fluid added mass}\label{sec:galerkin-2-4-6}
+
+Define the joint translational velocity matrix
+
+\begin{equation}
+\label{eq:galerkin-2-53}
+\mathbf{N}_{q}(S) = \begin{bmatrix}
+\mathbf{N}(S) & \mathbf{0}
+\end{bmatrix},
+\end{equation}
+
+such that \({\dot{\mathbf{r}}}_{h} = \mathbf{N}_{q}\dot{\mathbf{q}}\). Let
+
+\begin{equation}
+\label{eq:galerkin-2-54}
+\mathbf{w}_{\bot,h} = \mathbf{P}_{\bot}\left( \mathbf{q} \right)\left\lbrack \mathbf{N}_{q}\dot{\mathbf{q}} - \mathbf{v}_{f}\left( \mathbf{r}_{h},t \right) \right\rbrack,\quad\quad m_{A} = \rho_{f}C_{A}A_{d}.
+\end{equation}
+
+The added-fluid inertia functional of \Cref{sec:rod-model} is discretized as follows (and becomes an added kinetic energy for a stationary flow):
+
+\begin{equation}
+\label{eq:galerkin-2-55}
+\boxed{T_{A,h} = \frac{1}{2}\int_{0}^{L}m_{A}\,\mathbf{w}_{\bot,h}^{T}\mathbf{w}_{\bot,h}\, dS.}
+\end{equation}
+
+Expansion gives
+
+\begin{equation}
+\label{eq:galerkin-2-56}
+T_{A,h} = \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}_{A}\left( \mathbf{q} \right)\dot{\mathbf{q}} - {\dot{\mathbf{q}}}^{T}\mathbf{b}_{A}\left( \mathbf{q},t \right) + c_{A}\left( \mathbf{q},t \right),
+\end{equation}
+
+where
+
+\begin{equation}
+\label{eq:galerkin-2-57}
+\boxed{\mathbf{M}_{A}\left( \mathbf{q} \right) = \int_{0}^{L}m_{A}\,\mathbf{N}_{q}^{T}\mathbf{P}_{\bot}\left( \mathbf{q} \right)\mathbf{N}_{q}\, dS,}
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-58}
+\mathbf{b}_{A}\left( \mathbf{q},t \right) = \int_{0}^{L}m_{A}\,\mathbf{N}_{q}^{T}\mathbf{P}_{\bot}\left( \mathbf{q} \right)\mathbf{v}_{f}\, dS,
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-59}
+c_{A}\left( \mathbf{q},t \right) = \frac{1}{2}\int_{0}^{L}m_{A}\,\mathbf{v}_{f}^{T}\mathbf{P}_{\bot}\left( \mathbf{q} \right)\mathbf{v}_{f}\, dS.
+\end{equation}
+
+The structural kinetic energy, eccentric-attachment kinetic energy, and added-fluid contribution are therefore collected into the velocity-dependent inertial functional
+
+\begin{equation}
+\label{eq:galerkin-2-60}
+T_{h} = T_{str,h} + \sum_{e}^{}T_{e} + T_{A,h}.
+\end{equation}
+
+Its Hessian with respect to the generalized velocity gives the total effective mass--inertia matrix
+
+\begin{equation}
+\label{eq:galerkin-2-61}
+\boxed{\mathbf{M}\left( \mathbf{q} \right) = \mathbf{M}_{str}\left( \mathbf{q} \right) + \sum_{e}^{}\mathbf{M}_{e}\left( \mathbf{q} \right) + \mathbf{M}_{A}\left( \mathbf{q} \right).}
+\end{equation}
+
+Only when \(\mathbf{v}_{f} = \mathbf{0}\) is it physically valid to set \(\mathbf{b}_{A} = \mathbf{0}\) and \(c_{A} = 0\). For a general prescribed flow, moving the cross terms to an external port to construct an autonomous conservative backbone merely removes \(\mathbf{b}_{A}\) and \(c_{A}\) from the selected Hamiltonian backbone and assigns their complete Euler--Lagrange action to \(\mathbf{Q}_{flow}\); it does not assume that these quantities vanish in the original system. For a general flow, one cannot retain only \(\mathbf{M}_{A}\dot{\mathbf{q}}\). The constant added mass obtained by freezing \(\mathbf{P}_{\bot}\) is used only as an engineering validation branch.
+
+\subsubsection{Symmetry and positive definiteness}\label{sec:galerkin-2-4-7}
+
+By definition of the kinetic-energy Hessian,
+
+\begin{equation}
+\label{eq:galerkin-2-62}
+\mathbf{M}^{T}\left( \mathbf{q} \right) = \mathbf{M}\left( \mathbf{q} \right).
+\end{equation}
+
+If the material and added-mass parameters are positive, the orientation coordinates remain in a local chart where \(\mathbf{J}_{r}\) is nonsingular, and the joint velocity map does not degenerate almost everywhere for any nonzero generalized velocity, namely,
+
+\begin{equation}
+\label{eq:galerkin-2-63}
+\dot{\mathbf{q}} \neq \mathbf{0}\quad \Rightarrow \quad T_{h}^{(2)}\left( \mathbf{q},\dot{\mathbf{q}} \right) > 0,
+\end{equation}
+
+then
+
+\begin{equation}
+\label{eq:galerkin-2-64}
+\mathbf{y}^{T}\mathbf{M}\left( \mathbf{q} \right)\mathbf{y} > 0,\quad\quad\forall\mathbf{y} \neq \mathbf{0}.
+\end{equation}
+
+Therefore, \(\mathbf{M}\left( \mathbf{q} \right)\) is symmetric positive definite. What must be excluded is a redundant generalized coordinate or a degenerate velocity map, not a rigid-body mode under free boundary conditions. A rigid-body mode may give a zero eigenvalue of the stiffness matrix, while a valid rigid-body motion still has positive kinetic energy.
+
+\subsection{Joint Galerkin projection}\label{sec:galerkin-2-5}
+
+\subsubsection{Inertial term}\label{sec:galerkin-2-5-1}
+
+Substituting the finite-dimensional approximation into the total inertial virtual work of \Cref{sec:rod-model} gives
+
+\begin{equation}
+\label{eq:galerkin-2-65}
+\delta W_{in,h} = \delta\mathbf{q}^{T}\left\lbrack \frac{d}{dt}\left( \frac{\partial T_{h}}{\partial\dot{\mathbf{q}}} \right) - \frac{\partial T_{h}}{\partial\mathbf{q}} \right\rbrack.
+\end{equation}
+
+For a stationary flow, or for an autonomous conservative inertial backbone selected after assigning the complete Euler--Lagrange action of the prescribed-flow cross terms to \(\mathbf{Q}_{flow}\),
+
+\begin{equation}
+\label{eq:galerkin-2-66}
+T_{h} = \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}},
+\end{equation}
+
+the inertial generalized force can be arranged as
+
+\begin{equation}
+\label{eq:galerkin-2-67}
+\mathbf{M}\left( \mathbf{q} \right)\ddot{\mathbf{q}} + \mathbf{g}_{M}\left( \mathbf{q},\dot{\mathbf{q}} \right).
+\end{equation}
+
+For a general prescribed flow, \(T_{h}\) also contains \(- {\dot{\mathbf{q}}}^{T}\mathbf{b}_{A} + c_{A}\), whose additional contribution is denoted by \(\mathbf{g}_{f}\left( \mathbf{q},\dot{\mathbf{q}},t \right)\). The unified form is therefore
+
+\begin{equation}
+\label{eq:galerkin-2-68}
+\boxed{\mathbf{M}\left( \mathbf{q} \right)\ddot{\mathbf{q}} + \mathbf{g}_{T}\left( \mathbf{q},\dot{\mathbf{q}},t \right),\quad\quad\mathbf{g}_{T} = \mathbf{g}_{M} + \mathbf{g}_{f}.}
+\end{equation}
+
+The terms are derived rigorously in \Cref{sec:galerkin-2-6}.
+
+\subsubsection{Internal-force term}\label{sec:galerkin-2-5-2}
+
+The discrete internal virtual work is
+
+\begin{equation}
+\label{eq:galerkin-2-69}
+\delta W_{int,h} = \delta\mathbf{q}^{T}\int_{0}^{L}\left\lbrack \mathbf{B}_{\nu}^{T}\mathbf{n}_{b} + \mathbf{B}_{\kappa}^{T}\mathbf{m}_{b} \right\rbrack dS.
+\end{equation}
+
+Therefore,
+
+\begin{equation}
+\label{eq:galerkin-2-70}
+\mathbf{f}_{int}\left( \mathbf{q} \right) = \int_{0}^{L}\left\lbrack \mathbf{B}_{\nu}^{T}\mathbf{n}_{b} + \mathbf{B}_{\kappa}^{T}\mathbf{m}_{b} \right\rbrack dS = \nabla_{\mathbf{q}}V_{int,h}\left( \mathbf{q} \right).
+\end{equation}
+
+\subsubsection{Joint projection of distributed forces and couples}\label{sec:galerkin-2-5-3}
+
+First, decompose the distributed loads that remain in the external-force ports through mutually exclusive accounting:
+
+\begin{equation}
+\label{eq:galerkin-2-71}
+\mathbf{f}_{ext,rem} = \mathbf{f}_{cons} + \mathbf{f}_{nc},\quad\quad\mathbf{l}_{ext} = \mathbf{l}_{cons} + \mathbf{l}_{nc}.
+\end{equation}
+
+The conservative part is represented through an external potential in \Cref{sec:galerkin-2-5-5}; only the nonconservative part is projected directly onto the right-hand side. A spatially distributed couple is first transformed to the material frame, \(\mathbf{l}_{nc}^{b} = \mathbf{R}_{h}^{T}\mathbf{l}_{nc}\), and the nonconservative distributed generalized force is
+
+\begin{equation}
+\label{eq:galerkin-2-72}
+\boxed{\mathbf{Q}_{nc,dist}\left( \mathbf{q},\dot{\mathbf{q}},t \right) = \int_{0}^{L}\begin{bmatrix}
+\mathbf{N}^{T}\mathbf{f}_{nc} \\
+\mathbf{B}_{\omega}^{T}\mathbf{R}_{h}^{T}\mathbf{l}_{nc}
+\end{bmatrix}dS.}
+\end{equation}
+
+This expression allows magnetic, contact, and fluid couples to enter the rotational generalized coordinates directly when they belong to nonconservative ports. If a load has already been represented by a potential, it must not be included again in \(\mathbf{Q}_{nc,dist}\).
+
+For normal quadratic drag acting only on the centerline translational velocity, define the joint velocity matrix
+
+\begin{equation}
+\label{eq:galerkin-2-73}
+\boxed{\mathbf{N}_{q} = \left\lbrack \,\mathbf{N}\ \ \mathbf{0}\, \right\rbrack \in \mathbb{R}^{3 \times n},\quad\quad{\dot{\mathbf{r}}}_{h} = \mathbf{N}_{q}\dot{\mathbf{q}}.}
+\end{equation}
+
+Its consistent generalized-force projection is
+
+\begin{equation}
+\label{eq:galerkin-2-74}
+\mathbf{Q}_{drag} = \int_{0}^{L}d_{f}\mathbf{N}_{q}^{T}\mathbf{P}_{\bot}\left( \mathbf{v}_{f} - \mathbf{N}_{q}\dot{\mathbf{q}} \right)\, dS = - \mathbf{D}_{drag}\left( \mathbf{q},\dot{\mathbf{q}},t \right)\dot{\mathbf{q}} + \mathbf{Q}_{drag,flow}\left( \mathbf{q},\dot{\mathbf{q}},t \right),
+\end{equation}
+
+where
+
+\begin{equation}
+\label{eq:galerkin-2-75}
+\boxed{\mathbf{D}_{drag} = \int_{0}^{L}d_{f}\mathbf{N}_{q}^{T}\mathbf{P}_{\bot}\mathbf{N}_{q}\, dS,\quad\quad\mathbf{Q}_{drag,flow} = \int_{0}^{L}d_{f}\mathbf{N}_{q}^{T}\mathbf{P}_{\bot}\mathbf{v}_{f}\, dS.}
+\end{equation}
+
+For every \(\mathbf{y} \in \mathbb{R}^{n}\),
+
+\begin{equation}
+\label{eq:galerkin-2-76}
+\mathbf{y}^{T}\mathbf{D}_{drag}\mathbf{y} = \int_{0}^{L}d_{f} \parallel \mathbf{P}_{\bot}\mathbf{N}_{q}\mathbf{y} \parallel^{2}\, dS \geq 0,
+\end{equation}
+
+Hence, \(\mathbf{D}_{drag} = \mathbf{D}_{drag}^{T} \succcurlyeq 0\). The matrix \(\mathbf{N}_{q}^{T}\), rather than \(\mathbf{N}^{T}\), must be used so that \(\mathbf{Q}_{drag} \in \mathbb{R}^{n}\) and \(\mathbf{D}_{drag} \in \mathbb{R}^{n \times n}\). Because \(\mathbf{N}_{q} = \left\lbrack \mathbf{N}\ \mathbf{0} \right\rbrack\), the \(ab\), \(ba\), and \(bb\) blocks associated with centerline drag vanish. Eccentric fluid couples and cross-sectional spin damping still enter the orientation channels through independent distributed-couple projections. Since \(d_{f}\) depends on the relative velocity, \(\mathbf{D}_{drag}\) is a statewise positive-semidefinite nonlinear matrix.
+
+\subsubsection{Boundary generalized force}\label{sec:galerkin-2-5-4}
+
+The boundary virtual work in \Cref{sec:rod-model} is
+
+\begin{equation}
+\label{eq:galerkin-2-77}
+\left\lbrack \mathbf{n} \cdot \delta\mathbf{r} + \mathbf{m}_{b} \cdot \bm{\eta} \right\rbrack_{0}^{L}.
+\end{equation}
+
+Substitution of the finite-dimensional virtual variables gives
+
+\begin{equation}
+\label{eq:galerkin-2-78}
+\boxed{\mathbf{Q}_{\partial}\left( \mathbf{q},t \right) = \begin{bmatrix}
+\mathbf{N}^{T}\overline{\mathbf{n}} \\
+\mathbf{B}_{\omega}^{T}\left( \mathbf{q} \right){\overline{\mathbf{m}}}_{b}
+\end{bmatrix}_{0}^{L}.}
+\end{equation}
+
+The boundary generalized force generally depends on the configuration because the rotational test matrix \(\mathbf{B}_{\omega}\) and the transformation from a spatial moment to a material moment may both vary with orientation. At an essential boundary, the corresponding test function vanishes and the boundary term disappears automatically. At a natural boundary, the prescribed terminal force and moment must be retained.
+
+\subsubsection{Conservative and nonconservative external loads}\label{sec:galerkin-2-5-5}
+
+If the conservative distributed and boundary loads admit a discrete external potential \(V_{ext,h}\left( \mathbf{q},t \right)\), their total conservative generalized force is
+
+\begin{equation}
+\label{eq:galerkin-2-79}
+\mathbf{Q}_{cons} = - \nabla_{\mathbf{q}}V_{ext,h},
+\end{equation}
+
+and define
+
+\begin{equation}
+\label{eq:galerkin-2-80}
+V_{h}\left( \mathbf{q},t \right) = V_{int,h}\left( \mathbf{q} \right) + V_{ext,h}\left( \mathbf{q},t \right).
+\end{equation}
+
+The nonconservative generalized force is denoted collectively by
+
+\begin{equation}
+\label{eq:galerkin-2-81}
+\mathbf{Q}_{nc} = \mathbf{Q}_{nc,dist} + \mathbf{Q}_{control} + \mathbf{Q}_{disturbance} + \mathbf{Q}_{other,nc}.
+\end{equation}
+
+The final equations use only \(\nabla_{\mathbf{q}}V_{h}\) on the left-hand side and \(\mathbf{Q}_{nc}\) on the right-hand side. The original load projection containing conservative components must not be added again in its entirety to the right-hand side. If a time-dependent magnetic action has already been included in \(V_{ext,h}\left( \mathbf{q},t \right)\), its explicit-time power is represented only by \(\partial V_{ext,h}/\partial t\).
+
+\subsection{Rigorous derivation of generalized momentum and geometric inertial terms}\label{sec:galerkin-2-6}
+
+\subsubsection{Generalized momentum}\label{sec:galerkin-2-6-1}
+
+For the velocity-dependent inertial functional in \Cref{sec:galerkin-2-4-6},
+
+\begin{equation}
+\label{eq:galerkin-2-82}
+T_{h} = \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - {\dot{\mathbf{q}}}^{T}\mathbf{b}_{A}\left( \mathbf{q},t \right) + c_{A}\left( \mathbf{q},t \right),
+\end{equation}
+
+define the generalized momentum
+
+\begin{equation}
+\label{eq:galerkin-2-83}
+\boxed{\mathbf{p} = \frac{\partial T_{h}}{\partial\dot{\mathbf{q}}} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - \mathbf{b}_{A}\left( \mathbf{q},t \right).}
+\end{equation}
+
+For a general prescribed flow, one therefore cannot unconditionally write \(\mathbf{p} = \mathbf{M}\dot{\mathbf{q}}\). The backbone momentum is defined only for a stationary flow or after the complete action of \(\mathbf{b}_{A}\) has been moved to \(\mathbf{Q}_{flow}\) in a deliberately selected autonomous conservative backbone:
+
+\begin{equation}
+\label{eq:galerkin-2-84}
+\mathbf{p}_{0} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}}.
+\end{equation}
+
+\subsubsection{Geometric inertia generated by the mass metric}\label{sec:galerkin-2-6-2}
+
+Taking the Euler--Lagrange derivative of the purely quadratic velocity term gives
+
+\begin{equation}
+\label{eq:galerkin-2-85}
+\mathbf{M}\left( \mathbf{q} \right)\ddot{\mathbf{q}} + \mathbf{g}_{M}\left( \mathbf{q},\dot{\mathbf{q}} \right),
+\end{equation}
+
+where
+
+\begin{equation}
+\label{eq:galerkin-2-86}
+\boxed{\mathbf{g}_{M} = \dot{\mathbf{M}}\dot{\mathbf{q}} - \frac{1}{2}\nabla_{\mathbf{q}}\left( {\dot{\mathbf{q}}}^{T}\mathbf{M}\dot{\mathbf{q}} \right).}
+\end{equation}
+
+Define
+
+\begin{equation}
+\label{eq:galerkin-2-87}
+\Gamma_{ijk} = \frac{1}{2}\left( \frac{\partial M_{ij}}{\partial q_{k}} + \frac{\partial M_{ik}}{\partial q_{j}} - \frac{\partial M_{jk}}{\partial q_{i}} \right),
+\end{equation}
+
+Then
+
+\begin{equation}
+\label{eq:galerkin-2-88}
+g_{M,i} = \sum_{j,k = 1}^{n}\Gamma_{ijk}{\dot{q}}_{j}{\dot{q}}_{k}.
+\end{equation}
+
+Let \(C_{ij} = \sum_{k}^{}\Gamma_{ijk}{\dot{q}}_{k}\). Then \(\mathbf{g}_{M} = \mathbf{C}\dot{\mathbf{q}}\), and \(\dot{\mathbf{M}} - 2\mathbf{C}\) is skew symmetric, which guarantees the kinetic-energy power identity.
+
+\subsubsection{Additional action generated by prescribed-flow cross terms}\label{sec:galerkin-2-6-3}
+
+The term \(- {\dot{\mathbf{q}}}^{T}\mathbf{b}_{A} + c_{A}\) gives
+
+\begin{equation}
+\label{eq:galerkin-2-89}
+\boxed{\mathbf{g}_{f} = - {\dot{\mathbf{b}}}_{A} + \left( \nabla_{\mathbf{q}}\mathbf{b}_{A} \right)^{T}\dot{\mathbf{q}} - \nabla_{\mathbf{q}}c_{A}.}
+\end{equation}
+
+Here, \({\dot{\mathbf{b}}}_{A}\) denotes the total derivative along the trajectory. The total inertial action is therefore
+
+\begin{equation}
+\label{eq:galerkin-2-90}
+\boxed{\frac{d}{dt}\frac{\partial T_{h}}{\partial\dot{\mathbf{q}}} - \frac{\partial T_{h}}{\partial\mathbf{q}} = \mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{M} + \mathbf{g}_{f}.}
+\end{equation}
+
+Equivalently, \(\mathbf{g}_{f}\) may be moved to the right-hand side and denoted as a flow input \(\mathbf{Q}_{flow}\), but the entire term must be moved; retaining only selected components is inconsistent.
+
+\subsubsection{Constant-mass special case}\label{sec:galerkin-2-6-4}
+
+If, under a specific small-rotation, zero-eccentricity, frozen-normal-projection, and fixed-added-mass approximation,
+
+\begin{equation}
+\label{eq:galerkin-2-91}
+\frac{\partial\mathbf{M}}{\partial q_{i}} = \mathbf{0},\quad\quad i = 1,\ldots,n,
+\end{equation}
+
+then \(\mathbf{g}_{M} = \mathbf{0}\). If \(\mathbf{b}_{A} = \mathbf{0}\) as well, all geometric inertial terms vanish. This conclusion applies only to the corresponding local approximation and must not be used in reverse to deny configuration-dependent inertia in the complete model.
+
+\subsection{Discrete treatment of the Kirchhoff shear-free constraint}\label{sec:galerkin-2-7}
+
+\subsubsection{Discrete constraints}\label{sec:galerkin-2-7-1}
+
+The strict Kirchhoff model requires\cite{MarsdenRatiu1999MechanicsSymmetry,HairerLubichWanner2006GNI}
+
+\begin{equation}
+\label{eq:galerkin-2-92}
+\nu_{h1}\left( \mathbf{q} \right) = 0,\quad\quad\nu_{h2}\left( \mathbf{q} \right) = 0.
+\end{equation}
+
+Collect all discrete constraints in
+
+\begin{equation}
+\label{eq:galerkin-2-93}
+\mathbf{c}\left( \mathbf{q} \right) = \mathbf{0}.
+\end{equation}
+
+Define the constraint Jacobian
+
+\begin{equation}
+\label{eq:galerkin-2-94}
+\mathbf{G}\left( \mathbf{q} \right) = \frac{\partial\mathbf{c}}{\partial\mathbf{q}}.
+\end{equation}
+
+\subsubsection{Lagrange-multiplier form}\label{sec:galerkin-2-7-2}
+
+Introduce the Lagrange multiplier \(\bm{\lambda}_{c}\). The generalized constraint reaction is
+
+\begin{equation}
+\label{eq:galerkin-2-95}
+\mathbf{Q}_{c} = \mathbf{G}^{T}\left( \mathbf{q} \right)\bm{\lambda}_{c}.
+\end{equation}
+
+The complete constrained discrete system is
+
+\begin{equation}
+\label{eq:galerkin-2-96}
+\left\{ \begin{matrix}
+ & \mathbf{M}\left( \mathbf{q} \right)\ddot{\mathbf{q}} + \mathbf{g}\left( \mathbf{q},\dot{\mathbf{q}} \right) + \nabla_{\mathbf{q}}V_{h}\left( \mathbf{q},t \right) + \mathbf{G}^{T}\left( \mathbf{q} \right)\bm{\lambda}_{c} = \mathbf{Q}_{nc}\left( \mathbf{q},\dot{\mathbf{q}},t \right), \\
+ & \mathbf{c}\left( \mathbf{q} \right) = \mathbf{0}.
+\end{matrix} \right.\ \ \ \
+\end{equation}
+
+This is a nonlinear differential--algebraic system. The constraint eliminates shear deformation only; it does not remove rotational generalized coordinates or torsional modes.
+
+\subsubsection{Finite-shear-stiffness form}\label{sec:galerkin-2-7-3}
+
+If the fully shearable Cosserat rod is used, or if the Kirchhoff constraint is approximated by a large but finite shear stiffness, no Lagrange multiplier is required because the shear energy is already included in \(V_{int,h}\). The resulting system is an ordinary second-order nonlinear ODE. The two treatments have different numerical properties but share the same complete translational--rotational discretization.
+
+\subsection{Global finite-dimensional equations of motion}\label{sec:galerkin-2-8}
+
+\subsubsection{Form without explicit constraints}\label{sec:galerkin-2-8-1}
+
+Assembling the inertial term, internal conservative force, conservative external potential, nonconservative distributed loads, and boundary loads gives
+
+\begin{equation}
+\label{eq:galerkin-2-97}
+\boxed{\mathbf{M}\left( \mathbf{q} \right)\ddot{\mathbf{q}} + \mathbf{g}_{T}\left( \mathbf{q},\dot{\mathbf{q}},t \right) + \nabla_{\mathbf{q}}V_{h}\left( \mathbf{q},t \right) = \mathbf{Q}_{nc}\left( \mathbf{q},\dot{\mathbf{q}},t \right) + \mathbf{Q}_{\partial}\left( \mathbf{q},t \right).}
+\end{equation}
+
+Here, \(\mathbf{q}\) contains both translational and rotational generalized coordinates; \(\mathbf{M}\) is generated by the velocity-quadratic terms of the base rod, eccentric attachments, and the energy-consistent added mass; \(\mathbf{g}_{T} = \mathbf{g}_{M} + \mathbf{g}_{f}\); and \(V_{h}\) contains extension, shear, bending, torsion, and external potentials satisfying the potential condition.
+
+If the prescribed-flow cross terms are moved collectively to the input port and dissipation is separated from control inputs, the system becomes
+
+\begin{equation}
+\label{eq:galerkin-2-98}
+\mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{M} + \nabla_{\mathbf{q}}V_{h} = \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial}.
+\end{equation}
+
+The passively dissipative drag kernel obtained by exclusive splitting, normal contact damping and friction for a fixed wall, and any retained spin damping constitute \(\mathbf{Q}_{diss}\), with \({\dot{\mathbf{q}}}^{T}\mathbf{Q}_{diss} \leq 0\). The background-flow drag term \(\mathbf{Q}_{drag,flow}\) must be assigned to \(\mathbf{Q}_{flow}\), and its power is generally sign-indefinite; therefore, no global dissipativity claim may be made for the complete relative drag. Nor should \(\mathbf{Q}_{diss}\) be forced into the form of a constant damping matrix times velocity, because the quadratic-drag matrix \(\mathbf{D}_{drag}\left( \mathbf{q},\dot{\mathbf{q}},t \right)\) itself depends on state and relative velocity. The same fluid action may be counted only once in any selected representation.
+
+\subsubsection{Constrained form}\label{sec:galerkin-2-8-2}
+
+The strict Kirchhoff shear-free model is finally written as
+
+\begin{equation}
+\label{eq:galerkin-2-99}
+\mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{T} + \nabla_{\mathbf{q}}V_{h} + \mathbf{G}^{T}\left( \mathbf{q} \right)\bm{\lambda}_{c} = \mathbf{Q}_{nc} + \mathbf{Q}_{\partial},
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-100}
+\mathbf{c}\left( \mathbf{q} \right) = \mathbf{0}.
+\end{equation}
+
+The system retains complete bending--torsion dynamics, cross-sectional orientation, and rotary inertia while enforcing the shear-free condition exactly.
+
+\subsection{Discrete energy and power identities}\label{sec:galerkin-2-9}
+
+\subsubsection{Discrete mechanical energy of the conservative inertial backbone}\label{sec:galerkin-2-9-1}
+
+For a stationary flow with \(\mathbf{b}_{A} = \mathbf{0}\) and \(c_{A} = 0\), or for an autonomous conservative backbone selected after the prescribed-flow cross terms have been moved completely to \(\mathbf{Q}_{flow}\), define
+
+\begin{equation}
+\label{eq:galerkin-2-101}
+E_{h}\left( \mathbf{q},\dot{\mathbf{q}},t \right) = \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} + V_{h}\left( \mathbf{q},t \right).
+\end{equation}
+
+Because \(\mathbf{g}_{M}\) is generated by the Euler--Lagrange derivative of the complete quadratic kinetic energy,
+
+\begin{equation}
+\label{eq:galerkin-2-102}
+{\dot{\mathbf{q}}}^{T}\left\lbrack \mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{M} \right\rbrack = \frac{d}{dt}\left( \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}\dot{\mathbf{q}} \right).
+\end{equation}
+
+\subsubsection{General port-power balance}\label{sec:galerkin-2-9-2}
+
+Left-multiplication of the global equation by \({\dot{\mathbf{q}}}^{T}\) gives
+
+\begin{equation}
+\label{eq:galerkin-2-103}
+\frac{dE_{h}}{dt} = {\dot{\mathbf{q}}}^{T}\left( \mathbf{Q}_{nc} + \mathbf{Q}_{\partial} - \mathbf{g}_{f} \right) + \frac{\partial V_{h}}{\partial t}.
+\end{equation}
+
+If the complete Euler--Lagrange contribution of the prescribed-flow cross action is treated as part of the flow input, then
+
+\begin{equation}
+\label{eq:galerkin-2-104}
+\boxed{\frac{dE_{h}}{dt} = {\dot{\mathbf{q}}}^{T}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} \right) + \frac{\partial V_{h}}{\partial t}.}
+\end{equation}
+
+Here, \(\mathbf{Q}_{diss}\) contains only the passive dissipative kernel after splitting and satisfies \({\dot{\mathbf{q}}}^{T}\mathbf{Q}_{diss} \leq 0\). The term \(\mathbf{Q}_{flow}\) collects \(\mathbf{Q}_{drag,flow}\), the Froude--Krylov input, and the reactive-flow contribution determined by the selected representation; its power is not assigned a fixed sign. The relative-motion identity verifies physical passivity of the drag law, whereas the dissipative structural constraint of the CHNN must be imposed on the preceding \(\mathbf{Q}_{diss}\); the two must not be conflated. For an ideal constraint,
+
+\begin{equation}
+\label{eq:galerkin-2-105}
+\mathbf{G}\left( \mathbf{q} \right)\dot{\mathbf{q}} = \mathbf{0},
+\end{equation}
+
+Therefore,
+
+\begin{equation}
+\label{eq:galerkin-2-106}
+{\dot{\mathbf{q}}}^{T}\mathbf{G}^{T}\bm{\lambda}_{c} = 0.
+\end{equation}
+
+Only in the absence of nonconservative loads, flow inputs, boundary-power inputs, and explicit time dependence of the potential does \(dE_{h}/dt = 0\).
+
+\subsubsection{Consistent tangent matrix}\label{sec:galerkin-2-9-3}
+
+For nonlinear solution or local linearization, the consistent internal tangent matrix is defined by
+
+\begin{equation}
+\label{eq:galerkin-2-107}
+\mathbf{K}_{T}\left( \mathbf{q} \right) = \frac{\partial\mathbf{f}_{int}}{\partial\mathbf{q}} = \nabla_{\mathbf{q}}^{2}V_{int,h}\left( \mathbf{q} \right).
+\end{equation}
+
+This matrix contains both material stiffness and the geometric stiffness generated by variations in orientation, extension, and curvature. It is not the secant matrix obtained by multiplying a state-dependent scalar stiffness by an integral of fixed basis functions.
+
+\subsection{Local linearization and engineering reductions}\label{sec:galerkin-2-10}
+
+\subsubsection{Local linearization about an equilibrium configuration}\label{sec:galerkin-2-10-1}
+
+Use the dissipation--input decomposition
+
+\begin{equation}
+\label{eq:galerkin-2-108}
+\mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{M} + \nabla V_{h} + \mathbf{G}^{T}\bm{\lambda}_{c} = \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial}.
+\end{equation}
+
+Let \(\mathbf{q}_{e}\) be a static equilibrium configuration with \({\dot{\mathbf{q}}}_{e} = \mathbf{0}\). Then
+
+Here, a ``static equilibrium configuration'' requires that the explicit time-dependent input, control parameters, and prescribed flow have been frozen at \(t = t_{e}\), or that the system itself is autonomous. If the magnetic field or flow is periodically driven, a Floquet linearization about a periodic orbit must be used instead of a static equilibrium matrix.
+
+\begin{equation}
+\label{eq:galerkin-2-109}
+\nabla V_{h}\left( \mathbf{q}_{e} \right) + \mathbf{G}^{T}\left( \mathbf{q}_{e} \right)\bm{\lambda}_{ce} = \mathbf{Q}_{diss}\left( \mathbf{q}_{e},\mathbf{0} \right) + \mathbf{Q}_{in,e} + \mathbf{Q}_{flow,e} + \mathbf{Q}_{\partial,e}.
+\end{equation}
+
+Usually, \(\mathbf{Q}_{diss}\left( \mathbf{q},\mathbf{0} \right) = \mathbf{0}\). Let \(\mathbf{q} = \mathbf{q}_{e} + \bm{\eta}\) and neglect second- and higher-order perturbation terms. For the unconstrained system,
+
+\begin{equation}
+\label{eq:galerkin-2-110}
+\mathbf{M}_{e}\ddot{\bm{\eta}} + \mathbf{C}_{e}\dot{\bm{\eta}} + \mathbf{K}_{e}\bm{\eta} = \delta\mathbf{Q}(t),
+\end{equation}
+
+where
+
+\begin{equation}
+\label{eq:galerkin-2-111}
+\mathbf{M}_{e} = \mathbf{M}\left( \mathbf{q}_{e} \right),
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-112}
+\mathbf{C}_{e} = - \left. \ \ \ \frac{\partial\mathbf{Q}_{diss}}{\partial\dot{\mathbf{q}}} \right|_{e},
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-113}
+\boxed{\mathbf{K}_{e} = \left. \ \ \ \left\lbrack \nabla_{\mathbf{q}}^{2}V_{h} - \frac{\partial\mathbf{Q}_{diss}}{\partial\mathbf{q}} - \frac{\partial\left( \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} \right)}{\partial\mathbf{q}} \right\rbrack \right|_{e}.}
+\end{equation}
+
+Here, \(\delta\mathbf{Q}(t)\) collects explicit time-dependent input perturbations not absorbed by the state Jacobian. Under the actual dissipative-force convention above, passive dissipation gives \(\mathbf{C}_{e} \succcurlyeq \mathbf{0}\) near the equilibrium. If the load Jacobian contains nonsymmetric follower terms, \(\mathbf{K}_{e}\) need not be symmetric.
+
+If contact is active near the equilibrium, the preceding Jacobian and consistent tangent assume that the contact active set remains fixed. If the equilibrium lies on a contact opening/closing switching surface, a smooth contact regularization, semismooth Newton method, or piecewise linearization must be used; the \(\max\) function cannot be treated as differentiable everywhere.
+
+For a purely conservative system without boundary follower loads, the expression reduces directly to
+
+\begin{equation}
+\label{eq:galerkin-2-114}
+\boxed{\mathbf{K}_{e} = \nabla_{\mathbf{q}}^{2}V_{h}\left( \mathbf{q}_{e} \right),}
+\end{equation}
+
+No derivative of a conservative generalized force already included in \(V_{h}\) is subtracted again. If strict constraints are present, the system must be projected onto the constraint tangent space or first expressed in independent local coordinates satisfying \(\mathbf{c}\left( \mathbf{q} \right) = 0\). The tangent stiffness at a constrained equilibrium must also include the second-order contribution of the constraint Lagrangian. A constant-matrix linear system is only a local approximation of the complete coupled nonlinear model near the specified equilibrium configuration.\cite{MarsdenRatiu1999MechanicsSymmetry,HairerLubichWanner2006GNI}
+
+\subsubsection{Scope of engineering reductions}\label{sec:galerkin-2-10-2}
+
+Small rotations, constant mass, a frozen normal projection, and low-order modal truncation are used only for numerical checks, parameter identification, or ablation experiments. The Euler--Bernoulli branch has two roles: theoretically, it is the Kirchhoff shear-free reduction of the geometrically exact parent model; within COMSOL, it is the Kirchhoff-consistent engineering realization used for the primary training data. It may be used as the primary training branch only after the slenderness ratio, the fraction of shear energy, and the comparison error relative to Timoshenko/solid models satisfy prescribed tolerances. The corotational Beam geometric-nonlinearity formulation in COMSOL permits large rotations but assumes locally small element strains; the mesh must therefore keep the rotation increment between adjacent nodes sufficiently small\cite{COMSOLBeamInterface2025,COMSOLGeometricNonlinearity2025}.
+
+\subsubsection{Modal truncation and selection of the principal computational order}\label{sec:galerkin-2-10-3}
+
+The CHNN and KAM analyses must use a finite-dimensional system of fixed dimension and cannot remain indefinitely at an abstract modal order \(n\). For candidate truncation orders \(n = 1,2,\ldots,n_{max}\), compute at least the leading natural frequencies, terminal displacement, structural energy, torsional response, and principal port powers. Define the adjacent-order convergence indicators
+
+\begin{equation}
+\label{eq:galerkin-2-115}
+e_{n}^{freq} = \max_{1 \leq j \leq m}\frac{\left| \omega_{j}^{(n + 1)} - \omega_{j}^{(n)} \right|}{\left| \omega_{j}^{(n + 1)} \right|},\quad\quad e_{n}^{traj} = \frac{\parallel \mathbf{q}^{(n + 1)} - \Pi_{n + 1 \rightarrow n}\mathbf{q}^{(n + 1)} \parallel}{\parallel \mathbf{q}^{(n + 1)} \parallel},
+\end{equation}
+
+and define analogous indicators for energy and torsion. The principal computational order \(n_{*}\) is the first order at which all prescribed indicators simultaneously fall below their tolerances. Until this computation has been completed, the manuscript may retain \(n_{*}\) only as an undetermined parameter and must not describe an empirically selected order as proven sufficient.
+
+The canonical data mapping is examined using a fixed \(N=2\) basis. It is extracted from the mesh-80 near-frequency cluster, orthonormalized in the consistent finite-element mass metric, and fixed with respect to sign, normalization, and degree-of-freedom row order. It defines the paired-coordinate contract used in the P1 series and the subsequent consistency analysis. The complete bridge retains the first 12 production modes and the mesh-40/80 comparison, so \(N=2\) neither replaces the convergence criterion for \(n_{*}\) nor establishes high-fidelity sufficiency.
+
+\subsection{Numerical implementation and finite-dimensional model outputs}\label{sec:galerkin-2-11}
+
+\subsubsection{COMSOL model hierarchy, projection, and validation}\label{sec:galerkin-2-11-1}
+
+The COMSOL data use a three-level hierarchy: ``primary training--strict reproduction--high-fidelity comparison.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Kirchhoff-consistent primary training model.} Use the Euler--Bernoulli formulation of the three-dimensional Beam interface with Time Dependent dynamics and geometric nonlinearity, retaining axial deformation, bending about two axes, three-dimensional cross-sectional rotations, and torsion. The three-dimensional Euler--Bernoulli section stiffness in COMSOL includes axial force, torque, and two bending moments; shear-free therefore does not mean torsion-free\cite{COMSOLBeamInterface2025,COMSOLSectionStiffness2025}. This model generates data under assumptions consistent with the strict Kirchhoff branch.
+\item
+  \textbf{Strict weak-form reproduction model.} When a term-by-term check of the coupled translational--orientation weak form, nonstandard constraints, or custom distributed couples is required, Weak Form PDE or Weak Contribution is used to specify test functions, boundary terms, and auxiliary variables\cite{COMSOLWeakFormPDE2025,COMSOLWeakContribution2025}. This branch checks discrepancies between the built-in Beam interface and the present equations; it is not the default model for every operating condition.
+\item
+  \textbf{High-fidelity comparison model.} A Timoshenko Beam model quantifies corrections from transverse shear and rotary inertia, while three-dimensional Solid Mechanics checks local cross-sectional stresses, contact regions, and attachment effects. These models output \(X_{HF}\). Their discrepancy from the Kirchhoff-consistent model \(X_{K}\) is used for validation and model-discrepancy learning rather than directly replacing the primary KAM branch.
+\end{enumerate}
+
+Every model should output the centerline position \(\mathbf{r}_{C}(S,t)\), cross-sectional orientation \(\mathbf{R}_{C}(S,t)\) or an equivalent rotation representation, centerline velocity, cross-sectional angular velocity, resultant section forces and moments, structural kinetic energy, and strain energy. The primary training branch should additionally output the separate powers associated with magnetic, fluid, contact, and boundary actions.
+
+Define the translational Gram matrix
+
+\begin{equation}
+\label{eq:galerkin-2-116}
+\mathbf{G}_{a} = \int_{0}^{L}\mathbf{N}^{T}\mathbf{W}_{a}\mathbf{N}\, dS,
+\end{equation}
+
+Then the projection of the COMSOL centerline field is
+
+\begin{equation}
+\label{eq:galerkin-2-117}
+\mathbf{a}(t) = \mathbf{G}_{a}^{- 1}\int_{0}^{L}\mathbf{N}^{T}\mathbf{W}_{a}\left\lbrack \mathbf{r}_{C}(S,t) - \mathbf{r}_{0}(S) \right\rbrack dS.
+\end{equation}
+
+Orientation must not be projected linearly by its Euler-angle components. First compute the logarithmic coordinates of the relative rotation
+
+\begin{equation}
+\label{eq:galerkin-2-118}
+\bm{\theta}_{C}(S,t) = \log\left( \mathbf{R}_{0}^{T}(S)\mathbf{R}_{C}(S,t) \right)^{\vee},
+\end{equation}
+
+and then set
+
+\begin{equation}
+\label{eq:galerkin-2-119}
+\mathbf{G}_{b} = \int_{0}^{L}\bm{\Psi}^{T}\mathbf{W}_{b}\bm{\Psi}\, dS,\quad\quad\mathbf{b}(t) = \mathbf{G}_{b}^{- 1}\int_{0}^{L}\bm{\Psi}^{T}\mathbf{W}_{b}\bm{\theta}_{C}(S,t)\, dS.
+\end{equation}
+
+This gives \(\mathbf{q} = \left( \mathbf{a}^{T},\mathbf{b}^{T} \right)^{T}\). The angular velocity should be checked through \(\bm{\omega}_{h} = \mathbf{B}_{\omega}\left( \mathbf{q} \right)\dot{\mathbf{b}}\), rather than by setting \(\bm{\omega} = \bm{\Psi}\dot{\mathbf{b}}\).
+
+The COMSOL--Galerkin bridge compares the stationary energy/field exports, modal reality on mesh 40/80, the leading 12 frequency clusters, and the mass-metric basis. The maximum relative mesh-frequency difference is \(4.15920\times10^{-5}\), and the maximum off-diagonal entry among the candidate-prefix mass Gram matrices is at most \(1.32445\times10^{-15}\). The three \(1\,\mathrm{s}\) trajectories do not satisfy the original \(0.5\%\) strict perturbation-energy criterion overall, whereas all three satisfy the independent \(2\%\) force-v2 criterion on its fixed common support and anchor. The strict energy criterion, the exploratory \(1\%\) energy criterion, and the force-v2 criterion address different questions and use different thresholds; their separate values are reported in \Cref{sec:numerical-6-2}.
+
+The fluid-loading implementation must match the selected theoretical branch. The theoretical route uses \(T_{A}\) (or its discrete equivalent mass and geometric terms), the pure Froude--Krylov term, and drag. The engineering Morison comparison uses the complete \(C_{M}\mathbf{a}_{f} - C_{A}\ddot{\mathbf{r}}\) form but must not activate \(T_{A}\) simultaneously. The same physical action may be counted only once in any data sample.
+
+\subsubsection{Finite-dimensional state, energy, port, and structure-learning outputs}\label{sec:galerkin-2-11-2}
+
+After the joint Galerkin discretization and the consistent Legendre postprocessing of \Cref{sec:hamiltonian-structure}, the numerical implementation should output unified finite-dimensional states, energies, ports, and representation labels:
+
+\begin{equation}
+\label{eq:galerkin-2-120}
+\mathcal{O}_{h} = \left( \mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}},\mathbf{p}_{rep},{\dot{\mathbf{p}}}_{rep},\mathbf{M}\left( \mathbf{q} \right),V_{h},E_{h},\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow},\mathbf{Q}_{\partial},\mathbf{c},\mathbf{G},representation \right).
+\end{equation}
+
+Here, \(\mathbf{p}_{rep}\) and \({\dot{\mathbf{p}}}_{rep}\) must be consistent with the selected Lagrangian representation. The \(representation\) label must distinguish at least the autonomous-backbone, exact-nonautonomous, and engineering-reduction representations. The strict Kirchhoff branch also stores the discrete constraint \(\mathbf{c}\left( \mathbf{q} \right)\) and its Jacobian \(\mathbf{G}\left( \mathbf{q} \right)\); these two components may be marked as empty in an unconstrained branch.
+
+On this basis, \Cref{sec:hamiltonian-structure} constructs two data objects that must not be mixed. The autonomous-backbone data are
+
+\begin{equation}
+\label{eq:galerkin-2-121}
+\mathcal{D}_{sk} = \left( \mathbf{z}_{0},{\dot{\mathbf{z}}}_{0},H_{cons},\nabla_{\mathbf{z}_{0}}H_{cons},\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{sk},\mathbf{Q}_{\partial} \right),\quad\quad\mathbf{z}_{0} = \left( \mathbf{q},\mathbf{p}_{0} \right),
+\end{equation}
+
+and the exact nonautonomous data are
+
+\begin{equation}
+\label{eq:galerkin-2-122}
+\mathcal{D}_{na} = \left( \mathbf{z},\dot{\mathbf{z}},t,H,\nabla_{\mathbf{z}}H,\partial_{t}H,\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{H},\mathbf{Q}_{\partial} \right),\quad\quad\mathbf{z} = \left( \mathbf{q},\mathbf{p} \right).
+\end{equation}
+
+If \({\dot{\mathbf{p}}}_{rep}\) or \({\dot{\mathbf{z}}}_{rep}\) is obtained by numerical differentiation rather than from a solver residual, analytic equations, or automatic differentiation, the differentiation order, time step, and derivative-error estimate must also be recorded. CHNN derivative supervision, energy-balance supervision, and the subsequent KAM error budget may use only representation-consistent data with traceable errors.
+
+\subsubsection{Training-data hierarchy and model labels}\label{sec:galerkin-2-11-3}
+
+Each sample must store
+
+\begin{equation}
+\label{eq:galerkin-2-123}
+model\_ level \in \{ K,WF,T,S\},\quad\quad representation \in \{ sk,na,red\},
+\end{equation}
+
+Here, \(K\) denotes the Kirchhoff-consistent Beam primary training model, \(WF\) the strict weak-form model, \(T\) the Timoshenko comparison, and \(S\) the three-dimensional solid comparison; \(sk\) denotes the autonomous-backbone representation, \(na\) the exact nonautonomous representation, and \(red\) an engineering reduction.
+
+The data set used for the conservative CHNN and the statistical-learning--KAM interface is restricted to
+
+\begin{equation}
+\label{eq:galerkin-2-124}
+\mathcal{D}_{K}^{cons} = \{\left( \mathbf{z}_{0},{\dot{\mathbf{z}}}_{0},H_{cons},\nabla H_{cons} \right):model\_ level = K,\ representation = sk,\ \mathbf{Q}_{port} = 0\},
+\end{equation}
+
+The open-port training set is
+
+\begin{equation}
+\label{eq:galerkin-2-125}
+\mathcal{D}_{K}^{port} = \{\left( \mathbf{z}_{rep},{\dot{\mathbf{z}}}_{rep},\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow},\mathbf{Q}_{\partial} \right):model\_ level = K\},
+\end{equation}
+
+The high-fidelity comparison set is
+
+\begin{equation}
+\label{eq:galerkin-2-126}
+\mathcal{D}_{HF} = \{ X_{HF} - X_{K}:model\_ level \in \{ WF,T,S\}\}.
+\end{equation}
+
+Only after closure, power-sign, and regularity tests may \(\mathcal{D}_{HF}\) enter a conservative correction, dissipative correction, or general residual, respectively; the entire high-fidelity discrepancy must not be interpreted as a Hamiltonian perturbation. Samples with different \(model\_ level\) and \(representation\) labels must not be mixed directly without labels and pairing.
+
+\subsection{Section summary}\label{sec:galerkin-2-12}
+
+Starting directly from the complete translational--rotational weak form, this section constructed a joint Galerkin approximation using a centerline expansion and an exponential-map representation of cross-sectional orientation. The compatibility conditions for the reference configuration and strains, the initial conditions, the contact active set, and the mutually exclusive accounting of conservative and nonconservative loads were specified explicitly. The base rod, eccentric attachments, and energy-consistent fluid added mass were collected in a velocity-dependent inertial functional, whose Hessian with respect to generalized velocity gives
+
+\begin{equation}
+\label{eq:galerkin-2-127}
+\mathbf{M}\left( \mathbf{q} \right) = \mathbf{M}_{str}\left( \mathbf{q} \right) + \sum_{e}^{}\mathbf{M}_{e}\left( \mathbf{q} \right) + \mathbf{M}_{A}\left( \mathbf{q} \right).
+\end{equation}
+
+For a general prescribed flow, the generalized momentum is rigorously
+
+\begin{equation}
+\label{eq:galerkin-2-128}
+\mathbf{p} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - \mathbf{b}_{A}\left( \mathbf{q},t \right),
+\end{equation}
+
+Both the geometric inertia and the prescribed-flow cross terms are generated by the complete Euler--Lagrange derivative rather than added empirically. The internal restoring force is obtained from the gradient of the full extension--shear--bending--torsion potential, while magnetic and other distributed couples are projected directly through the rotational test functions. The local linearization eliminates double counting of conservative external loads and explicitly includes boundary follower-load and constraint-tangent contributions.
+
+The resulting finite-dimensional nonlinear dynamical systems are provided in unconstrained and Kirchhoff-constrained forms, together with a projection from COMSOL full-order fields to the joint generalized coordinates and a unified output specification. The energy-consistent fluid branch uses \(T_{A} + \mathbf{f}_{FK} + \mathbf{f}_{drag}\), with the drag further split, under a general background flow, into \(\mathbf{f}_{drag,diss} + \mathbf{f}_{drag,flow}\); the engineering Morison formulation is used only as a mutually exclusive validation branch. Small rotations, constant mass, and frozen added mass are retained only as reduced branches. Euler--Bernoulli serves as the COMSOL Kirchhoff-consistent primary training branch after the slenderness and shear-error tolerances are satisfied. These discrete objects support not only the canonical momentum and Hamiltonian construction of \Cref{sec:hamiltonian-structure}, but also provide the sole upstream interface to the CHNN training in \Cref{sec:chnn-model} and the structure-preservation and KAM validation in \Cref{sec:symplectic-kam} through \(\mathcal{D}_{K}^{cons}\), \(\mathcal{D}_{K}^{port}\), \(\mathcal{D}_{HF}\), port labels, model-level labels, and constraint labels.

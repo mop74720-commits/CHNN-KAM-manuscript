@@ -1,0 +1,20 @@
+% Migrated from the Word baseline; do not duplicate content in other section files.
+\section{讨论与适用范围}\label{sec:discussion}
+
+\subsection{理论依据与方法边界}\label{sec:discussion-7-1}
+
+连续力学与有限维约化以几何精确杆、经典几何力学和几何数值积分为理论基础；HNN、耗散/端口网络与复值网络文献用于界定可学习对象和函数类；有限维连续 KAM、辛映射 KAM 与参数化方法分别支撑保守流、辛离散和不变环面核验。各类文献对应不同数学对象，本文不以软件文档或学习模型文献替代连续力学与 KAM 定理的结构假设。\cite{Simo1985FiniteStrainBeam,Antman2005Elasticity,MarsdenRatiu1999MechanicsSymmetry,HairerLubichWanner2006GNI,Greydanus2019HNN,Zhong2020Dissipative,Desai2021PHNN,Chen2022KAMSLT,Trabelsi2018DeepComplex,Hirose2012CVNN,FengQin2010,Shang1999KAMAlgorithms,Shang2000KAMMappings,Haro2016Parameterization,Arnold1989ClassicalMechanics,Poschel2001KAMLecture}
+
+Moser 环带定理、Kuksin 无限维 KAM、metriplectic 框架及特定复反应网络理论用于限定二维截面、PDE 极限、热力学耗散和特定复结构优势的适用范围，不直接构成本文有限维导管系统的主定理。\cite{Coquinot2020Metriplectic,Moser1962InvariantCurves,Kuksin1993InfiniteDimensionalKAM,Poschel2001KAMLecture,Zhang2022ComplexReaction}
+
+Canonical 数据合同的诊断说明，结构一致性必须在构形、切空间和余切空间中逐项核验，不能由能量漂移或单一 residual 代替。跨轨迹误比较、projected momentum 与 mass diagnostic 的差异、求解器内部 stage 的不可观测性以及 fixed-basis 初值变换遗漏，分别对应比较对象、余切投影、输出语义和初始化四类误差源。双层时间步结果未满足预设收敛判据，而三层比较澄清了收敛趋势。这一过程为其他有限维投影问题提供了可复用的诊断顺序。force-v2 的力闭合结果与 Bridge 扰动能量结果回答不同问题，不能互相替代。
+
+\subsection{研究边界与待验证条件}\label{sec:discussion-7-2}
+
+本文完成了连续模型、联合 Galerkin 约化、正则 Hamiltonian 表述、结构化 CHNN、误差预算和不变环面核验接口的形式构造，并以固定 \(N=2\) 基实例化 COMSOL 场投影与 canonical 标签映射。P0、P1、P1.5 和 P1.6 给出了低维与三轨迹小样本结果；其中 P1.6 表明，即使硬结构约束被精确满足，预测性能仍可能恶化。三层时间步和 \(1\,\mathrm{s}\) 验证则表明，当前 canonical 数据合同满足后续多幅值实验的数据生成要求。
+
+主模态阶数 \(n_{\mathrm{main}}\)、完整 96 轨迹、P2 模型比较、开放端口辨识、高保真偏差、正规形系数、非退化常数、统计学习常数、高阶误差证书和 KAM 阈值仍需进一步数值实例化。P1 系列中的随机种子只是算法重复，三条轨迹不足以支持总体物理外推。因此，现有结果尚不能证明 CHNN 在完整 P2 任务上普遍优于 Real HNN，也不构成具体导管工况下的不变环面认证、完整开放系统长期稳定保证、工程安全域或临床有效性结论。BDF 仍只承担状态采样和向量场标签生成，未被证明为辛积分器。
+
+\subsection{非主线模型与扩展方向}\label{sec:discussion-7-3}
+
+严格弱形式 COMSOL 实现、Timoshenko 梁和三维实体模型用于高保真验证；无限维 KAM、热力学 metriplectic 结构、未知正则坐标学习、完整 Maxwell 场和运动壁流固耦合作为后续扩展。开放端口研究将进一步检验功率平衡、耗散符号和端口可辨识性；数值 KAM 研究将计算非退化裕度、高阶误差和不变环面残差。这些模型和验证内容保留其完整研究价值，但不与本文 Kirchhoff 有限维保守主分支的现有结论混用。\cite{COMSOLBeamInterface2025,COMSOLGeometricNonlinearity2025,COMSOLSectionStiffness2025,COMSOLWeakFormPDE2025,COMSOLWeakContribution2025,Jackson1998Electrodynamics,Abbott2020MagneticRobotics,Coquinot2020Metriplectic,Kuksin1993InfiniteDimensionalKAM}

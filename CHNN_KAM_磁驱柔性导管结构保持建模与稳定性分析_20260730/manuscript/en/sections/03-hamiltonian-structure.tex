@@ -1,0 +1,957 @@
+% Migrated from the Word baseline; do not duplicate content in other section files.
+\section{Finite-Dimensional Hamiltonian Structure and Canonicalization}\label{sec:hamiltonian-structure}
+
+\subsection{Finite-Dimensional Phase-Space Variables and Hamiltonian Formulation}\label{sec:hamiltonian-3-1}
+
+\subsubsection{Joint Generalized Coordinates}\label{sec:hamiltonian-3-1-1}
+
+The joint Galerkin projection of centerline position and cross-sectional orientation developed in \Cref{sec:galerkin-discretization} yields
+
+\begin{equation}
+\label{eq:hamiltonian-3-1}
+\boxed{\mathbf{q} = \begin{bmatrix}
+\mathbf{a} \\
+\mathbf{b}
+\end{bmatrix} \in \mathbb{R}^{n},\quad\quad n = n_{a} + n_{b},}
+\end{equation}
+
+where \(\mathbf{a}\) denotes the generalized coordinates of centerline translation and \(\mathbf{b}\) contains the finite-dimensional coefficients of the local rotational coordinates for cross-sectional orientation. The vector \(\mathbf{b}\) is an independent configuration variable describing the bending orientation of the cross section, torsion about the tangent, angular velocity, and rotary inertia; it is not an auxiliary variable derived from the centerline displacement. Thus, \(\mathbf{q}\) is the complete joint generalized configuration coordinate for translation and cross-sectional orientation.
+
+The discrete dynamics of the finite-shear-stiffness geometrically exact Cosserat parent model can be written as
+
+\begin{equation}
+\label{eq:hamiltonian-3-2}
+\boxed{\mathbf{M}\left( \mathbf{q} \right)\ddot{\mathbf{q}} + \mathbf{g}_{M}\left( \mathbf{q},\dot{\mathbf{q}} \right) + \mathbf{g}_{f}\left( \mathbf{q},\dot{\mathbf{q}},t \right) + \nabla_{\mathbf{q}}V_{h}\left( \mathbf{q},t \right) = \mathbf{Q}_{port}.}
+\end{equation}
+
+The mass--inertia matrix
+
+\begin{equation}
+\label{eq:hamiltonian-3-3}
+\mathbf{M}\left( \mathbf{q} \right) = \mathbf{M}_{str}\left( \mathbf{q} \right) + \sum_{e}^{}\mathbf{M}_{e}\left( \mathbf{q} \right) + \mathbf{M}_{A}\left( \mathbf{q} \right)
+\end{equation}
+
+contains the translational kinetic energy of the rod, cross-sectional rotational kinetic energy, translational--rotational coupling of eccentric attachments, and energy-consistent added mass. The Hamiltonian structure developed below is therefore always based on the complete bending--torsion model; it does not use a constant-mass, small-rotation, centerline-only, or torsion-deleted surrogate.
+
+\subsubsection{Basic Framework of the Hamiltonian Formulation}\label{sec:hamiltonian-3-1-2}
+
+The finite-dimensional Hamiltonian formulation follows the chain\cite{MarsdenRatiu1999MechanicsSymmetry,Arnold1989ClassicalMechanics}
+
+\begin{equation}
+\label{eq:hamiltonian-3-4}
+\mathbf{q} \rightarrow \mathbf{p} \rightarrow H\left( \mathbf{q},\mathbf{p} \right) \rightarrow \left\{ \begin{matrix}
+\dot{\mathbf{q}} = \nabla_{\mathbf{p}}H, \\
+\dot{\mathbf{p}} = - \nabla_{\mathbf{q}}H + \mathbf{Q},
+\end{matrix} \right.\ \  \rightarrow \frac{dH}{dt}.
+\end{equation}
+
+This derivation applies to the autonomous conservative backbone and its forced--dissipative extension. A general prescribed flow generates a velocity-linear term in the Lagrangian and consequently shifts the canonical momentum; \Cref{sec:hamiltonian-3-5} gives the complete nonautonomous Hamiltonian formulation.
+
+\subsection{Lagrangian, Momentum, and Hamiltonian of the Autonomous Conservative Backbone}\label{sec:hamiltonian-3-2}
+
+\subsubsection{Selection of the Autonomous Potential}\label{sec:hamiltonian-3-2-1}
+
+Let the external actuation be controlled by parameters \(\bm{\lambda}(t)\), and choose a reference value \(\bar{\bm{\lambda}}\). Write the discrete potential as
+
+\begin{equation}
+\label{eq:hamiltonian-3-5}
+V_{h}\left( \mathbf{q},t;\bm{\lambda}(t) \right) = V_{cons}\left( \mathbf{q};\bar{\bm{\lambda}} \right) + V_{drv}\left( \mathbf{q},t;\bm{\lambda}(t),\bar{\bm{\lambda}} \right),
+\end{equation}
+
+and impose
+
+\begin{equation}
+\label{eq:hamiltonian-3-6}
+V_{cons}\left( \mathbf{q};\bar{\bm{\lambda}} \right): = V_{h}\left( \mathbf{q},t;\bm{\lambda}(t) \right)|_{\bm{\lambda}(t) \equiv \bar{\bm{\lambda}}},\quad\quad V_{drv}: = V_{h} - V_{cons}.
+\end{equation}
+
+After the reference parameters are frozen, no explicit time-dependent term remains; hence
+
+\begin{equation}
+\label{eq:hamiltonian-3-7}
+\boxed{V_{drv}\left( \mathbf{q},t;\bar{\bm{\lambda}},\bar{\bm{\lambda}} \right) = 0,\quad\quad\partial_{t}V_{cons} = 0.}
+\end{equation}
+
+The potential \(V_{cons}\) contains the discrete Cosserat strain energy and the conservative magnetic potential, elastic contact potential, and other conservative external potentials selected at the reference operating condition. This definition freezes the actuation parameters rather than arbitrarily selecting a time slice.
+
+\subsubsection{Autonomous-Backbone Lagrangian and Generalized Momentum}\label{sec:hamiltonian-3-2-2}
+
+For the autonomous port-closed backbone, the Lagrangian is
+
+\begin{equation}
+\label{eq:hamiltonian-3-8}
+\boxed{L_{cons}\left( \mathbf{q},\dot{\mathbf{q}} \right) = \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - V_{cons}\left( \mathbf{q} \right).}
+\end{equation}
+
+The canonical momentum conjugate to \(\mathbf{q}\) is defined by\cite{MarsdenRatiu1999MechanicsSymmetry,Arnold1989ClassicalMechanics}
+
+\begin{equation}
+\label{eq:hamiltonian-3-9}
+\mathbf{p}_{0} = \frac{\partial L_{cons}}{\partial\dot{\mathbf{q}}},
+\end{equation}
+
+which gives the relation between canonical momentum and generalized velocity
+
+\begin{equation}
+\label{eq:hamiltonian-3-10}
+\boxed{\mathbf{p}_{0} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}},\quad\quad\dot{\mathbf{q}} = \mathbf{M}^{- 1}\left( \mathbf{q} \right)\mathbf{p}_{0}.}
+\end{equation}
+
+The subscript \(0\) distinguishes this quantity from the shifted canonical momentum \(\mathbf{p}\) arising under a general prescribed flow in \Cref{sec:hamiltonian-3-5}. The \(\mathbf{p}_{0}\) orientation component \(\mathbf{p}_{0b}\) is the discrete momentum conjugate to the local coordinate \(\mathbf{b}\); it is not, in general, equal to a component of the material angular momentum of any individual cross section.
+
+\subsubsection{Legendre Regularity}\label{sec:hamiltonian-3-2-3}
+
+The velocity Hessian is\cite{MarsdenRatiu1999MechanicsSymmetry,Arnold1989ClassicalMechanics}
+
+\begin{equation}
+\label{eq:hamiltonian-3-11}
+\frac{\partial^{2}L_{cons}}{\partial\dot{\mathbf{q}}\,\partial\dot{\mathbf{q}}} = \mathbf{M}\left( \mathbf{q} \right).
+\end{equation}
+
+If the joint basis contains no velocity redundancy, the material density, rotary inertia, and added-mass parameters satisfy the required physical positivity conditions, and throughout the configuration domain of interest
+
+\begin{equation}
+\label{eq:hamiltonian-3-12}
+\boxed{\mathbf{y}^{T}\mathbf{M}\left( \mathbf{q} \right)\mathbf{y} > 0\quad\left( \forall\mathbf{y} \neq \mathbf{0} \right),}
+\end{equation}
+
+then \(\mathbf{M}\left( \mathbf{q} \right) = \mathbf{M}^{T}\left( \mathbf{q} \right) \succ 0\), and the Legendre map is locally invertible. Geometrically, \(\mathbf{M}\) is the mass metric on the tangent space of configuration space, while \(\mathbf{M}^{-1}\) is the corresponding dual metric on the cotangent space.
+
+For the fixed \(N\)-dimensional reduced manifold \(\mathcal{Q}_{N}\), the configuration coordinate satisfies \(q_N\in\mathcal{Q}_{N}\), the generalized velocity satisfies \(\dot q_N\in T_{q_N}\mathcal{Q}_{N}\), and the conjugate momentum satisfies \(p_N\in T_{q_N}^{*}\mathcal{Q}_{N}\). In the same paired-coordinate trivialization, \(\dot p_N\) is stored as the momentum-rate component paired with \(p_N\); comparisons across charts additionally require the associated connection or coordinate transformation. The data mapping from COMSOL full-order outputs to this cotangent contract is defined by
+
+\begin{equation}
+\label{eq:hamiltonian-canonical-data-contract}
+\boxed{
+q_N=\Pi_{\mathrm{conf},N}(U),\qquad
+p_N=B_N(q_N)^{T}P_{\mathrm{full}},\qquad
+\dot q_N=M_N(q_N)^{-1}p_N,\qquad
+\dot p_N=B_N(q_N)^{T}L.}
+\end{equation}
+
+Here, \(B_N(q_N)\) is the current-configuration tangent lift of the fixed translational--\(SO(3)\) basis; \(P_{\mathrm{full}}\) and \(L\) are, respectively, the full-order momentum and the unscaled load at the same solver step; and \(M_N=B_N^{T}EB_N\). The quantity \(p_{\mathrm{mass}}=M_N\dot q_{\mathrm{native}}\) is used only as a diagnostic. It equals \(B_N^{T}P_{\mathrm{full}}\) only when the full-order velocity lies in the fixed tangent space and the temporal storage and projection are consistent. Offline comparison shows better closure for the projected momentum than for the mass diagnostic, while the solver-output semantics and three-level time-step analysis further support the cotangent projection used in \Cref{eq:hamiltonian-canonical-data-contract}.
+
+\subsubsection{Construction of the Hamiltonian}\label{sec:hamiltonian-3-2-4}
+
+The Hamiltonian is defined as
+
+\begin{equation}
+\label{eq:hamiltonian-3-13}
+H_{cons}\left( \mathbf{q},\mathbf{p}_{0} \right) = \mathbf{p}_{0}^{T}\dot{\mathbf{q}} - L_{cons}\left( \mathbf{q},\dot{\mathbf{q}} \right).
+\end{equation}
+
+Substituting \(\dot{\mathbf{q}} = \mathbf{M}^{-1}\mathbf{p}_{0}\) gives
+
+\begin{equation}
+\label{eq:hamiltonian-3-14}
+\boxed{H_{cons}\left( \mathbf{q},\mathbf{p}_{0} \right) = \frac{1}{2}\mathbf{p}_{0}^{T}\mathbf{M}^{- 1}\left( \mathbf{q} \right)\mathbf{p}_{0} + V_{cons}\left( \mathbf{q} \right).}
+\end{equation}
+
+This Hamiltonian has the standard form \(H=T+V\) and contains both translational and cross-sectional rotational degrees of freedom. Configuration dependence of the mass matrix does not invalidate the Legendre transformation; its contribution enters the geometric inertial terms through the derivative of the Hamiltonian with respect to \(\mathbf{q}\).
+
+\subsubsection{Nonlinear Potential and Restoring Force}\label{sec:hamiltonian-3-2-5}
+
+The discrete internal potential of the Cosserat rod is determined by the strain-energy functional in \Cref{sec:galerkin-discretization}. Define
+
+\begin{equation}
+\label{eq:hamiltonian-3-15}
+\boxed{\mathbf{f}_{int}\left( \mathbf{q} \right) = \nabla_{\mathbf{q}}V_{int,h}\left( \mathbf{q} \right),\quad\quad\mathbf{K}_{tan}\left( \mathbf{q} \right) = \frac{\partial\mathbf{f}_{int}}{\partial\mathbf{q}} = \nabla_{\mathbf{q}}^{2}V_{int,h}\left( \mathbf{q} \right).}
+\end{equation}
+
+Relative to a reference configuration \(\mathbf{q}_{*}\), the conservative potential may also be written as the path-independent line integral
+
+\begin{equation}
+\label{eq:hamiltonian-3-16}
+V_{int,h}\left( \mathbf{q} \right) - V_{int,h}\left( \mathbf{q}_{*} \right) = \int_{0}^{1}\mathbf{f}_{int}\left( \mathbf{q}_{*} + s\left( \mathbf{q} - \mathbf{q}_{*} \right) \right)^{T}\left( \mathbf{q} - \mathbf{q}_{*} \right)\, ds.
+\end{equation}
+
+Thus, the conservative potential can be represented by the line integral of the restoring force along a path in configuration space. In general, one cannot assume \(\mathbf{f}_{int} = \mathbf{K}_{tan}\left( \mathbf{q} \right)\mathbf{q}\). A quadratic approximation is justified only in a linearized neighborhood or when the restoring force genuinely admits that factorization:
+
+\begin{equation}
+\label{eq:hamiltonian-3-17}
+V_{int,h}\left( \mathbf{q}_{*} + \bm{\eta} \right) \approx V_{int,h}\left( \mathbf{q}_{*} \right) + \frac{1}{2}\bm{\eta}^{T}\mathbf{K}_{tan}\left( \mathbf{q}_{*} \right)\bm{\eta}.
+\end{equation}
+
+A global quadratic form is generally invalid because both the potential and the restoring force are geometrically nonlinear.
+
+\subsection{Canonical Hamilton Equations and Geometric Inertia}\label{sec:hamiltonian-3-3}
+
+\subsubsection{Standard Symplectic Structure}\label{sec:hamiltonian-3-3-1}
+
+Define the phase-space variable and the standard symplectic matrix
+
+\begin{equation}
+\label{eq:hamiltonian-3-18}
+\mathbf{z}_{0} = \begin{bmatrix}
+\mathbf{q} \\
+\mathbf{p}_{0}
+\end{bmatrix},\quad\quad\mathbf{J} = \begin{bmatrix}
+\mathbf{0} & \mathbf{I} \\
+ - \mathbf{I} & \mathbf{0}
+\end{bmatrix},\quad\quad\mathbf{J}^{T} = - \mathbf{J}.
+\end{equation}
+
+The autonomous conservative backbone satisfies
+
+\begin{equation}
+\label{eq:hamiltonian-3-19}
+\boxed{{\dot{\mathbf{z}}}_{0} = \mathbf{J}\nabla_{\mathbf{z}_{0}}H_{cons},}
+\end{equation}
+
+that is,
+
+\begin{equation}
+\label{eq:hamiltonian-3-20}
+\boxed{\dot{\mathbf{q}} = \nabla_{\mathbf{p}_{0}}H_{cons},\quad\quad{\dot{\mathbf{p}}}_{0} = - \nabla_{\mathbf{q}}H_{cons}.}
+\end{equation}
+
+The corresponding standard Poisson bracket is
+
+\begin{equation}
+\label{eq:hamiltonian-3-21}
+\{ F,G\} = \nabla_{\mathbf{q}}F^{T}\nabla_{\mathbf{p}_{0}}G - \nabla_{\mathbf{p}_{0}}F^{T}\nabla_{\mathbf{q}}G.
+\end{equation}
+
+Because local orientation coordinates and their conjugate momenta are used, the standard canonical bracket applies. If global rotation matrices and material angular momenta were used instead, a Lie--Poisson or constrained symplectic structure would have to be constructed separately.
+
+\subsubsection{Terms Generated by the Configuration-Dependent Mass Matrix}\label{sec:hamiltonian-3-3-2}
+
+For the \(i\)-th configuration component,
+
+\begin{equation}
+\label{eq:hamiltonian-3-22}
+\frac{\partial H_{cons}}{\partial q_{i}} = \frac{1}{2}\mathbf{p}_{0}^{T}\frac{\partial\mathbf{M}^{- 1}}{\partial q_{i}}\mathbf{p}_{0} + \frac{\partial V_{cons}}{\partial q_{i}}.
+\end{equation}
+
+Therefore, the momentum equation is
+
+\begin{equation}
+\label{eq:hamiltonian-3-23}
+\boxed{{\dot{p}}_{0i} = - \frac{1}{2}\mathbf{p}_{0}^{T}\frac{\partial\mathbf{M}^{- 1}}{\partial q_{i}}\mathbf{p}_{0} - \frac{\partial V_{cons}}{\partial q_{i}}.}
+\end{equation}
+
+Using the derivative identity for an inverse matrix,
+
+\begin{equation}
+\label{eq:hamiltonian-3-24}
+\frac{\partial\mathbf{M}^{- 1}}{\partial q_{i}} = - \mathbf{M}^{- 1}\mathbf{M}_{,i}\mathbf{M}^{- 1}
+\end{equation}
+
+one obtains
+
+\begin{equation}
+\label{eq:hamiltonian-3-25}
+- \frac{1}{2}\mathbf{p}_{0}^{T}\frac{\partial\mathbf{M}^{- 1}}{\partial q_{i}}\mathbf{p}_{0} = \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}_{,i}\dot{\mathbf{q}}.
+\end{equation}
+
+This term fully represents the contribution of the configuration-dependent mass matrix in the Hamiltonian momentum equation. Only when the momentum equation is converted back to a second-order acceleration equation must it be combined with \({\dot{\mathbf{p}}}_{0}\), specifically with the contribution \(\dot{\mathbf{M}}\dot{\mathbf{q}}\) contained therein.
+
+\subsubsection{Equivalence with the Euler--Lagrange Equations}\label{sec:hamiltonian-3-3-3}
+
+From
+
+\begin{equation}
+\label{eq:hamiltonian-3-26}
+{\dot{\mathbf{p}}}_{0} = \mathbf{M}\ddot{\mathbf{q}} + \dot{\mathbf{M}}\dot{\mathbf{q}}
+\end{equation}
+
+and the preceding Hamiltonian momentum equation, one obtains
+
+\begin{equation}
+\label{eq:hamiltonian-3-27}
+\boxed{\mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{M}\left( \mathbf{q},\dot{\mathbf{q}} \right) + \nabla_{\mathbf{q}}V_{cons}\left( \mathbf{q} \right) = \mathbf{0},}
+\end{equation}
+
+where
+
+\begin{equation}
+\label{eq:hamiltonian-3-28}
+\boxed{\mathbf{g}_{M} = \dot{\mathbf{M}}\dot{\mathbf{q}} - \frac{1}{2}\nabla_{\mathbf{q}}\left( {\dot{\mathbf{q}}}^{T}\mathbf{M}\dot{\mathbf{q}} \right).}
+\end{equation}
+
+This result agrees with the autonomous conservative Euler--Lagrange equation in \Cref{sec:galerkin-discretization}, establishing the equivalence between the geometric-inertia representations in canonical momentum form and in second-order generalized-coordinate form.
+
+\subsubsection{Energy Conservation}\label{sec:hamiltonian-3-3-4}
+
+Because \(\mathbf{J}\) is skew-symmetric and \(H_{cons}\) has no explicit time dependence,
+
+\begin{equation}
+\label{eq:hamiltonian-3-29}
+\frac{dH_{cons}}{dt} = \nabla H_{cons}^{T}\mathbf{J}\nabla H_{cons} = 0.
+\end{equation}
+
+and hence
+
+\begin{equation}
+\label{eq:hamiltonian-3-30}
+\boxed{H_{cons}\left( \mathbf{q}(t),\mathbf{p}_{0}(t) \right) = const.}
+\end{equation}
+
+\subsection{Forced--Dissipative Hamiltonian Structure}\label{sec:hamiltonian-3-4}
+
+\subsubsection{Unified Entry Point for Nonconservative Generalized Forces}\label{sec:hamiltonian-3-4-1}
+
+Nonconservative generalized forces enter uniformly through the right-hand side of the Hamiltonian momentum equation:
+
+\begin{equation}
+\label{eq:hamiltonian-3-31}
+\boxed{\dot{\mathbf{q}} = \nabla_{\mathbf{p}_{0}}H_{cons},\quad\quad{\dot{\mathbf{p}}}_{0} = - \nabla_{\mathbf{q}}H_{cons} + \mathbf{Q}_{port}.}
+\end{equation}
+
+Following the mutually exclusive power accounting established in \Cref{sec:rod-model,sec:galerkin-discretization}, write
+
+\begin{equation}
+\label{eq:hamiltonian-3-32}
+\boxed{\mathbf{Q}_{port} = \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial}.}
+\end{equation}
+
+where:
+
+\begin{itemize}
+\tightlist
+\item
+  \(\mathbf{Q}_{diss}\) contains only passive components whose power with respect to the structural mechanical energy is nonpositive;
+\item
+  \(\mathbf{Q}_{in}\) contains magnetic control, actuation, and other nonfluid inputs that have not been included in the potential;
+\item
+  \(\mathbf{Q}_{flow}\) contains background-flow drag input, Froude--Krylov input, and representation-dependent reactive-flow effects;
+\item
+  \(\mathbf{Q}_{\partial}\) separately collects terminal forces, terminal moments, and boundary actuation.
+\end{itemize}
+
+The joint virtual-work projection of these forces and moments was derived in \Cref{sec:galerkin-discretization}; the corresponding finite-dimensional generalized forces are used directly here.
+
+\subsubsection{Equivalent Viscous-Damping Special Case}\label{sec:hamiltonian-3-4-2}
+
+If, for a particular operating condition, the nonconservative force can be represented equivalently as
+
+\begin{equation}
+\label{eq:hamiltonian-3-33}
+\mathbf{Q}_{port} = \mathbf{F}_{ext}\left( \mathbf{q},t \right) - \mathbf{C}\left( \mathbf{q},\dot{\mathbf{q}},t \right)\dot{\mathbf{q}},\quad\quad\mathbf{C} = \mathbf{C}^{T} \succcurlyeq 0,
+\end{equation}
+
+then \(\dot{\mathbf{q}}=\nabla_{\mathbf{p}_{0}}H_{cons}\) gives
+
+\begin{equation}
+\label{eq:hamiltonian-3-34}
+\boxed{{\dot{\mathbf{p}}}_{0} = - \nabla_{\mathbf{q}}H_{cons} + \mathbf{F}_{ext} - \mathbf{C}\nabla_{\mathbf{p}_{0}}H_{cons}.}
+\end{equation}
+
+These equations form a forced--damped Hamiltonian special case on the autonomous backbone. The operator \(\mathbf{C}\) may be a state-dependent effective dissipation operator and need not be constant. For quadratic drag, only the passive dissipative component enters \(\mathbf{C}\dot{\mathbf{q}}\); the background-flow input remains in \(\mathbf{Q}_{flow}\). Coulomb friction, contact switching, and impact may be treated as separate generalized-force ports without requiring a single globally smooth dissipation matrix.
+
+If the magnetic and elastic contact forces have not been included in the potential, one may set
+
+\begin{equation}
+\label{eq:hamiltonian-3-35}
+\mathbf{F}_{ext} = \mathbf{F}_{mag} + \mathbf{F}_{cont}
+\end{equation}
+
+If the same actions have already been generated by the gradients of \(V_{mag,cons}\) or \(V_{cont,el}\), they must not be counted again in \(\mathbf{F}_{ext}\).
+
+\subsubsection{Energy Rate}\label{sec:hamiltonian-3-4-3}
+
+For an autonomous Hamiltonian,\cite{MarsdenRatiu1999MechanicsSymmetry,Zhong2020Dissipative,Desai2021PHNN}
+
+\begin{equation}
+\label{eq:hamiltonian-3-36}
+\frac{dH_{cons}}{dt} = \nabla_{\mathbf{q}}H_{cons}^{T}\dot{\mathbf{q}} + \nabla_{\mathbf{p}_{0}}H_{cons}^{T}{\dot{\mathbf{p}}}_{0}.
+\end{equation}
+
+Substitution of the forced canonical equations causes the symplectic terms to cancel, yielding
+
+\begin{equation}
+\label{eq:hamiltonian-3-37}
+\boxed{\frac{dH_{cons}}{dt} = {\dot{\mathbf{q}}}^{T}\mathbf{Q}_{port}.}
+\end{equation}
+
+Under the equivalent-damping condition of \Cref{sec:hamiltonian-3-4-2},
+
+\begin{equation}
+\label{eq:hamiltonian-3-38}
+\boxed{\frac{dH_{cons}}{dt} = \nabla_{\mathbf{p}_{0}}H_{cons}^{T}\left( \mathbf{F}_{ext} - \mathbf{C}\nabla_{\mathbf{p}_{0}}H_{cons} \right).}
+\end{equation}
+
+where
+
+\begin{equation}
+\label{eq:hamiltonian-3-39}
+- \nabla_{\mathbf{p}_{0}}H_{cons}^{T}\mathbf{C}\nabla_{\mathbf{p}_{0}}H_{cons} \leq 0,
+\end{equation}
+
+The sign of the external input power depends on the operating condition. This energy-rate expression clearly distinguishes external input from passive dissipation and is consistent with the port classification.
+
+\subsubsection{Phase-Space Form of the Complete Forced System}\label{sec:hamiltonian-3-4-4}
+
+Define
+
+\begin{equation}
+\label{eq:hamiltonian-3-40}
+\mathbf{B} = \begin{bmatrix}
+\mathbf{0} \\
+\mathbf{I}
+\end{bmatrix},
+\end{equation}
+
+The complete forced--dissipative system on the autonomous backbone is then
+
+\begin{equation}
+\label{eq:hamiltonian-3-41}
+\boxed{{\dot{\mathbf{z}}}_{0} = \mathbf{J}\nabla_{\mathbf{z}_{0}}H_{cons} + \mathbf{B}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} \right).}
+\end{equation}
+
+The system is therefore a forced--dissipative Hamiltonian system, or equivalently an open system with a canonical Hamiltonian backbone. It reduces to a classical closed conservative Hamiltonian system only when every port is closed and the Hamiltonian is autonomous. A closed Hamiltonian representation of the dissipative environment would require additional energy-storage or heat-bath degrees of freedom, which are not part of the finite-dimensional variable set constructed in \Cref{sec:rod-model,sec:galerkin-discretization}.
+
+\subsection{Canonical Momentum and Hamiltonian under a General Prescribed Flow}\label{sec:hamiltonian-3-5}
+
+\subsubsection{General Discrete Lagrangian}\label{sec:hamiltonian-3-5-1}
+
+The energy-consistent prescribed-flow formulation in \Cref{sec:rod-model,sec:galerkin-discretization} generates a velocity-linear term. The general discrete Lagrangian is\cite{MarsdenRatiu1999MechanicsSymmetry,Arnold1989ClassicalMechanics}
+
+\begin{equation}
+\label{eq:hamiltonian-3-42}
+\boxed{L_{h}\left( \mathbf{q},\dot{\mathbf{q}},t \right) = \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - {\dot{\mathbf{q}}}^{T}\mathbf{b}_{A}\left( \mathbf{q},t \right) + c_{A}\left( \mathbf{q},t \right) - V_{h}\left( \mathbf{q},t \right).}
+\end{equation}
+
+Here, \(\mathbf{M}\) still contains the velocity-quadratic added-mass contribution, while \(\mathbf{b}_{A}\) and \(c_{A}\) represent the cross term and the pure-flow term induced by the prescribed flow. Added inertia already included in \(\mathbf{M}_{A},\mathbf{b}_{A},c_{A}\) must not be reintroduced on the right-hand side as a complete Morison added-mass generalized force.
+
+\subsubsection{General Canonical Momentum and Hamiltonian}\label{sec:hamiltonian-3-5-2}
+
+By definition,
+
+\begin{equation}
+\label{eq:hamiltonian-3-43}
+\mathbf{p} = \frac{\partial L_{h}}{\partial\dot{\mathbf{q}}}
+\end{equation}
+
+one obtains
+
+\begin{equation}
+\label{eq:hamiltonian-3-44}
+\boxed{\mathbf{p} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - \mathbf{b}_{A}\left( \mathbf{q},t \right),\quad\quad\dot{\mathbf{q}} = \mathbf{M}^{- 1}\left( \mathbf{q} \right)\left( \mathbf{p} + \mathbf{b}_{A} \right).}
+\end{equation}
+
+When \(\mathbf{b}_{A}=\mathbf{0}\), this relation reduces to \(\mathbf{p}_{0}=\mathbf{M}\dot{\mathbf{q}}\) for the autonomous backbone or the backbone--port representation. When the velocity-linear prescribed-flow term is retained explicitly, the general canonical momentum \(\mathbf{p}\) must be used.
+
+The Legendre transformation gives
+
+\begin{equation}
+\label{eq:hamiltonian-3-45}
+\boxed{H\left( \mathbf{q},\mathbf{p},t \right) = \frac{1}{2}\left( \mathbf{p} + \mathbf{b}_{A} \right)^{T}\mathbf{M}^{- 1}\left( \mathbf{q} \right)\left( \mathbf{p} + \mathbf{b}_{A} \right) + V_{h}\left( \mathbf{q},t \right) - c_{A}\left( \mathbf{q},t \right).}
+\end{equation}
+
+where \(-c_{A}\) follows directly from the Legendre transformation. If \(\mathbf{M} = \mathbf{M}\left( \mathbf{q} \right)\) has no explicit time dependence, then
+
+\begin{equation}
+\label{eq:hamiltonian-3-46}
+\boxed{\nabla_{\mathbf{p}}H = \mathbf{M}^{- 1}\left( \mathbf{p} + \mathbf{b}_{A} \right) = \dot{\mathbf{q}},}
+\end{equation}
+
+\begin{equation}
+\label{eq:hamiltonian-3-47}
+\boxed{\frac{\partial H}{\partial q_{i}} = - \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}_{,i}\dot{\mathbf{q}} + \mathbf{b}_{A,i}^{T}\dot{\mathbf{q}} + \frac{\partial V_{h}}{\partial q_{i}} - \frac{\partial c_{A}}{\partial q_{i}},}
+\end{equation}
+
+and, at fixed \(\left(\mathbf{q},\mathbf{p}\right)\),
+
+\begin{equation}
+\label{eq:hamiltonian-3-48}
+\boxed{\left. \ \ \frac{\partial H}{\partial t} \right|_{\mathbf{q},\mathbf{p}} = {\dot{\mathbf{q}}}^{T}\partial_{t}\mathbf{b}_{A} + \partial_{t}V_{h} - \partial_{t}c_{A}.}
+\end{equation}
+
+\subsubsection{Equivalence with the General Euler--Lagrange Equations}\label{sec:hamiltonian-3-5-3}
+
+In the absence of external ports, the standard nonautonomous canonical equations still hold:
+
+\begin{equation}
+\label{eq:hamiltonian-3-49}
+\dot{\mathbf{q}} = \nabla_{\mathbf{p}}H,\quad\quad\dot{\mathbf{p}} = - \nabla_{\mathbf{q}}H.
+\end{equation}
+
+From
+
+\begin{equation}
+\label{eq:hamiltonian-3-50}
+\dot{\mathbf{p}} = \mathbf{M}\ddot{\mathbf{q}} + \dot{\mathbf{M}}\dot{\mathbf{q}} - {\dot{\mathbf{b}}}_{A}
+\end{equation}
+
+one recovers
+
+\begin{equation}
+\label{eq:hamiltonian-3-51}
+\boxed{\mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{M} + \mathbf{g}_{f} + \nabla_{\mathbf{q}}V_{h} = \mathbf{0},}
+\end{equation}
+
+where
+
+\begin{equation}
+\label{eq:hamiltonian-3-52}
+\boxed{\mathbf{g}_{f} = - {\dot{\mathbf{b}}}_{A} + \left( \nabla_{\mathbf{q}}\mathbf{b}_{A} \right)^{T}\dot{\mathbf{q}} - \nabla_{\mathbf{q}}c_{A}.}
+\end{equation}
+
+This result agrees with the prescribed-flow Euler--Lagrange equation in \Cref{sec:galerkin-discretization}. Both \(\mathbf{g}_{M}\) and \(\mathbf{g}_{f}\) are generated automatically by the Legendre transformation and therefore must not be added again as separate generalized forces.
+
+\subsubsection{Exact Representation and Backbone--Port Representation}\label{sec:hamiltonian-3-5-4}
+
+When \(\mathbf{b}_{A},c_{A}\) are retained, define\cite{MarsdenRatiu1999MechanicsSymmetry,Arnold1989ClassicalMechanics}
+
+\begin{equation}
+\label{eq:hamiltonian-3-53}
+\mathbf{z} = \begin{bmatrix}
+\mathbf{q} \\
+\mathbf{p}
+\end{bmatrix},
+\end{equation}
+
+The complete forced system is
+
+\begin{equation}
+\label{eq:hamiltonian-3-54}
+\boxed{\dot{\mathbf{z}} = \mathbf{J}\nabla_{\mathbf{z}}H\left( \mathbf{z},t \right) + \mathbf{B}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{H} + \mathbf{Q}_{\partial} \right).}
+\end{equation}
+
+In the exact representation, \(\mathbf{g}_{f}\) is already contained in the Hamiltonian, so \(\mathbf{Q}_{flow}^{H}\) does not include an additional \(- \mathbf{g}_{f}\).
+
+In the backbone--port representation, take
+
+\begin{equation}
+\label{eq:hamiltonian-3-55}
+\mathbf{p}_{0} = \mathbf{M}\dot{\mathbf{q}}
+\end{equation}
+
+and define
+
+\begin{equation}
+\label{eq:hamiltonian-3-56}
+H_{sk}\left( \mathbf{q},\mathbf{p}_{0},t \right) = \frac{1}{2}\mathbf{p}_{0}^{T}\mathbf{M}^{- 1}\mathbf{p}_{0} + V_{h}\left( \mathbf{q},t \right),
+\end{equation}
+
+The prescribed-flow cross term is then transferred in its entirety to the port:
+
+\begin{equation}
+\label{eq:hamiltonian-3-57}
+\boxed{\mathbf{Q}_{flow}^{sk} = \mathbf{Q}_{flow}^{H} - \mathbf{g}_{f}.}
+\end{equation}
+
+The two representations generate the same configuration trajectories, but each must be used as a complete and internally consistent set:
+
+\begin{equation}
+\label{eq:hamiltonian-3-58}
+\boxed{\left( \mathbf{p},H,\mathbf{Q}_{flow}^{H} \right) \neq \left( \mathbf{p}_{0},H_{sk},\mathbf{Q}_{flow}^{sk} \right).}
+\end{equation}
+
+The two variable sets and generating functions must remain paired. The shifted momentum \(\mathbf{p}\) is used with the exact Hamiltonian \(H\), whereas \(\mathbf{p}_{0}\) is used with \(H_{sk}\). The term \(-\mathbf{g}_{f}\) must not be added again to the exact Hamiltonian representation.
+
+\subsubsection{General Energy Rate}\label{sec:hamiltonian-3-5-5}
+
+The exact representation satisfies
+
+\begin{equation}
+\label{eq:hamiltonian-3-59}
+\boxed{\frac{dH}{dt} = \frac{\partial H}{\partial t} + {\dot{\mathbf{q}}}^{T}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{H} + \mathbf{Q}_{\partial} \right).}
+\end{equation}
+
+The backbone--port representation satisfies
+
+\begin{equation}
+\label{eq:hamiltonian-3-60}
+\boxed{\frac{dH_{sk}}{dt} = \partial_{t}V_{h} + {\dot{\mathbf{q}}}^{T}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{sk} + \mathbf{Q}_{\partial} \right).}
+\end{equation}
+
+These two expressions give the energy rates under nonautonomous potentials, prescribed flow, and multiple ports, and remain dynamically equivalent in their respective variable representations.
+
+\subsection{Range of Applicability and the Strict Kirchhoff Constraint Branch}\label{sec:hamiltonian-3-6}
+
+\subsubsection{Local Orientation Coordinates}\label{sec:hamiltonian-3-6-1}
+
+Exponential coordinates form a local chart on \(SO(3)\). To use standard canonical variables within the current chart, require, for every \(S\in\lbrack 0,L\rbrack\),
+
+\begin{equation}
+\label{eq:hamiltonian-3-61}
+\parallel \bm{\Psi}(S)\mathbf{b} \parallel < \pi.
+\end{equation}
+
+This is a coordinate-chart restriction rather than a small-rotation mechanical approximation. When a trajectory crosses the chart boundary, the orientation coordinates must be switched and the conjugate momentum updated consistently through the corresponding cotangent transformation.
+
+\subsubsection{Strict Kirchhoff Primary Branch and Finite-Shear Validation Branch}\label{sec:hamiltonian-3-6-2}
+
+The geometrically exact parent model in \Cref{sec:rod-model} is a finite-shear Cosserat rod. To remain consistent with the Kirchhoff slender-catheter assumptions and to provide \Cref{sec:chnn-model,sec:symplectic-kam} with a nonredundant canonical state, the primary structured-learning and KAM branches preferentially use a locally reduced representation of the strict shear-free constraint. Write the constraint as\cite{MarsdenRatiu1999MechanicsSymmetry,HairerLubichWanner2006GNI}
+
+\begin{equation}
+\label{eq:hamiltonian-3-62}
+\mathbf{c}\left( \mathbf{q} \right) = \mathbf{0},\quad\quad\mathbf{G}\left( \mathbf{q} \right) = \frac{\partial\mathbf{c}}{\partial\mathbf{q}},
+\end{equation}
+
+If \(\mathbf{G}\) has constant rank throughout the domain of interest, the constraint set is locally a smooth manifold. In the full coordinates, the equations are
+
+\begin{equation}
+\label{eq:hamiltonian-3-63}
+\boxed{\dot{\mathbf{q}} = \nabla_{\mathbf{p}}H,\quad\quad\dot{\mathbf{p}} = - \nabla_{\mathbf{q}}H + \mathbf{Q}_{port} - \mathbf{G}^{T}\bm{\lambda}_{c},\quad\quad\mathbf{c}\left( \mathbf{q} \right) = \mathbf{0}.}
+\end{equation}
+
+The ideal constraint reaction satisfies \({\dot{\mathbf{q}}}^{T}\mathbf{G}^{T}\bm{\lambda}_{c}=0\). To obtain a canonical system that can be used directly by the CHNN and standard symplectic analysis, introduce independent local coordinates \(\mathbf{q} = \bm{\chi}\left( \mathbf{y} \right)\) and define
+
+\begin{equation}
+\label{eq:hamiltonian-3-64}
+\mathbf{C}\left( \mathbf{y} \right) = \frac{\partial\bm{\chi}}{\partial\mathbf{y}},\quad\quad\mathbf{M}_{r}\left( \mathbf{y} \right) = \mathbf{C}^{T}\mathbf{M}\left( \bm{\chi}\left( \mathbf{y} \right) \right)\mathbf{C},
+\end{equation}
+
+When \(\mathbf{M}_{r}\succ0\), construct the reduced Hamiltonian. The reduced momentum of the autonomous backbone is \(\mathbf{p}_{r}=\mathbf{M}_{r}\dot{\mathbf{y}}\). If the reduced prescribed-flow model still contains a velocity-linear term, use instead \(\mathbf{p}_{r}=\mathbf{M}_{r}\dot{\mathbf{y}}-\mathbf{b}_{A,r}\). \Cref{sec:chnn-model,sec:symplectic-kam} use only this independent-coordinate canonical system; the differential--algebraic equations containing the multiplier \(\bm{\lambda}_{c}\) cannot be treated directly as a standard Hamiltonian system on the full space.
+
+The finite-shear-stiffness Cosserat ordinary differential equations are retained for COMSOL comparison, numerical regularization, and constraint-convergence analysis. Data from this regularized branch may replace locally reduced data in CHNN training only when the shear strains, trajectories, energies, and principal frequencies converge to the Kirchhoff results as the shear stiffness increases. This strategy preserves the advantages of the complete parent model while keeping the primary computational object consistent with the original Kirchhoff research objective.
+
+\subsection{Interfaces to CHNN, KAM, and Structure-Preserving Discretization}\label{sec:hamiltonian-3-7}
+
+\Cref{sec:hamiltonian-structure} does not anticipate the neural-network construction or KAM theorem proofs developed in \Cref{sec:chnn-model,sec:symplectic-kam}. Instead, based on the HNN, dissipative/port-Hamiltonian network, statistical-learning--KAM, symplectic-algorithm, and parameterization-method literature used there, it specifies the unique and verifiable mathematical objects that connect the preceding and subsequent parts.\cite{Greydanus2019HNN,Zhong2020Dissipative,Desai2021PHNN,Chen2022KAMSLT,Trabelsi2018DeepComplex,Hirose2012CVNN,FengQin2010,Shang1999KAMAlgorithms,Shang2000KAMMappings,Haro2016Parameterization}
+
+BDF order 2 with \texttt{tsteps} and \texttt{tstepsstore=1} is used only to store same-solver-step states and to generate vector-field labels under \Cref{eq:hamiltonian-canonical-data-contract}. The three-level time-step comparison tests discrete observability and convergence of this data contract, not symplecticity of BDF. Any symplectic or KAM inference requires a separate symplectic map satisfying the assumptions in \Cref{sec:symplectic-kam}.
+
+\subsubsection{Canonical Nondimensionalization, Complex Coordinates, and the Physical Hamiltonian Baseline}\label{sec:hamiltonian-3-7-1}
+
+A subsequent complex representation cannot add \(\mathbf{q}\) and \(\mathbf{p}\) directly when they have different physical dimensions and scales. Choose a stable reference state \(\left(\mathbf{q}_{*},\mathbf{p}_{*}\right)\), coordinate and momentum scale matrices \(\mathbf{S}_{q}\) and \(\mathbf{S}_{p}\), a time scale \(t_{*}\), and an energy scale \(E_{*}\), and define the action scale \(\mathcal{A}_{*}=E_{*}t_{*}\). Require
+
+\begin{equation}
+\label{eq:hamiltonian-3-65}
+\boxed{\mathbf{S}_{q}^{T}\mathbf{S}_{p} = \mathcal{A}_{*}\mathbf{I}.}
+\end{equation}
+
+Define
+
+\begin{equation}
+\label{eq:hamiltonian-3-66}
+\mathbf{q} = \mathbf{q}_{*} + \mathbf{S}_{q}\mathbf{Q},\quad\quad\mathbf{p} = \mathbf{p}_{*} + \mathbf{S}_{p}\mathbf{P},\quad\quad t = t_{*}\tau,\quad\quad H = E_{*}\widehat{H}.
+\end{equation}
+
+The scale-compatibility condition then gives
+
+\begin{equation}
+\label{eq:hamiltonian-3-67}
+\frac{d\mathbf{Q}}{d\tau} = \nabla_{\mathbf{P}}\widehat{H},\quad\quad\frac{d\mathbf{P}}{d\tau} = - \nabla_{\mathbf{Q}}\widehat{H},
+\end{equation}
+
+so the nondimensional variables still satisfy the standard canonical Hamilton equations. Define the complex coordinates\cite{MarsdenRatiu1999MechanicsSymmetry,Arnold1989ClassicalMechanics}
+
+\begin{equation}
+\label{eq:hamiltonian-3-68}
+\boxed{\bm{\xi} = \frac{\mathbf{Q} + i\mathbf{P}}{\sqrt{2}},\quad\quad\overline{\bm{\xi}} = \frac{\mathbf{Q} - i\mathbf{P}}{\sqrt{2}}.}
+\end{equation}
+
+The real and imaginary parts of \(\bm{\xi}\) are canonically paired configuration and momentum variables with compatible scales. A nontrivial real-valued Hamiltonian is generally written as \(\widehat{H}\left( \bm{\xi},\overline{\bm{\xi}} \right) \in \mathbb{R}\), rather than as a real-valued holomorphic function of \(\bm{\xi}\) alone.\cite{Trabelsi2018DeepComplex,Hirose2012CVNN}
+
+\Cref{sec:hamiltonian-structure} supplies \Cref{sec:chnn-model} with the analytical physical baseline
+
+\begin{equation}
+\label{eq:hamiltonian-3-69}
+{\widehat{H}}_{phys} = {\widehat{H}}_{cons},
+\end{equation}
+
+The real-valued readout in \Cref{sec:chnn-model} should use the physical-residual form
+
+\begin{equation}
+\label{eq:hamiltonian-3-70}
+\boxed{{\widehat{H}}_{\lambda} = {\widehat{H}}_{phys} + \Delta{\widehat{H}}_{\lambda}.}
+\end{equation}
+
+The known mass matrix, Cosserat strain energy, and identified conservative magnetic and elastic-contact potentials are not relearned by the network. The term \(\Delta{\widehat{H}}_{\lambda}\) represents only parameter corrections, conservative corrections induced by Galerkin truncation, and other unmodeled conservative effects. Because a Hamiltonian inferred from vector-field data is identifiable only up to an additive constant, a gauge must be fixed, for example \({\widehat{H}}_{\lambda}\left( \mathbf{z}_{*} \right) = 0\) or zero mean over the training domain.\cite{Greydanus2019HNN,Desai2021PHNN}
+
+\subsubsection{Backbone--Port Structure and Consistent Data Representations}\label{sec:hamiltonian-3-7-2}
+
+In the autonomous-backbone representation with frozen actuation parameters \(\bm{\lambda}(t) \equiv \overline{\bm{\lambda}}\),
+
+\begin{equation}
+\label{eq:hamiltonian-3-71}
+V_{drv} = 0,\quad\quad H_{sk} = H_{cons},\quad\quad\partial_{t}H_{sk} = 0,
+\end{equation}
+
+and
+
+\begin{equation}
+\label{eq:hamiltonian-3-72}
+\boxed{{\dot{\mathbf{z}}}_{0} = \mathbf{J}\nabla_{\mathbf{z}_{0}}H_{cons} + \mathbf{B}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{sk} + \mathbf{Q}_{\partial} \right).}
+\end{equation}
+
+\Cref{sec:chnn-model} should parameterize or supervise the ports separately rather than allowing a single unstructured residual to absorb every physical contribution:
+
+\begin{equation}
+\label{eq:hamiltonian-3-73}
+\mathbf{Q}_{port,\theta} = \mathbf{Q}_{diss,\mu} + \mathbf{Q}_{in,\nu} + \mathbf{Q}_{flow,\kappa} + \mathbf{Q}_{\partial} + \mathbf{r}_{\eta}.
+\end{equation}
+
+Here, \(\mathbf{Q}_{diss,\mu}\) represents only the passive component with nonpositive power; magnetic control, background-flow input, and boundary actuation remain separate ports; and \(\mathbf{r}_{\eta}\) represents only the residual remaining after the known model and known ports have been removed. This hierarchy is consistent with the structured modeling principles of dissipative SymODEN and port-Hamiltonian neural networks.\cite{Zhong2020Dissipative,Desai2021PHNN}
+
+For nonfrozen or pulsatile operating conditions, \(H_{sk}=H_{cons}+V_{drv}\). The following two representations are mutually exclusive:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  If the complete \(H_{sk}\) is used as the generator, the same conservative actuation force must not also enter \(\mathbf{Q}_{in}\);
+\item
+  If the autonomous \(H_{cons}\) is used as the generator, set \(\mathbf{Q}_{drv}=-\nabla_{\mathbf{q}}V_{drv}\) and include it exactly once in \(\mathbf{Q}_{in}\).
+\end{enumerate}
+
+Under a general prescribed flow, use \(\mathbf{p}=\mathbf{M}\dot{\mathbf{q}}-\mathbf{b}_{A}\) and the corresponding nonautonomous Hamiltonian; the autonomous backbone uses \(\mathbf{p}_{0}=\mathbf{M}\dot{\mathbf{q}}\). The two data types must be distinguished by a \(representation\) label. The backbone and nonautonomous data supplied to \Cref{sec:chnn-model} are, respectively,
+
+\begin{equation}
+\label{eq:hamiltonian-3-74}
+\mathcal{D}_{sk} = \left( \mathbf{Q},\mathbf{P},\bm{\xi},{\dot{\mathbf{z}}}_{0},{\widehat{H}}_{cons},\nabla{\widehat{H}}_{cons},\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{sk},\mathbf{Q}_{\partial} \right),
+\end{equation}
+
+\begin{equation}
+\label{eq:hamiltonian-3-75}
+\mathcal{D}_{na} = \left( \mathbf{z},\dot{\mathbf{z}},t,H,\nabla H,\partial_{t}H,\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{H},\mathbf{Q}_{\partial} \right).
+\end{equation}
+
+The statistical-learning--KAM interface preferentially uses derivative-supervised autonomous conservative samples and does not interpret the sum of trajectory loss, dissipation loss, and regularization terms directly as the KAM perturbation size.\cite{Chen2022KAMSLT}
+
+\subsubsection{Stable Equilibrium, Modal Canonicalization, and the Integrable Reference System}\label{sec:hamiltonian-3-7-3}
+
+The subsequent KAM analysis starts from the autonomous conservative backbone \(H_{cons}\left( \mathbf{q},\mathbf{p}_{0} \right)\), without assuming that it is globally integrable. Choose an equilibrium \(\left(\mathbf{q}_{*},\mathbf{0}\right)\) satisfying
+
+\begin{equation}
+\label{eq:hamiltonian-3-76}
+\nabla_{\mathbf{q}}V_{cons}\left( \mathbf{q}_{*} \right) = \mathbf{0},\quad\quad\mathbf{M}_{*} = \mathbf{M}\left( \mathbf{q}_{*} \right) \succ 0,\quad\quad\mathbf{K}_{*} = \nabla_{\mathbf{q}}^{2}V_{cons}\left( \mathbf{q}_{*} \right) \succ 0.
+\end{equation}
+
+Solve the generalized eigenvalue problem
+
+\begin{equation}
+\label{eq:hamiltonian-3-77}
+\mathbf{K}_{*}\bm{\phi}_{j} = \omega_{j}^{2}\mathbf{M}_{*}\bm{\phi}_{j},
+\end{equation}
+
+and choose the modal matrix \(\bm{\Phi}\) such that
+
+\begin{equation}
+\label{eq:hamiltonian-3-78}
+\bm{\Phi}^{T}\mathbf{M}_{*}\bm{\Phi} = \mathbf{I},\quad\quad\bm{\Phi}^{T}\mathbf{K}_{*}\bm{\Phi} = \bm{\Omega}^{2}.
+\end{equation}
+
+The linear canonical transformation
+
+\begin{equation}
+\label{eq:hamiltonian-3-79}
+\mathbf{q} - \mathbf{q}_{*} = \bm{\Phi}\mathbf{Q}_{m},\quad\quad\mathbf{p}_{0} = \bm{\Phi}^{- T}\mathbf{P}_{m}
+\end{equation}
+
+reduces the quadratic Hamiltonian to
+
+\begin{equation}
+\label{eq:hamiltonian-3-80}
+H_{2} = \frac{1}{2}\left( \mathbf{P}_{m}^{T}\mathbf{P}_{m} + \mathbf{Q}_{m}^{T}\bm{\Omega}^{2}\mathbf{Q}_{m} \right) = \sum_{j = 1}^{n}\omega_{j}I_{j},
+\end{equation}
+
+where
+
+\begin{equation}
+\label{eq:hamiltonian-3-81}
+x_{j} = \sqrt{\omega_{j}}Q_{m,j},\quad\quad y_{j} = \frac{P_{m,j}}{\sqrt{\omega_{j}}},\quad\quad I_{j} = \frac{x_{j}^{2} + y_{j}^{2}}{2}.
+\end{equation}
+
+With quadratic terms alone, the frequencies are independent of the actions, and hence
+
+\begin{equation}
+\label{eq:hamiltonian-3-82}
+\frac{\partial^{2}H_{2}}{\partial\mathbf{I}^{2}} = \mathbf{0},
+\end{equation}
+
+Thus the linear harmonic oscillator is isochronously degenerate. The condition \(\mathbf{K}_{*} \succ 0\) cannot replace the Kolmogorov nondegeneracy condition; nondegeneracy must be supplied by geometric or material nonlinearities, conservative magnetic potentials, or other higher-order conservative terms.
+
+If \(H_{cons}\) is analytic in the neighborhood of interest, or has the regularity required by the selected finitely differentiable KAM theorem, and the linear frequencies avoid low-order resonances to the required order, a finite-order Birkhoff normal form can be constructed:\cite{HairerLubichWanner2006GNI,FengQin2010,Arnold1989ClassicalMechanics}
+
+\begin{equation}
+\label{eq:hamiltonian-3-83}
+H_{cons} \circ \bm{\Psi} = H_{*} + \bm{\omega} \cdot \mathbf{I} + Z_{4}\left( \mathbf{I} \right) + \cdots + Z_{r}\left( \mathbf{I} \right) + R_{r + 1}\left( \mathbf{I},\bm{\theta} \right).
+\end{equation}
+
+Define
+
+\begin{equation}
+\label{eq:hamiltonian-3-84}
+\boxed{H_{0}\left( \mathbf{I} \right) = H_{*} + \bm{\omega} \cdot \mathbf{I} + Z_{4}\left( \mathbf{I} \right) + \cdots + Z_{r}\left( \mathbf{I} \right),\quad\quad\varepsilon H_{1} = R_{r + 1}.}
+\end{equation}
+
+The lowest nontrivial case commonly has
+
+\begin{equation}
+\label{eq:hamiltonian-3-85}
+Z_{4}\left( \mathbf{I} \right) = \frac{1}{2}\mathbf{I}^{T}\mathbf{A}\mathbf{I},
+\end{equation}
+
+The Kolmogorov nondegeneracy condition over the action domain under consideration then requires
+
+\begin{equation}
+\label{eq:hamiltonian-3-86}
+\boxed{\det\left( \frac{\partial^{2}H_{0}}{\partial\mathbf{I}^{2}} \right) \neq 0,}
+\end{equation}
+
+Near the origin, this reduces to \(\det\mathbf{A}\neq0\). If this matrix is singular, classical Kolmogorov KAM cannot be claimed; one must increase the normal-form order, choose another reference family, or invoke and verify an isoenergetic or degenerate KAM theorem.
+
+On a fixed complex neighborhood or Sobolev domain \(\mathcal{D}\), with a common function norm \(\parallel \cdot \parallel_{\mathcal{X}\left( \mathcal{D} \right)}\), write the nondimensional Hamiltonian as
+
+\begin{equation}
+\label{eq:hamiltonian-3-87}
+{\widehat{H}}_{cons} = {\widehat{H}}_{0} + \varepsilon P,\quad\quad \parallel P \parallel_{\mathcal{X}\left( \mathcal{D} \right)} = 1,
+\end{equation}
+
+and define
+
+\begin{equation}
+\label{eq:hamiltonian-3-88}
+\boxed{\varepsilon = \left. \parallel{\widehat{H}}_{cons} - {\widehat{H}}_{0} \right.\parallel_{\mathcal{X}\left( \mathcal{D} \right)}.}
+\end{equation}
+
+The frequency vector must also satisfy the corresponding Diophantine condition. If a low-order resonance is present, the analysis must use a resonant normal form and an appropriate theorem; the resonant term cannot simply be absorbed into an ordinary small perturbation.
+
+\subsubsection{Learning Error, Discretization Error, and the KAM Smallness Budget}\label{sec:hamiltonian-3-7-4}
+
+To place the learning error from \Cref{sec:chnn-model} and the symplectic-discretization error from \Cref{sec:symplectic-kam} in one mathematical chain, all errors must be measured on the same domain and in compatible function norms. At the continuous Hamiltonian level, first define
+
+\begin{equation}
+\label{eq:hamiltonian-3-89}
+\delta_{model} = \parallel H_{cons} - H_{0} \parallel_{\mathcal{X}},\quad\quad\delta_{learn} = \parallel H_{\lambda} - H_{cons} \parallel_{\mathcal{X}},
+\end{equation}
+
+so that
+
+\begin{equation}
+\label{eq:hamiltonian-3-90}
+\boxed{\parallel H_{\lambda} - H_{0} \parallel_{\mathcal{X}} \leq \delta_{model} + \delta_{learn}.}
+\end{equation}
+
+At the discrete level, do not assume unconditionally that a globally exact ``discrete Hamiltonian'' exists. Let \(\Phi_{h}^{H}\) denote the exact flow of Hamiltonian \(H\) over the time interval \(h\), let \(F_{\lambda,h}\) denote the conservative symplectic one-step map actually used in \Cref{sec:symplectic-kam}, and set the unperturbed reference map to \(F_{0,h}=\Phi_{h}^{H_{0}}\). On a fixed compact domain, define in the \(C^{r}\) or analytic norm appropriate to the selected symplectic-map KAM theorem\cite{HairerLubichWanner2006GNI,FengQin2010}
+
+\begin{equation}
+\label{eq:hamiltonian-3-91}
+\delta_{alg} = \parallel F_{\lambda,h} - \Phi_{h}^{H_{\lambda}} \parallel ,\quad\quad\delta_{map} = \parallel F_{\lambda,h} - F_{0,h} \parallel .
+\end{equation}
+
+The triangle inequality gives
+
+\begin{equation}
+\label{eq:hamiltonian-3-92}
+\boxed{\delta_{map} \leq \delta_{alg} + \parallel \Phi_{h}^{H_{\lambda}} - \Phi_{h}^{H_{cons}} \parallel + \parallel \Phi_{h}^{H_{cons}} - \Phi_{h}^{H_{0}} \parallel .}
+\end{equation}
+
+If the vector field depends locally Lipschitz-continuously on Hamiltonian perturbations and the flow remains in the same domain over the time interval considered, the last two terms can be bounded by \(C_{learn}(h)\delta_{learn}\) and \(C_{model}(h)\delta_{model}\), respectively. Hence,
+
+\begin{equation}
+\label{eq:hamiltonian-3-93}
+\boxed{\delta_{map} \leq \delta_{alg} + C_{learn}(h)\delta_{learn} + C_{model}(h)\delta_{model}.}
+\end{equation}
+
+If backward error analysis additionally constructs a modified Hamiltonian for a specified step size and finite time scale, an equivalent modified-Hamiltonian budget may be used. The domain of validity, truncation order, and remainder bound must accompany this object; global exact existence cannot be inferred solely from the statement that the integrator is symplectic.
+
+Persistence of invariant tori can be concluded only when the continuous or discrete budget is below the concrete threshold of the selected KAM theorem, which depends on the analytic domain, Diophantine constants, nondegeneracy margin, dimension, and step size. The statistical-learning result of Chen--Matsubara--Yaguchi directly controls only the conservative HNN branch under its assumptions. Transferring a comparable probabilistic bound to the CHNN requires a real-valued readout and a corresponding complexity analysis of the function class.\cite{Chen2022KAMSLT}
+
+Quadratic drag, contact damping and friction, nonpotential magnetic actuation, background-flow input, boundary input, and contact activation or release are not included in the preceding classical autonomous-Hamiltonian perturbation. Their contributions to the complete safe operating domain must instead be treated through energy balance, port gains, structural defects, Lyapunov indicators, or a specialized theory of dissipative invariant tori.
+
+\subsubsection{Symplectic Maps, Birkhoff Structure, and the Torus Equation}\label{sec:hamiltonian-3-7-5}
+
+For the autonomous conservative branch, a structure-preserving integrator produces the one-step map
+
+\begin{equation}
+\label{eq:hamiltonian-3-94}
+F_{h} = \Phi_{h}^{cons}.
+\end{equation}
+
+\Cref{sec:symplectic-kam} first verifies whether \(F_{h}\) is an exact symplectic map and then applies the KAM conditions for symplectic maps and symplectic algorithms due to Shang together with the parameterization method of Haro et al.\cite{FengQin2010,Shang1999KAMAlgorithms,Shang2000KAMMappings,Haro2016Parameterization} The torus embedding \(K:\mathbb{T}^{d}\rightarrow\mathcal{M}\) satisfies\cite{Haro2016Parameterization}
+
+\begin{equation}
+\label{eq:hamiltonian-3-95}
+\boxed{F_{h}\left( K\left( \bm{\theta} \right) \right) = K\left( \bm{\theta} + \bm{\omega} \right).}
+\end{equation}
+
+The invariance residual of a numerical approximation \(K_{N}\) is
+
+\begin{equation}
+\label{eq:hamiltonian-3-96}
+E_{N}\left( \bm{\theta} \right) = F_{h}\left( K_{N}\left( \bm{\theta} \right) \right) - K_{N}\left( \bm{\theta} + \bm{\omega} \right).
+\end{equation}
+
+For the complete data vector field, the known conservative backbone and known ports must first be removed:
+
+\begin{equation}
+\label{eq:hamiltonian-3-97}
+\boxed{X_{res} = X_{data} - \mathbf{J}\nabla H_{\lambda} - \mathbf{B}\left( \mathbf{Q}_{diss,\mu} + \mathbf{Q}_{in,\nu} + \mathbf{Q}_{flow,\kappa} + \mathbf{Q}_{\partial} \right).}
+\end{equation}
+
+The ``self-adjoint Birkhoff-system representation'' used here and the ``Hamiltonian Birkhoff normal form'' used to construct \(H_{0}\) in \Cref{sec:hamiltonian-3-7-3} are distinct concepts. The former concerns the variational self-adjointness and \(K\left( \mathbf{z},t \right)\)-symplectic structure of a general first-order system, whereas the latter is the Hamiltonian normal form near an elliptic equilibrium. \Cref{sec:symplectic-kam} tests only whether \(X_{res}\) admits a regular self-adjoint Birkhoff-system representation. If the closure, time-compatibility, or nondegeneracy conditions fail, \(X_{res}\) remains a general residual and the complete open system cannot be called a strict \(K\left( \mathbf{z},t \right)\)-symplectic system. Explicit time dependence alone also does not necessarily imply a nonstandard symplectic structure: in appropriate canonical variables and extended phase space, the exact nonautonomous Hamiltonian branch should still be treated preferentially with standard symplectic theory.\cite{HairerLubichWanner2006GNI,FengQin2010}
+
+\subsubsection{Structural Decomposition of the Difference between the Primary COMSOL Training Model and High-Fidelity Models}\label{sec:hamiltonian-3-7-6}
+
+\Cref{sec:hamiltonian-structure} treats the Kirchhoff-consistent COMSOL branch as the primary training dynamics \(X_{K}\), and the Weak Form, Timoshenko, or solid model as the high-fidelity reference \(X_{HF}\). Define the paired-condition model discrepancy
+
+\begin{equation}
+\label{eq:hamiltonian-3-98}
+\Delta X_{HF} = X_{HF} - X_{K}.
+\end{equation}
+
+This discrepancy cannot be inserted wholesale into the Hamiltonian. First test its conservative closure in canonical variables. If a real-valued \(\Delta H_{HF}\) exists such that
+
+\begin{equation}
+\label{eq:hamiltonian-3-99}
+\Delta X_{HF}^{cons} = \mathbf{J}\nabla\Delta H_{HF},
+\end{equation}
+
+then that component may enter the conservative correction head in \Cref{sec:chnn-model}. If a momentum port satisfies
+
+\begin{equation}
+\label{eq:hamiltonian-3-100}
+\nabla_{\mathbf{P}}{\widehat{H}}^{T}\Delta\mathbf{Q}_{HF}^{diss} \leq 0,
+\end{equation}
+
+it may enter the dissipative correction head. Components that do not satisfy closure, power-sign, or smoothness conditions remain in the general model residual \(\mathbf{r}_{HF}\). Thus,
+
+\begin{equation}
+\label{eq:hamiltonian-3-101}
+\boxed{\Delta X_{HF} = \mathbf{J}\nabla\Delta H_{HF} + \mathbf{B}\Delta\mathbf{Q}_{HF}^{diss} + \mathbf{B}\Delta\mathbf{Q}_{HF}^{port} + \mathbf{r}_{HF}.}
+\end{equation}
+
+This decomposition is a structural projection to be identified and validated, not an identity that holds automatically for an arbitrary high-fidelity discrepancy. The model error used in KAM analysis consists only of the conservatively closed component and its bound in the common function norm. Shear dissipation, contact switching, and local solid effects must not be included in \(H_{1}\) without proof.
+
+\subsubsection{Interfaces for Structured Learning and Stability Analysis}\label{sec:hamiltonian-3-7-7}
+
+The preceding derivations yield three interfaces required by the subsequent structured-learning and stability analyses:
+
+\begin{equation}
+\label{eq:hamiltonian-3-102}
+\mathcal{I}_{CHNN} = \left( \mathbf{Q},\mathbf{P},\bm{\xi},{\widehat{H}}_{phys},\nabla{\widehat{H}}_{phys},\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow},\mathbf{Q}_{\partial},model\_ level,representation \right),
+\end{equation}
+
+\begin{equation}
+\label{eq:hamiltonian-3-103}
+\mathcal{I}_{KAM} = \left( H_{0},H_{1},\varepsilon,\bm{\omega}\left( \mathbf{I} \right),\partial_{\mathbf{I}}\bm{\omega},\gamma,\tau,\mathcal{D},\mathcal{X} \right),
+\end{equation}
+
+\begin{equation}
+\label{eq:hamiltonian-3-104}
+\mathcal{I}_{geom} = \left( \mathbf{J},F_{0,h},F_{\lambda,h},X_{res},E_{N},\delta_{model},\delta_{learn},\delta_{alg},\delta_{map} \right).
+\end{equation}
+
+Each object is traceable to the physical model and Galerkin outputs in \Cref{sec:rod-model,sec:galerkin-discretization} and to the canonicalization performed in this section. If an object has not yet been constructed or verified numerically, subsequent sections may list it only as a condition to be tested and must not present the conditional interface as an established theorem conclusion.
+
+\subsection{Section Summary}\label{sec:hamiltonian-3-8}
+
+Using the complete joint coordinates for translation and cross-sectional orientation, the canonical momentum and Hamiltonian of the autonomous conservative backbone are
+
+\begin{equation}
+\label{eq:hamiltonian-3-105}
+\boxed{\mathbf{p}_{0} = \mathbf{M}\dot{\mathbf{q}},\quad\quad H_{cons} = \frac{1}{2}\mathbf{p}_{0}^{T}\mathbf{M}^{- 1}\mathbf{p}_{0} + V_{cons},}
+\end{equation}
+
+and the forced--dissipative canonical equations are
+
+\begin{equation}
+\label{eq:hamiltonian-3-106}
+\boxed{{\dot{\mathbf{z}}}_{0} = \mathbf{J}\nabla H_{cons} + \mathbf{B}\mathbf{Q}_{port},\quad\quad\frac{dH_{cons}}{dt} = {\dot{\mathbf{q}}}^{T}\mathbf{Q}_{port}.}
+\end{equation}
+
+The contribution of the configuration-dependent mass matrix in the Hamiltonian momentum equation is equivalent to the geometric-inertia vector \(\mathbf{g}_{M}\) in \Cref{sec:galerkin-discretization}. A nonlinear conservative potential can be represented as a path-independent line integral of the restoring force; under equivalent viscous damping, the energy rate reduces to the sum of external-input power and dissipative power.
+
+Under a general prescribed flow, the canonical momentum and Hamiltonian become
+
+\begin{equation}
+\label{eq:hamiltonian-3-107}
+\boxed{\mathbf{p} = \mathbf{M}\dot{\mathbf{q}} - \mathbf{b}_{A},\quad\quad H = \frac{1}{2}\left( \mathbf{p} + \mathbf{b}_{A} \right)^{T}\mathbf{M}^{- 1}\left( \mathbf{p} + \mathbf{b}_{A} \right) + V_{h} - c_{A}.}
+\end{equation}
+
+This general representation retains cross-sectional orientation, independent torsion, rotary inertia, added mass, and external ports while unifying the autonomous backbone, prescribed-flow dynamics, and forced--dissipative dynamics. Canonical nondimensionalization, complex coordinates, a physical-residual Hamiltonian, Birkhoff normal form, a unified KAM error budget, and the three interfaces \(\mathcal{I}_{CHNN}\), \(\mathcal{I}_{KAM}\), and \(\mathcal{I}_{geom}\) then enable \Cref{sec:hamiltonian-structure} to provide the subsequent analyses with mutually consistent and traceable mathematical objects for structured CHNN learning, symplectic discretization, parameterized-torus validation, and safe-domain computation.

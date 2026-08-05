@@ -1,0 +1,5 @@
+% Example only. Ensure elsarticle.cls is provided by the official template.
+% \documentclass[preprint,12pt]{elsarticle}
+% \newif\ifProjectClassLoadsNatbib
+% \ProjectClassLoadsNatbibtrue
+% \providecommand{\ProjectBibliographyStyle}{elsarticle-num}

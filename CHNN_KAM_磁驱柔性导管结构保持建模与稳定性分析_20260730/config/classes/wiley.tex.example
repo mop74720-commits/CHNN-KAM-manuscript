@@ -1,0 +1,5 @@
+% Example only. Use the exact class and bibliography style supplied by Wiley.
+% \documentclass{WileyNJD-v2}
+% \newif\ifProjectClassLoadsNatbib
+% \ProjectClassLoadsNatbibfalse
+% \providecommand{\ProjectBibliographyStyle}{WileyNJD-AMA}

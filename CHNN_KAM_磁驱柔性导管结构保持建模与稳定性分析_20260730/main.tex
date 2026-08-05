@@ -1,0 +1,27 @@
+% Single official entry point.
+% Journal switch: add a class/front-matter adapter and change this profile only.
+\providecommand{\ProjectClassProfile}{internal}
+\input{config/classes/\ProjectClassProfile}
+
+\input{config/project}
+\input{config/preamble}
+\input{frontmatter/\ProjectLanguage/metadata}
+\input{config/frontmatter/\ProjectClassProfile}
+
+\begin{document}
+\input{frontmatter/title-block}
+\input{bibliography/order}
+
+\ifProjectPrintTOC
+  \tableofcontents
+\fi
+
+\input{manuscript/\ProjectLanguage/body}
+
+\ifProjectIncludeAppendices
+  \appendix
+  \input{backmatter/appendices}
+\fi
+
+\input{backmatter/references}
+\end{document}

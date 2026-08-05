@@ -1,0 +1,3 @@
+% Example only. An English journal profile should normally use the font policy
+% supplied by the official template instead of forcing local fonts.
+% \defaultfontfeatures{Ligatures=TeX}

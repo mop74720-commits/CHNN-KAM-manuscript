@@ -1,0 +1,656 @@
+% Migrated from the Word baseline; do not duplicate content in other section files.
+\section{复值表示增强的结构化 Hamiltonian 神经网络}\label{sec:chnn-model}
+
+\subsection{研究对象与上游接口}\label{sec:chnn-4-1}
+
+本章在约化后的正则有限维系统上构造复值表示增强的 Hamiltonian 神经网络，并将其与 KAM 稳定性分析衔接。为保持物理对象明确，不采用单一复值标量同时生成保守、耗散和驱动动力学。\Cref{sec:hamiltonian-structure}已经给出严格 Kirchhoff 约束局部约化后的独立正则变量、正则无量纲化、物理 Hamiltonian 基线以及端口分账；本章只在这些对象上定义 CHNN。
+
+设约化后的无量纲正则状态为
+
+\begin{equation}
+\label{eq:chnn-4-1}
+\mathbf{Z} = \begin{bmatrix}
+\mathbf{Q} \\
+\mathbf{P}
+\end{bmatrix} \in \mathbb{R}^{2d},\quad\quad\mathbf{J} = \begin{bmatrix}
+\mathbf{0} & \mathbf{I} \\
+ - \mathbf{I} & \mathbf{0}
+\end{bmatrix},
+\end{equation}
+
+并定义复坐标
+
+\begin{equation}
+\label{eq:chnn-4-2}
+\boxed{\bm{\xi} = \frac{\mathbf{Q} + i\mathbf{P}}{\sqrt{2}},\quad\quad\overline{\bm{\xi}} = \frac{\mathbf{Q} - i\mathbf{P}}{\sqrt{2}}.}
+\end{equation}
+
+这里 \(\mathbf{Q}\) 与 \(\mathbf{P}\) 已经过满足 \(\mathbf{S}_{q}^{T}\mathbf{S}_{p} = E_{ref}t_{ref}\mathbf{I}\) 的正则尺度变换，因此二者可作为复数实部与虚部组合。未经正则无量纲化的有量纲 \(\mathbf{q}\)、\(\mathbf{p}\) 不直接相加。
+
+COMSOL 数据同时携带
+
+\begin{equation}
+\label{eq:chnn-4-3}
+model\_ level \in \{ K,WF,T,S\},\quad\quad representation \in \{ sk,na,red\},
+\end{equation}
+
+分别标识 Kirchhoff 一致 Beam、严格弱形式、Timoshenko、实体模型，以及自治骨架、精确非自治和工程约化表示。不同标签的数据不无条件混合。
+
+\subsection{保守 Hamiltonian 头与复值内部表示}\label{sec:chnn-4-2}
+
+\subsubsection{实值物理 Hamiltonian}\label{sec:chnn-4-2-1}
+
+标准 HNN 通过实值标量 Hamiltonian 的梯度生成保守向量场\cite{Greydanus2019HNN}。本文采用
+
+\begin{equation}
+\label{eq:chnn-4-4}
+\boxed{{\widehat{H}}_{\lambda}\left( \mathbf{Z} \right) = {\widehat{H}}_{phys}\left( \mathbf{Z} \right) + \Delta{\widehat{H}}_{\lambda}\left( \mathbf{Z} \right) \in \mathbb{R},}
+\end{equation}
+
+其中 \({\widehat{H}}_{phys}\) 由\Cref{sec:hamiltonian-structure}的质量矩阵、Cosserat／Kirchhoff 应变能、已确定的保守磁势和固定活动集内的弹性接触势给出；网络只学习材料参数偏差、Galerkin 截断造成的保守修正和其他闭合的保守模型差异。为消除加性规范自由度，固定
+
+\begin{equation}
+\label{eq:chnn-4-5}
+{\widehat{H}}_{\lambda}\left( \mathbf{Z}_{ref} \right) = 0
+\end{equation}
+
+或令其在训练域上的均值为零。
+
+\subsubsection{复值主干与实值读出}\label{sec:chnn-4-2-2}
+
+令
+
+\begin{equation}
+\label{eq:chnn-4-6}
+\mathbf{h}_{\theta} = \mathcal{N}_{\theta}^{\mathbb{C}}\left( \bm{\xi},\overline{\bm{\xi}} \right),\quad\quad\Delta{\widehat{H}}_{\lambda} = \mathcal{R}_{H,\lambda}\left( \mathbf{h}_{\theta} \right) \in \mathbb{R}.
+\end{equation}
+
+复值线性层通过实---虚块结构同时实现幅值缩放和相位旋转；对非圆对称相空间数据，输入保留 \(\bm{\xi}\) 与 \(\overline{\bm{\xi}}\)，或采用等价增广表示。实用 CVNN 可视为 \(\mathbb{R}^{2d} \rightarrow \mathbb{R}\) 的实可微映射，不要求整个网络全纯\cite{Trabelsi2018DeepComplex,Hirose2012CVNN}。非恒定实值 Hamiltonian 一般不能是连通开域上的纯全纯函数，因此物理读出允许同时依赖 \(\bm{\xi}\) 与 \(\overline{\bm{\xi}}\)。
+
+理论主分支采用关于实部、虚部足够光滑的激活函数，例如
+
+\begin{equation}
+\label{eq:chnn-4-7}
+\phi_{split}(z) = \tanh(Rez) + i\tanh(Imz).
+\end{equation}
+
+modReLU、CReLU 和 zReLU 可用于工程消融，但其分段光滑或边界不可微性质使其不能直接进入要求高阶光滑性的统计学习---KAM 定理。复值权重采用 complex Glorot 或半酉初始化；Hamiltonian 主干不默认使用依赖批统计量的 BatchNorm\cite{Trabelsi2018DeepComplex,Hirose2012CVNN}。
+
+\subsubsection{广义复线性层与实仿射完备性}\label{sec:chnn-4-2-3}
+
+为使复值主干既保留幅值---相位耦合的结构偏置，又具有与一般实网络相容的表达能力，采用广义复线性层。令
+
+\begin{equation}
+\label{eq:chnn-4-8}
+\mathbf{z}_{out} = \mathbf{W}\mathbf{z} + \mathbf{V}\overline{\mathbf{z}} + \mathbf{b}
+\end{equation}
+
+其中 \(\mathbf{z} = \mathbf{x} + i\mathbf{y}\)、\(\mathbf{W} = \mathbf{A} + i\mathbf{B}\)、\(\mathbf{V} = \mathbf{C} + i\mathbf{D}\)、\(\mathbf{b} = \mathbf{b}_{R} + i\mathbf{b}_{I}\)。于是
+
+\begin{equation}
+\label{eq:chnn-4-9}
+\mathbf{x}_{out} = \left( \mathbf{A} + \mathbf{C} \right)\mathbf{x} + \left( - \mathbf{B} + \mathbf{D} \right)\mathbf{y} + \mathbf{b}_{R}
+\end{equation}
+
+\begin{equation}
+\label{eq:chnn-4-10}
+\mathbf{y}_{out} = \left( \mathbf{B} + \mathbf{D} \right)\mathbf{x} + \left( \mathbf{A} - \mathbf{C} \right)\mathbf{y} + \mathbf{b}_{I}
+\end{equation}
+
+\begin{proposition}[实仿射完备性]\label{prop:real-affine-completeness}
+对任意实仿射映射
+
+\begin{equation}
+\label{eq:chnn-4-11}
+\mathbf{x}_{out} = \mathbf{M}_{11}\mathbf{x} + \mathbf{M}_{12}\mathbf{y} + \mathbf{c}_{1}
+\end{equation}
+
+\begin{equation}
+\label{eq:chnn-4-12}
+\mathbf{y}_{out} = \mathbf{M}_{21}\mathbf{x} + \mathbf{M}_{22}\mathbf{y} + \mathbf{c}_{2}
+\end{equation}
+
+存在唯一的 \(\mathbf{W},\mathbf{V},\mathbf{b}\) 使广义复线性层与之完全等价，其显式构造为
+
+\begin{equation}
+\label{eq:chnn-4-13}
+\mathbf{A} = \frac{\mathbf{M}_{11} + \mathbf{M}_{22}}{2},\quad\quad\mathbf{C} = \frac{\mathbf{M}_{11} - \mathbf{M}_{22}}{2}
+\end{equation}
+
+\begin{equation}
+\label{eq:chnn-4-14}
+\mathbf{B} = \frac{\mathbf{M}_{21} - \mathbf{M}_{12}}{2},\quad\quad\mathbf{D} = \frac{\mathbf{M}_{21} + \mathbf{M}_{12}}{2}
+\end{equation}
+
+\begin{equation}
+\label{eq:chnn-4-15}
+\mathbf{b} = \mathbf{c}_{1} + i\mathbf{c}_{2}
+\end{equation}
+\end{proposition}
+
+\begin{proof} 将上述构造代入实部和虚部方程即可逐块恢复 \(\mathbf{M}_{11},\mathbf{M}_{12},\mathbf{M}_{21},\mathbf{M}_{22}\)；反向解四个线性块方程得到唯一性。\end{proof}
+
+当 \(\mathbf{V} = \mathbf{0}\) 时，标准复线性层对应的实块矩阵必须与标准复结构交换，因而只是一般实线性映射的真子类。本文把标准复线性层作为较强的幅相结构偏置，把广义复线性层作为不牺牲一般实仿射表达能力的默认理论模型。该结论只说明函数类包含关系，不自动推出复值模型具有更少参数或更高样本效率。
+
+\subsubsection{实 MLP 嵌入与条件性 Sobolev 逼近继承}\label{sec:chnn-4-2-4}
+
+\begin{theorem}[实 MLP 类的逐层嵌入]\label{thm:real-mlp-embedding}
+设一个实值多层感知机以 \(\left( \mathbf{Q},\mathbf{P} \right)\) 为输入，隐藏层采用满足 \(\sigma(0) = 0\) 的光滑激活。则存在一个以 \(\bm{\xi} = \left( \mathbf{Q} + i\mathbf{P} \right)/\sqrt{2}\) 和 \(\overline{\bm{\xi}}\) 为输入、采用广义复线性层与 split 激活的复网络，使其实值输出与该实 MLP 完全相同。
+\end{theorem}
+
+\begin{proof} 第一层把 \(\left( Re\bm{\xi},Im\bm{\xi} \right)\) 视为实化输入，并由\Cref{prop:real-affine-completeness} 实现目标实仿射映射，同时令目标虚预激活为零。由于 \(\sigma(0) = 0\)，split 激活后虚通道仍为零。自第二层起，使用\Cref{prop:real-affine-completeness} 的块对角特例逐层实现原实网络的仿射层；最终实值读出与原 MLP 一致。\end{proof}
+
+\begin{corollary}[条件性 Sobolev 逼近继承]\label{cor:sobolev-inheritance}
+设 \(\Omega \subset \mathbb{R}^{2d}\) 为有界 Lipschitz 区域，\(s \in \mathbb{N}\)，\(1 \leq r < \infty\)。若给定激活下的实 MLP 类在 \(W^{s,r}(\Omega)\) 中稠密，则上述广义复线性网络的实值读出类同样在 \(W^{s,r}(\Omega)\) 中稠密。
+\end{corollary}
+
+该推论只转移既有实网络稠密性结果，不自行取消原定理对激活、区域、网络宽度和导数逼近的假设\cite{Hornik1990DerivativeApproximation}。标准复线性子类因受到块结构约束，不由此自动获得同样的 Sobolev 稠密性结论。
+
+Zhang 等关于 complex-reaction networks 的理论优势结论依赖其特定复反应结构、激活和问题设定\cite{Zhang2022ComplexReaction}，不能直接推广为``一般复值 CHNN 必然优于实值 HNN''。本文仅把该文献作为复结构可能形成任务相关归纳偏置的依据，实际样本效率和误差优势仍由参数量匹配的消融实验判断。
+
+\subsubsection{复值表示的物理边界}\label{sec:chnn-4-2-5}
+
+考虑复值标量表示
+
+\begin{equation}
+\label{eq:chnn-4-16}
+\widetilde{\mathcal{H}} = H + iG
+\end{equation}
+
+仅保留为特殊表示层。若某一剩余向量场对应的一形式闭合且局部可积，才可由实值辅助势 \(G\) 表示；一般二次拖曳、接触摩擦、磁控制输入和背景流作用不满足这一条件。虚部不被直接解释为物理耗散，最终能量始终由实值 \({\widehat{H}}_{\lambda}\) 给出。
+
+\subsection{开放端口动力学与分支网络}\label{sec:chnn-4-3}
+
+Coquinot---Morrison 的 metriplectic 框架要求同时给出 Poisson 括号、对称半正定度量括号、能量与熵变量，并满足相应退化条件和熵产生关系\cite{Coquinot2020Metriplectic}。当前导管模型没有建立独立热力学熵场和上述退化结构，因此，本文开放端口模型不采用 metriplectic 表述；该框架用于界定未来热---黏弹耦合与严格熵产生机制的扩展条件。
+
+自治骨架上的完整结构化模型写为
+
+\begin{equation}
+\label{eq:chnn-4-17}
+\boxed{\dot{\mathbf{Z}} = \mathbf{J}\nabla{\widehat{H}}_{\lambda}\left( \mathbf{Z} \right) + \mathbf{B}\left( {\widehat{\mathbf{Q}}}_{diss,\mu} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + {\widehat{\mathbf{Q}}}_{\partial} + {\widehat{\mathbf{r}}}_{\eta} \right),}
+\end{equation}
+
+其中
+
+\begin{equation}
+\label{eq:chnn-4-18}
+\mathbf{B} = \begin{bmatrix}
+\mathbf{0} \\
+\mathbf{I}
+\end{bmatrix}.
+\end{equation}
+
+各分支具有不同物理含义。
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \({\widehat{\mathbf{Q}}}_{diss,\mu}\) 只表示对结构机械能功率非正的被动核。对等效黏性子类可取
+\end{enumerate}
+
+\begin{equation}
+\label{eq:chnn-4-19}
+{\widehat{\mathbf{Q}}}_{diss,\mu} = - \mathbf{D}_{\mu}\left( \mathbf{Z} \right)\nabla_{\mathbf{P}}{\widehat{H}}_{\lambda},\quad\quad\mathbf{D}_{\mu} = \mathbf{L}_{\mu}\mathbf{L}_{\mu}^{T} \succcurlyeq 0,
+\end{equation}
+
+\begin{itemize}
+\tightlist
+\item
+  从而 \(\nabla_{\mathbf{P}}{\widehat{H}}_{\lambda}^{T}{\widehat{\mathbf{Q}}}_{diss,\mu} \leq 0\)。接触切换、库仑摩擦和冲击可保留为独立端口，不强求由单一光滑矩阵表示\cite{Zhong2020Dissipative}。
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  \({\widehat{\mathbf{Q}}}_{in,\nu}\) 表示未进入势能的磁控制和其他非流体输入。固定磁参数下可由势能表示的磁作用进入 \({\widehat{H}}_{phys}\)；时变保守磁势可选择进入非自治 Hamiltonian，或作为 \(- \nabla V_{drv}\) 一次性进入输入端口，两种表示互斥。
+\item
+  \({\widehat{\mathbf{Q}}}_{flow,\kappa}\) 分别表示 Froude--Krylov 输入、背景流拖曳输入以及规定流场产生的反应性作用。背景流功率一般不定号，不能整体并入耗散矩阵。
+\item
+  \({\widehat{\mathbf{Q}}}_{\partial}\) 由已知端部合力、合力矩和边界驱动给出，原则上不由网络重复学习。
+\item
+  \({\widehat{\mathbf{r}}}_{\eta}\) 只承担已知物理主体和各端口扣除后的剩余误差。
+\end{enumerate}
+
+该分解延续 Dissipative SymODEN 对 Hamiltonian、耗散和控制的分离，以及 port-Hamiltonian 神经网络对显式时变驱动和可辨识性的处理\cite{Zhong2020Dissipative,Desai2021PHNN}。
+
+pHNN 的数值研究指出，仅凭状态轨迹同时辨识 Hamiltonian、时变驱动力和阻尼时可能出现信息在各分支之间泄漏，反映出可辨识性并非由网络结构自动保证\cite{Desai2021PHNN}。因此本文固定\Cref{sec:rod-model,sec:galerkin-discretization,sec:hamiltonian-structure}已经确定的物理 Hamiltonian 与已知端口，仅允许网络学习保守修正、受符号约束的耗散修正及扣除已知项后的剩余量，并采用分阶段训练、端口功率监督和稀疏／幅值正则化降低分支互相代偿；这些措施是针对泄漏风险的结构约束，但仍需通过配对工况和消融实验验证唯一性与稳定性。
+
+\subsection{COMSOL 数据体系与训练对象}\label{sec:chnn-4-4}
+
+\subsubsection{Kirchhoff 一致主训练集}\label{sec:chnn-4-4-1}
+
+COMSOL 主训练模型采用三维 Euler--Bernoulli Beam、几何非线性、动态惯性和扭转自由度。COMSOL 6.3 的 Beam 接口将 Euler--Bernoulli 用于细长梁并忽略横向剪切，同时仍保留三维位移、截面旋转和扭矩；几何非线性采用大转动、小应变的共旋形式\cite{COMSOLBeamInterface2025,COMSOLGeometricNonlinearity2025,COMSOLSectionStiffness2025}。因此它与本文严格 Kirchhoff 主分支在无剪切假设上保持一致，但不是几何精确 Cosserat 方程的无条件同义实现。
+
+保守训练集限定为
+
+\begin{equation}
+\label{eq:chnn-4-20}
+\mathcal{D}_{K}^{cons} = \left\{ \left( \mathbf{Z}_{i},{\dot{\mathbf{Z}}}_{i},{\widehat{H}}_{phys,i} \right):model\_ level = K,\ representation = sk,\ \mathbf{Q}_{port} = 0 \right\}.
+\end{equation}
+
+开放端口训练集为
+
+\begin{equation}
+\label{eq:chnn-4-21}
+\mathcal{D}_{K}^{port} = \left\{ \left( \mathbf{Z}_{i},{\dot{\mathbf{Z}}}_{i},\mathbf{Q}_{diss,i},\mathbf{Q}_{in,i},\mathbf{Q}_{flow,i},\mathbf{Q}_{\partial,i} \right) \right\}.
+\end{equation}
+
+用于 KAM 概率传递的样本只能来自 \(\mathcal{D}_{K}^{cons}\)，不能把开放端口的总训练损失当作 Hamiltonian 小扰动。
+
+P1 系列 pilot 仅使用固定 \(N=2\) 基下的 mode1、mode2 和 mixed12 三条小轨迹，并按 leave-one-whole-trajectory-out 划分，未从同一轨迹随机抽点跨越训练/测试边界。P1 为 \(3\) folds\(\times4\) models\(\times5\) seeds 共 \(60\) 次导数训练；P1.5 为 \(45\) 次 residual 与 \(15\) 次 physics-only 运行；P1.6 为 \(30\) 次约束与 \(30\) 次非约束运行。这里的五个 seed 是同一物理轨迹上的算法重复，只刻画优化不确定性，不能当作五个独立物理样本。上述 pilot 用于比较结构假设和暴露失败模式，不能替代计划的 96 条轨迹数据集或完整规模 P2 训练。
+
+\subsubsection{严格弱形式和高保真对照}\label{sec:chnn-4-4-2}
+
+当需要逐项复现本文联合弱形式时，采用 Weak Form PDE 或 Weak Contribution 输入试验函数、边界贡献和辅助变量\cite{COMSOLWeakFormPDE2025,COMSOLWeakContribution2025}。Timoshenko Beam 和三维 Solid Mechanics 用于检查剪切、局部接触和截面效应。对配对工况定义
+
+\begin{equation}
+\label{eq:chnn-4-22}
+\Delta X_{HF} = X_{HF} - X_{K}.
+\end{equation}
+
+只有通过闭合性检验的部分才进入保守修正 \(\mathbf{J}\nabla\Delta H_{HF}\)；具有非正功率的部分进入耗散修正；其他部分保留为一般残差。不得把 \(\Delta X_{HF}\) 整体解释为 Hamiltonian 扰动或 KAM 中的 \(H_{1}\)。
+
+\subsection{损失函数与分阶段训练}\label{sec:chnn-4-5}
+
+\subsubsection{保守导数监督}\label{sec:chnn-4-5-1}
+
+对 \(\mathcal{D}_{K}^{cons}\)，定义
+
+\begin{equation}
+\label{eq:chnn-4-23}
+\mathcal{L}_{H} = \frac{1}{N_{c}}\sum_{i = 1}^{N_{c}}\left. \  \parallel {\dot{\mathbf{Z}}}_{i} - \mathbf{J}\nabla{\widehat{H}}_{\lambda}\left( \mathbf{Z}_{i} \right) \right.\  \parallel_{2}^{2}.
+\end{equation}
+
+若已知物理 Hamiltonian，则增加能量修正监督
+
+\begin{equation}
+\label{eq:chnn-4-24}
+\mathcal{L}_{\Delta H} = \frac{1}{N_{c}}\sum_{i = 1}^{N_{c}}\left| \Delta{\widehat{H}}_{\lambda}\left( \mathbf{Z}_{i} \right) - \Delta{\widehat{H}}_{ref,i} \right|^{2}.
+\end{equation}
+
+\subsubsection{端口与能量平衡监督}\label{sec:chnn-4-5-2}
+
+定义端口残差
+
+\begin{equation}
+\label{eq:chnn-4-25}
+\mathcal{L}_{port} = \frac{1}{N}\sum_{i = 1}^{N}\left. \  \parallel {\dot{\mathbf{Z}}}_{i} - \mathbf{J}\nabla{\widehat{H}}_{\lambda} - \mathbf{B}\left( {\widehat{\mathbf{Q}}}_{diss,\mu} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + \mathbf{Q}_{\partial} + {\widehat{\mathbf{r}}}_{\eta} \right) \right.\  \parallel_{2}^{2}.
+\end{equation}
+
+能量平衡损失为
+
+\begin{equation}
+\label{eq:chnn-4-26}
+\mathcal{L}_{E} = \frac{1}{N}\sum_{i = 1}^{N}\left| \frac{d{\widehat{H}}_{\lambda}}{d\tau} - \nabla_{\mathbf{P}}{\widehat{H}}_{\lambda}^{T}\left( {\widehat{\mathbf{Q}}}_{diss,\mu} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + \mathbf{Q}_{\partial} + {\widehat{\mathbf{r}}}_{\eta} \right) - \partial_{\tau}{\widehat{H}}_{\lambda} \right|^{2}.
+\end{equation}
+
+耗散符号约束只施加于 \({\widehat{\mathbf{Q}}}_{diss,\mu}\)：
+
+\begin{equation}
+\label{eq:chnn-4-27}
+\mathcal{L}_{pass} = \frac{1}{N}\sum_{i = 1}^{N}\left\lbrack \max\left\{ 0,\nabla_{\mathbf{P}}{\widehat{H}}_{\lambda}^{T}{\widehat{\mathbf{Q}}}_{diss,\mu} \right\} \right\rbrack^{2}.
+\end{equation}
+
+\subsubsection{轨迹、规范与辛结构损失}\label{sec:chnn-4-5-3}
+
+轨迹损失为
+
+\begin{equation}
+\label{eq:chnn-4-28}
+\mathcal{L}_{traj} = \frac{1}{N}\sum_{i = 1}^{N}\left. \  \parallel \mathbf{Z}_{i,n + 1} - Integrate\left( X_{\theta},\mathbf{Z}_{i,n},\Delta\tau \right) \right.\  \parallel_{2}^{2}.
+\end{equation}
+
+加性规范损失取
+
+\begin{equation}
+\label{eq:chnn-4-29}
+\mathcal{L}_{gauge} = \left| {\widehat{H}}_{\lambda}\left( \mathbf{Z}_{ref} \right) \right|^{2}.
+\end{equation}
+
+辛结构损失只作用于保守子映射 \(F_{h,\lambda}^{cons}\)：
+
+\begin{equation}
+\label{eq:chnn-4-30}
+\mathcal{L}_{symp} = \frac{1}{N}\sum_{i = 1}^{N}\left. \  \parallel \left( DF_{h,\lambda}^{cons} \right)^{T}\mathbf{J}DF_{h,\lambda}^{cons} - \mathbf{J} \right.\  \parallel_{F}^{2}.
+\end{equation}
+
+完整耗散映射通常不辛，因此不能对完整开放映射施加该损失后再把结果解释为严格辛流。
+
+训练分三阶段：先拟合 \({\widehat{H}}_{\lambda}\)，再固定或弱更新 Hamiltonian 头辨识各端口，最后联合微调。统计学习---KAM 分析只读取 \(\mathcal{L}_{H}\) 对应的保守导数误差及其函数空间推广界。
+
+P1/P1.5/P1.6 只实现上述流程中的保守 derivative-only pilot 和结构消融。P1.5 比较 physics-only、Real-HNN residual 与 CHNN residual 的条件性收益及计算代价；P1.6 则把 \(f(0)=0\) 和零点 Jacobian 结构作为硬约束消融。相应结果见\Cref{sec:numerical-6-3}；开放端口联合微调、高阶函数空间证书与 KAM 误差传递仍需在完整规模 P2 研究中检验。
+
+\subsubsection{CHNN 的实现基础与结构检验}\label{sec:chnn-4-5-4}
+
+为实现上述数学结构，本文构建了与统一接口对应的独立 CHNN 软件系统。该实现不把既有 HNN、CVNN 和 KAM--HNN 复现工程直接拼接，而是保留经单元测试核验的复值算子，并按照本文的正则状态、灰箱 Hamiltonian 和排他端口接口重新组织。软件实现中的主模型为
+
+\begin{equation}
+\label{eq:chnn-4-31}
+H_{\theta}\left( \mathbf{x},\bm{\mu} \right) = H_{phys}\left( \mathbf{x},\bm{\mu} \right) + \Delta H_{\theta}\left( \mathbf{x},\bm{\mu} \right),
+\end{equation}
+
+\begin{equation}
+\label{eq:chnn-4-32}
+\dot{\mathbf{x}} = \mathbf{J}\nabla_{\mathbf{x}}H_{\theta} + \mathbf{B}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} + \mathbf{Q}_{contact} + \mathbf{r}_{\eta} \right),\quad\quad\mathbf{B} = \begin{bmatrix}
+\mathbf{0} \\
+\mathbf{I}
+\end{bmatrix}.
+\end{equation}
+
+被动耗散头采用
+
+\begin{equation}
+\label{eq:chnn-4-33}
+\mathbf{Q}_{diss} = - \mathbf{D}_{\theta}\nabla_{\mathbf{p}}H_{\theta},\quad\quad\mathbf{D}_{\theta} = \mathbf{L}_{\theta}\mathbf{L}_{\theta}^{T} \succcurlyeq \mathbf{0},
+\end{equation}
+
+从而在代码结构层面保证
+
+\begin{equation}
+\label{eq:chnn-4-34}
+\left( \nabla_{\mathbf{p}}H_{\theta} \right)^{T}\mathbf{Q}_{diss} \leq 0.
+\end{equation}
+
+实现层与理论层的对应关系如下：正则尺度模块先把有量纲 \(\left( \mathbf{q},\mathbf{p} \right)\) 变换为无量纲正则对 \(\left( \mathbf{Q},\mathbf{P} \right)\)，再构造复坐标；复值主干同时提供标准复线性层和 \(\mathbf{W}\bm{\xi} + \mathbf{V}\overline{\bm{\xi}} + \mathbf{b}\) 型广义复线性层；Hamiltonian 头只输出实标量，并采用 \(H_{phys} + \Delta H_{\theta}\) 灰箱结构；耗散、磁输入、流场、边界、接触和剩余误差分别由独立广义力头表示，且只通过 \(\mathbf{B}\) 进入动量方程；数据接口用 \texttt{representation} 区分 \(\mathbf{p}_{0} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}}\) 与 \(\mathbf{p} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - \mathbf{b}_{A}\)，用 \texttt{model\_level} 区分 Kirchhoff Beam、严格弱形式和高保真对照模型，并以 \texttt{conservative\_mask} 隔离可供统计学习--KAM 分析读取的保守样本。训练流程实现``保守 Hamiltonian--端口--联合微调''三阶段，同时提供实值 HNN 和黑箱向量场网络作为比较基线。
+
+软件实现通过了以下结构一致性检验：
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  广义复线性层与任意实块线性映射的等价实现；
+\item
+  正则尺度变换的往返一致性及给定基函数下 Galerkin 投影的基空间恢复；
+\item
+  总 Hamiltonian 满足 \(H_{\theta} = H_{phys} + \Delta H_{\theta}\)；
+\item
+  连续保守场满足 \(\nabla H_{\theta}^{T}\mathbf{J}\nabla H_{\theta} = 0\)；
+\item
+  被动耗散功率非正；
+\item
+  所有外部端口对 \(\dot{\mathbf{q}}\) 通道的直接泄漏为零；
+\item
+  动量表示标签、模型层级标签和投影数据格式不一致时拒绝混用，且各损失可完成自动微分反向传播。
+\end{enumerate}
+
+在统一软件环境中，Python 源文件编译、可编辑安装及 13 项组件与接口测试均通过，合成数据上的三阶段训练流程能够完整执行。该结果验证了软件实现与所列结构恒等式的一致性；其证据范围限于实现正确性，不替代导管 COMSOL 数据上的辨识精度、函数类复杂度常数、高阶误差证书或 KAM 不变环面认证。具体导管模型的物理基线 Hamiltonian \({\widehat{H}}_{phys}\)、构形相关质量---惯性矩阵、精确非自治项和 COMSOL--Galerkin 投影将在数值实验中由实际模型与数据实例化。
+
+\subsection{从 CHNN 学习误差到 KAM 小量条件}\label{sec:chnn-4-6}
+
+\subsubsection{可积参考系统不是网络实部的自动结果}\label{sec:chnn-4-6-1}
+
+\Cref{sec:hamiltonian-structure}通过稳定平衡点、模态正则化和 Hamiltonian Birkhoff 正规形构造
+
+\begin{equation}
+\label{eq:chnn-4-35}
+H_{cons} = H_{0} + \varepsilon H_{1}.
+\end{equation}
+
+\(H_{0}\) 必须经过可积性和非退化性验证；不能仅因 \(H_{\lambda}\) 为实值就称其为可积 Hamiltonian。线性谐振子满足 \(\partial_{\mathbf{I}}^{2}H_{2} = 0\)，非退化性必须来自高阶保守项。
+
+\subsubsection{保守训练数据、函数类与加性规范}\label{sec:chnn-4-6-2}
+
+以下统计学习结论只针对保守训练集 \(\mathcal{D}_{K}^{cons}\)。设 \(\Omega \subset \mathbb{R}^{2d}\) 为有界、连通的 Lipschitz 区域，真实保守 Hamiltonian 为 \(H_{\star}\)，样本 \(\mathbf{Z}_{1},\ldots,\mathbf{Z}_{N}\) 独立同分布于概率测度 \(\mathbb{P}_{Z}\)，无噪声导数标签满足
+
+\begin{equation}
+\label{eq:chnn-4-36}
+{\dot{\mathbf{Z}}}_{i} = \mathbf{J}\nabla H_{\star}\left( \mathbf{Z}_{i} \right).
+\end{equation}
+
+把 Hamiltonian 头的全部复参数实化为 \(\bm{\vartheta} \in \Theta = \lbrack - B,B\rbrack^{P}\)，记学习误差
+
+\begin{equation}
+\label{eq:chnn-4-37}
+e_{\bm{\vartheta}} = {\widehat{H}}_{\bm{\vartheta}} - H_{\star}.
+\end{equation}
+
+仅由状态导数不能识别 Hamiltonian 的绝对常数，因此在理论域上固定
+
+\begin{equation}
+\label{eq:chnn-4-38}
+\int_{\Omega}^{}e_{\bm{\vartheta}}\left( \mathbf{Z} \right)\, d\mathbf{Z} = 0,
+\end{equation}
+
+或使用已知能量锚点固定同一加性等价类代表。取统计指数 \(r > 2d\)，定义标量梯度损失
+
+\begin{equation}
+\label{eq:chnn-4-39}
+g_{\bm{\vartheta}}\left( \mathbf{Z} \right) = \left. \parallel\dot{\mathbf{Z}} - \mathbf{J}\nabla{\widehat{H}}_{\bm{\vartheta}}\left( \mathbf{Z} \right) \right.\parallel_{\ell^{r}}^{r} = \left. \parallel\nabla e_{\bm{\vartheta}}\left( \mathbf{Z} \right) \right.\parallel_{\ell^{r}}^{r}.
+\end{equation}
+
+为应用有界损失的统一泛化界，另假设 \(0 \leq g_{\bm{\vartheta}} \leq c\)。该有界性是独立正则性假设，不由经验损失较小自动推出。
+
+\subsubsection{覆盖数与 Rademacher 复杂度接口}\label{sec:chnn-4-6-3}
+
+对样本 \(S = \left( \mathbf{Z}_{1},\ldots,\mathbf{Z}_{N} \right)\)，定义归一化经验度量
+
+\begin{equation}
+\label{eq:chnn-4-40}
+d_{S}(g,g\prime) = \left( \frac{1}{N}\sum_{i = 1}^{N}\left| g\left( \mathbf{Z}_{i} \right) - g\prime\left( \mathbf{Z}_{i} \right) \right|^{2} \right)^{1/2}.
+\end{equation}
+
+\begin{assumption}[参数到损失的样本 Lipschitz 性]\label{ass:parametric-loss-lipschitz}
+对给定样本 \(S\)，存在有限常数 \(L_{S}\)，使任意 \(\bm{\vartheta},\bm{\vartheta}\prime \in \Theta\) 满足
+
+\begin{equation}
+\label{eq:chnn-4-41}
+d_{S}\left( g_{\bm{\vartheta}},g_{\bm{\vartheta}\prime} \right) \leq L_{S}\left. \parallel\bm{\vartheta} - \bm{\vartheta}\prime \right.\parallel_{2}.
+\end{equation}
+\end{assumption}
+
+当输入域和参数集有界、网络深度有限且激活的一阶、二阶导数在相关范围内有界时，该假设可在紧参数集上成立；\(L_{S}\) 一般随深度、宽度、权重界和导数界增长。
+
+\begin{lemma}[有限参数覆盖数]\label{lem:finite-parameter-cover}
+在\Cref{ass:parametric-loss-lipschitz} 下，令 \(\mathcal{G} = \{ g_{\bm{\vartheta}}:\bm{\vartheta} \in \Theta\}\)，并记 \(\mathcal{G}_{S}\) 为该函数类在样本 \(S\) 上的限制，则
+
+\begin{equation}
+\label{eq:chnn-4-42}
+\mathcal{N}\left( \varepsilon,\mathcal{G}_{S},d_{S} \right) \leq \left( 1 + \frac{2B\sqrt{P}\, L_{S}}{\varepsilon} \right)^{P}
+\end{equation}
+\end{lemma}
+
+\begin{proof} 在参数立方体 \(\lbrack - B,B\rbrack^{P}\) 上取欧氏半径 \(\varepsilon/L_{S}\) 的网格，再由\Cref{ass:parametric-loss-lipschitz} 将参数覆盖推送为损失函数覆盖。\end{proof}
+
+由于参数集紧且参数到损失连续，上确界可取到。经验 Rademacher 复杂度定义为
+
+\begin{equation}
+\label{eq:chnn-4-43}
+{\widehat{\mathfrak{R}}}_{S}\left( \mathcal{G} \right) = \mathbb{E}_{\bm{\sigma}}\left\lbrack \max_{g \in \mathcal{G}}\frac{1}{N}\sum_{i = 1}^{N}\sigma_{i}g\left( \mathbf{Z}_{i} \right) \right\rbrack
+\end{equation}
+
+令
+
+\begin{equation}
+\label{eq:chnn-4-44}
+R_{S} = \max_{g \in \mathcal{G}}d_{S}(g,0)
+\end{equation}
+
+Dudley 熵积分给出\cite{Dudley1999UCLT}
+
+\begin{equation}
+\label{eq:chnn-4-45}
+{\widehat{\mathfrak{R}}}_{S}\left( \mathcal{G} \right) \leq \inf_{0 < \alpha < R_{S}}\left\lbrack 4\alpha + \frac{12}{\sqrt{N}}\int_{\alpha}^{R_{S}}\sqrt{\log\mathcal{N}\left( \varepsilon,\mathcal{G}_{S},d_{S} \right)}\, d\varepsilon \right\rbrack
+\end{equation}
+
+纯复线性网络是相应环境实网络的结构约束子类；广义复线性网络则应按实际实参数数目 \(P\) 和实际 Lipschitz 常数 \(L_{S}\) 计算，不能把``一个复参数''错误计为一个实自由度。
+
+\subsubsection{从梯度风险到 Hamiltonian 一致误差}\label{sec:chnn-4-6-4}
+
+假设损失类在抽样前固定。由标准 Rademacher 统一泛化界，以至少 \(1 - \delta\) 的概率，对所有 \(\bm{\vartheta} \in \Theta\) 同时有
+
+\begin{equation}
+\label{eq:chnn-4-46}
+\mathbb{E}_{\mathbb{P}_{Z}}g_{\bm{\vartheta}} \leq {\widehat{\mathcal{L}}}_{r}\left( \bm{\vartheta} \right) + 2{\widehat{\mathfrak{R}}}_{S}\left( \mathcal{G} \right) + 3c\sqrt{\frac{\log(2/\delta)}{2N}} = :B_{N,\delta}\left( \bm{\vartheta} \right).
+\end{equation}
+
+进一步假设 \(\mathbb{P}_{Z}\) 关于 Lebesgue 测度具有密度 \(f_{Z}\)，且在 \(\Omega\) 上
+
+\begin{equation}
+\label{eq:chnn-4-47}
+f_{Z}\left( \mathbf{Z} \right) \geq m_{Z} > 0.
+\end{equation}
+
+则在上述统一事件上
+
+\begin{equation}
+\label{eq:chnn-4-48}
+\left. \parallel\nabla e_{\bm{\vartheta}} \right.\parallel_{L^{r}\left( \Omega;\ell^{r} \right)} \leq \left( \frac{B_{N,\delta}\left( \bm{\vartheta} \right)}{m_{Z}} \right)^{1/r}.
+\end{equation}
+
+由加性规范和 Poincaré 不等式，再由 \(r > 2d\) 时的 Morrey--Sobolev 嵌入\cite{AdamsFournier2003SobolevSpaces}，得到：
+
+\begin{theorem}[Hamiltonian 一致泛化界]\label{thm:hamiltonian-uniform-generalization}
+在上述假设下，以至少 \(1 - \delta\) 的概率，对所有 \(\bm{\vartheta} \in \Theta\) 同时有
+
+\begin{equation}
+\label{eq:chnn-4-49}
+\boxed{\left. \parallel{\widehat{H}}_{\bm{\vartheta}} - H_{\star} \right.\parallel_{L^{\infty}(\Omega)} \leq C_{\Omega,r}\left( 1 + C_{P} \right)\left( \frac{B_{N,\delta}\left( \bm{\vartheta} \right)}{m_{Z}} \right)^{1/r}.}
+\end{equation}
+\end{theorem}
+
+其中 \(C_{P}\) 为 Poincaré 常数。整体 \(1/r\) 次方来自把 \(r\) 次幂风险恢复为梯度范数，不能吸收到与训练误差和样本量无关的常数中。
+
+\subsubsection{高阶 Sobolev 或解析误差证书}\label{sec:chnn-4-6-5}
+
+\Cref{thm:hamiltonian-uniform-generalization}只给出 \(C^{0}\) 层级的一致误差。高频小振幅函数可以在 \(C^{0}\) 中趋于零而高阶导数发散，因此不能仅凭一阶导数风险或 Hamiltonian 函数值接近就声称满足 KAM 小扰动条件。
+
+设\Cref{sec:hamiltonian-structure}已在局部作用量---角区域
+
+\begin{equation}
+\label{eq:chnn-4-50}
+\mathcal{A} = \mathbb{T}^{M} \times U
+\end{equation}
+
+建立可积参考和坐标变换。若原始训练数据位于物理正则坐标，则必须把学习误差拉回 \(\mathcal{A}\)，并把坐标变换及其逆的高阶导数界计入常数。取整数 \(s,\ell\) 与统计指数 \(r\) 满足
+
+\begin{equation}
+\label{eq:chnn-4-51}
+s > \ell + \frac{2M}{r}.
+\end{equation}
+
+令训练算法输出 \(\widehat{\bm{\vartheta}}\)。除\Cref{thm:hamiltonian-uniform-generalization} 的一阶统计证书外，另要求一个针对该训练输出的高阶证书：在概率至少 \(1 - \eta\) 的事件上，
+
+\begin{equation}
+\label{eq:chnn-4-52}
+\sum_{2 \leq |\alpha| \leq s}^{}\left. \parallel D^{\alpha}\left( {\widehat{H}}_{\widehat{\bm{\vartheta}}} - H_{\star} \right) \right.\parallel_{L^{r}\left( \mathcal{A} \right)}^{r} \leq C_{s,\eta}\left( \widehat{\bm{\vartheta}} \right)^{r}.
+\end{equation}
+
+该证书控制的必须是真实学习误差的高阶导数，而不只是网络自身导数的大小。由周期 Sobolev 嵌入，在两个事件的交集上
+
+\begin{equation}
+\label{eq:chnn-4-53}
+\left. \parallel{\widehat{H}}_{\widehat{\bm{\vartheta}}} - H_{\star} \right.\parallel_{C^{\ell}\left( \mathcal{A} \right)} \leq \mathfrak{C}_{N,\delta,\eta}\left( \widehat{\bm{\vartheta}} \right),
+\end{equation}
+
+其中可以取
+
+\begin{equation}
+\label{eq:chnn-4-54}
+\mathfrak{C}_{N,\delta,\eta} = C_{s,r,\mathcal{A}}\left\lbrack \left( C_{P}^{r} + 1 \right)\frac{B_{N,\delta}\left( \widehat{\bm{\vartheta}} \right)}{m_{Z}} + C_{s,\eta}\left( \widehat{\bm{\vartheta}} \right)^{r} \right\rbrack^{1/r}.
+\end{equation}
+
+若高阶证书是确定性区间验证或带严格余项的插值验证，则取 \(\eta = 0\)；若其本身是概率证书，不要求与泛化事件独立，只能由并集界得到联合概率至少为 \(1 - \delta - \eta\)。
+
+若选用解析 KAM 定理，则上述有限光滑证书仍不够，必须另行控制学习误差在指定复邻域上的解析上确界。广义复线性网络显式依赖 \(\bm{\xi}\) 与 \(\overline{\bm{\xi}}\)，并不妨碍实变量 Hamiltonian 具有实解析延拓；但实域 \(C^{\ell}\) 小性不能自动推出复邻域解析范数小性。
+
+\subsubsection{可积参考、既有物理摄动与学习误差分账}\label{sec:chnn-4-6-6}
+
+固定\Cref{sec:hamiltonian-structure}构造并验证的可积参考 Hamiltonian \(h\left( \mathbf{I} \right)\)。真实保守系统和学习系统分别写为
+
+\begin{equation}
+\label{eq:chnn-4-55}
+H_{\star} = h + P_{0},\quad\quad{\widehat{H}}_{\widehat{\bm{\vartheta}}} = H_{\star} + e_{\widehat{\bm{\vartheta}}} = h + P_{\widehat{\bm{\vartheta}}},
+\end{equation}
+
+其中
+
+\begin{equation}
+\label{eq:chnn-4-56}
+P_{\widehat{\bm{\vartheta}}} = P_{0} + e_{\widehat{\bm{\vartheta}}}.
+\end{equation}
+
+因此，在同一 \(C^{\ell}\left( \mathcal{A} \right)\) 范数下
+
+\begin{equation}
+\label{eq:chnn-4-57}
+\left. \parallel P_{\widehat{\bm{\vartheta}}} \right.\parallel_{C^{\ell}} \leq \left. \parallel P_{0} \right.\parallel_{C^{\ell}} + \mathfrak{C}_{N,\delta,\eta}\left( \widehat{\bm{\vartheta}} \right).
+\end{equation}
+
+若真实系统本身已经是近可积系统，\(P_{0}\) 必须占用 KAM 扰动预算；不能把全部阈值留给学习误差。坐标变换、Galerkin 截断、参数辨识和模型闭合误差只有在与 KAM 定理相同的函数空间范数中得到控制时，才可继续通过三角不等式加入该预算。一般耗散、摩擦、背景流输入和非势磁控制不属于这里的 Hamiltonian 摄动，仍按\Cref{sec:chnn-model}的开放端口分支处理。
+
+\subsubsection{学习误差证书向 KAM 条件的概率传递}\label{sec:chnn-4-6-7}
+
+预先选定一个外部 KAM 定理。用 \(\mathsf{A}_{KAM}(h,P)\) 表示该定理除扰动小性以外的全部结构假设，包括作用量---角区域、正则阶数、非退化类型、Diophantine 条件、边界距离和允许的扰动类别；用 \(\varepsilon_{KAM}\) 表示其小扰动阈值，用 \(\mathcal{K}(h + P)\) 表示该定理给出的环面持续结论。
+
+\begin{proposition}[概率传递]\label{prop:kam-probability-transfer}
+在前述假设下，以至少 \(1 - \delta - \eta\) 的概率，
+
+\begin{equation}
+\label{eq:chnn-4-58}
+\boxed{\mathsf{A}_{KAM}\left( h,P_{\widehat{\bm{\vartheta}}} \right)\  \land \ \left( \left. \parallel P_{0} \right.\parallel_{C^{\ell}\left( \mathcal{A} \right)} + \mathfrak{C}_{N,\delta,\eta}\left( \widehat{\bm{\vartheta}} \right) < \varepsilon_{KAM} \right)\  \Rightarrow \ \mathcal{K}\left( {\widehat{H}}_{\widehat{\bm{\vartheta}}} \right).}
+\end{equation}
+\end{proposition}
+
+\begin{proof} 在统一泛化事件和高阶证书事件的交集上，\Cref{sec:chnn-4-6-5} 给出学习误差的 \(C^{\ell}\) 上界；\Cref{sec:chnn-4-6-6} 的三角不等式使总 Hamiltonian 摄动小于 \(\varepsilon_{KAM}\)。若 \(\mathsf{A}_{KAM}\) 的其余条件同时成立，则可调用预先指定的 KAM 定理。联合事件的概率由并集界不小于 \(1 - \delta - \eta\)。\end{proof}
+
+该命题只完成``学习误差证书到外部 KAM 小扰动条件''的概率传递。持续环面的类型、正则性、测度估计和频率结论均由所选外部 KAM 定理决定，不能由训练损失单独推出。
+
+\subsubsection{连续和离散误差预算}\label{sec:chnn-4-6-8}
+
+在统一解析域 \(\mathcal{D}_{\rho}\) 上定义
+
+\begin{equation}
+\label{eq:chnn-4-59}
+\varepsilon_{model} = \parallel X_{cons} - X_{0} \parallel_{\rho},\quad\quad\varepsilon_{learn} = \parallel X_{\lambda} - X_{cons} \parallel_{\rho}.
+\end{equation}
+
+令 \(\Phi_{h}^{0}\) 为 \(X_{0}\) 的精确时间-\(h\) 映射，\(\Psi_{h,\lambda}\) 为施加于学习 Hamiltonian 的 \(s_{a}\) 阶辛算法。若向量场及其一阶导数一致有界，且轨迹留在较小解析域 \(\mathcal{D}_{\rho\prime}\)，则存在常数 \(C_{\rho,\rho\prime}\) 使
+
+\begin{equation}
+\label{eq:chnn-4-60}
+\boxed{\parallel \Psi_{h,\lambda} - \Phi_{h}^{0} \parallel_{\rho\prime} \leq C_{\rho,\rho\prime}h\left( \varepsilon_{model} + \varepsilon_{learn} + h^{s_{a}} \right) = :\varepsilon_{map}.}
+\end{equation}
+
+这里 \(h^{s_{a}}\) 来自局部算法误差；该预算不无条件假设存在全局精确``离散 Hamiltonian''。只有当
+
+\begin{equation}
+\label{eq:chnn-4-61}
+\varepsilon_{map} < \delta_{KAM}\left( \rho\prime,\gamma,\tau,\text{非退化裕度},h \right)
+\end{equation}
+
+并满足解析性、Diophantine 非共振及步长非共振条件时，才能调用具体辛映射 KAM 定理\cite{FengQin2010,Shang1999KAMAlgorithms,Shang2000KAMMappings,Poschel2001KAMLecture}。
+
+\subsection{三类离散动力学分支}\label{sec:chnn-4-7}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{自治保守分支。} 对 \(\dot{\mathbf{Z}} = \mathbf{J}\nabla{\widehat{H}}_{\lambda}\) 使用生成函数、隐式中点或其他已证明为辛的算法，得到 \(F_{h}^{cons}\)。该映射用于 Shang 的辛算法 KAM 和 Haro 参数化核验。
+\item
+  \textbf{精确非自治 Hamiltonian 分支。} 对 \(H\left( \mathbf{Z},\tau \right)\) 使用标准非自治正则方程，或引入扩展变量 \(\left( \tau,p_{\tau} \right)\) 和 \(\mathcal{H} = H + p_{\tau}\) 后采用扩展相空间辛算法。显含时间本身不意味着必须使用非标准 \(K\left( \mathbf{z},t \right)\)-辛结构。
+\item
+  \textbf{开放端口分支。} 对完整受迫---耗散系统采用一致时间积分和能量平衡监控。其映射一般既不是标准辛映射，也不自动属于 Birkhoff 系统；只有扣除已知主体和端口后的剩余向量场通过自伴表示检验时，才进入\Cref{sec:symplectic-kam}的 \(K\left( \mathbf{z},t \right)\)-辛分支。
+\end{enumerate}
+
+\subsection{面向不变环面分析的输出对象}\label{sec:chnn-4-8}
+
+由此可得到\Cref{sec:symplectic-kam}不变环面分析所需的对象：
+
+\begin{equation}
+\label{eq:chnn-4-62}
+\mathcal{O}_{4 \rightarrow 5} = \left( F_{h}^{cons},\varepsilon_{map},X_{res},\mathcal{D},\gamma,\tau,\text{非退化裕度},model\_ level,representation \right),
+\end{equation}
+
+其中
+
+\begin{equation}
+\label{eq:chnn-4-63}
+\boxed{X_{res} = X_{data} - \mathbf{J}\nabla{\widehat{H}}_{\lambda} - \mathbf{B}\left( {\widehat{\mathbf{Q}}}_{diss,\mu} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + \mathbf{Q}_{\partial} \right).}
+\end{equation}
+
+若某一量尚未数值构造或验证，后文只把它列为待检验条件，不写成已经成立的结论。

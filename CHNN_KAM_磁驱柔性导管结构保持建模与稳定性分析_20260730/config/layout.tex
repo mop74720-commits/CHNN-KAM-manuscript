@@ -1,0 +1,33 @@
+% Internal review layout only. Journal profiles should override this in their
+% adapter instead of editing manuscript files.
+\usepackage[a4paper,margin=1in]{geometry}
+
+\definecolor{codebg}{RGB}{247,248,250}
+\definecolor{codecomment}{RGB}{42,125,91}
+\definecolor{codekeyword}{RGB}{24,69,140}
+\definecolor{codestring}{RGB}{158,52,62}
+\lstdefinestyle{chnnpython}{
+  language=Python,
+  basicstyle=\ttfamily\scriptsize,
+  keywordstyle=\color{codekeyword}\bfseries,
+  commentstyle=\color{codecomment},
+  stringstyle=\color{codestring},
+  backgroundcolor=\color{codebg},
+  frame=single,
+  framerule=0.25pt,
+  rulecolor=\color{black!25},
+  numbers=left,
+  numberstyle=\tiny\color{black!55},
+  numbersep=7pt,
+  breaklines=true,
+  breakatwhitespace=false,
+  showstringspaces=false,
+  keepspaces=true,
+  columns=fullflexible,
+  tabsize=4,
+  upquote=true
+}
+
+% Improve line breaking for long mixed Chinese/English technical terms without changing content.
+\setlength{\emergencystretch}{2em}
+\raggedbottom

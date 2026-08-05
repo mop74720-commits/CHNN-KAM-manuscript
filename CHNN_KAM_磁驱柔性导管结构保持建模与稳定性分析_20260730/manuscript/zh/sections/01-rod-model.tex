@@ -1,0 +1,896 @@
+% Migrated from the Word baseline; do not duplicate content in other section files.
+\section{多物理载荷下的几何精确弯曲---扭转导管动力学}\label{sec:rod-model}
+
+\subsection{建模框架}\label{sec:rod-1-1}
+
+考虑空间站微重力环境下磁驱动柔性导管在磁场、流场以及血管壁接触共同作用下的三维大变形运动。为保持后续有限维 Hamilton 结构、复值 Hamilton 神经网络和 KAM 稳定性分析所需要的完整力学信息，本文以中心线位置和横截面姿态作为彼此独立的基本未知场，保留轴向伸长、横向剪切、两个方向的弯曲、独立扭转、截面转动惯量以及外部分布力矩。
+
+连续模型首先在几何精确 Cosserat 杆框架下建立。对于细长导管，可进一步施加 Kirchhoff 无剪切约束，但该约束仅消除横向剪切应变，不消除截面姿态、扭转自由度、角速度或转动惯量。因此，本文不通过中心线单场化来替代完整平移---转动模型。\cite{Simo1985FiniteStrainBeam,Antman2005Elasticity,MarsdenRatiu1999MechanicsSymmetry}
+
+设参考材料坐标为
+
+\begin{equation}
+\label{eq:rod-1-1}
+S \in \lbrack 0,L\rbrack,\quad\quad t \in \lbrack 0,T\rbrack,
+\end{equation}
+
+其中，\(L\) 为参考构形中的导管长度。除特别说明外，所有截面参数均允许随 \(S\) 变化，以描述变截面、变材料或局部磁性部件。
+
+本文中的磁场、流场与接触效应以单位参考长度的分布力和分布力矩进入杆方程。只有在同时求解电磁场、流场和结构场的控制方程时，才构成严格意义上的全场耦合 PDE 系统；本章建立的是具有多物理载荷输入的几何精确杆动力学模型。
+
+\subsubsection{模型层级与计算分支}\label{sec:rod-1-1-1}
+
+本文采用如下研究路线：由 Kirchhoff／几何精确杆、Maxwell 磁驱动、Morison 型流体作用和导管---血管壁接触共同建立连续模型，经 Galerkin 离散获得有限维动力学，再构造 Hamilton 主体、复值表示增强的结构化 Hamilton 神经网络以及 KAM／结构保持稳定性分析。为避免连续母模型、COMSOL 训练模型、结构学习模型和 KAM 分析对象相互混用，全文采用以下四层模型体系。
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{几何精确物理母模型。} 保留平移---截面姿态联合 Cosserat 杆、独立扭转、转动惯量、分布力和分布力矩。该层用于保证力学信息完整，并给出所有约化分支共同的能量和虚功来源\cite{Simo1985FiniteStrainBeam,Antman2005Elasticity}。
+\item
+  \textbf{严格 Kirchhoff 理论主分支。} 对满足细长、低剪切条件的导管施加无剪切约束，但不删除截面姿态、扭转、角速度和转动惯量。用于 CHNN 与 KAM 的有限维系统必须先在约束流形上取独立局部坐标，或采用经约束收敛验证的正则化近似；不得把含拉格朗日乘子的微分---代数系统直接当作全空间正则 Hamilton 系统。
+\item
+  \textbf{COMSOL Kirchhoff 一致训练分支。} 主训练数据优先采用三维 Euler--Bernoulli Beam、几何非线性、动态惯性和扭转自由度，作为 COMSOL 内置接口下与 Kirchhoff 无剪切假设最一致的工程实现。该接口允许大位移和大转动但仍采用小应变、单元局部线性假设，因此应称为``Kirchhoff 一致工程模型''，而不能与本文几何精确母模型无条件等同\cite{COMSOLBeamInterface2025,COMSOLGeometricNonlinearity2025,COMSOLSectionStiffness2025}。需要严格复现联合弱形式时，采用 Weak Form PDE／Weak Contribution 自定义方程\cite{COMSOLWeakFormPDE2025,COMSOLWeakContribution2025}。
+\item
+  \textbf{高保真验证与开放端口分支。} Timoshenko Beam、三维 Solid Mechanics 或自定义 Cosserat 弱形式用于检查剪切、局部截面效应和模型偏差；磁控制、背景流输入、被动拖曳、接触耗散、摩擦和边界驱动按照能量功率排他分账进入有限维端口。高保真数据用于外部验证和模型差异学习，不与 Kirchhoff 保守样本无标签混合。完整开放系统用于结构化 CHNN 辨识与安全域计算；只有关闭端口后得到的自治保守骨架，或另经证明的精确辛扩展，才是经典 KAM 的直接分析对象。
+\end{enumerate}
+
+因此，前两章在给出连续方程与 Galerkin 系统的同时，为\Cref{sec:hamiltonian-structure,sec:chnn-model,sec:symplectic-kam}提供相互一致的保守能量、约束约化状态、端口分解、模型层级标签和数值表示标签。后续工程约化均在该物理---数学框架内进行。
+
+\subsection{几何与运动学描述}\label{sec:rod-1-2}
+
+\subsubsection{中心线与截面标架}\label{sec:rod-1-2-1}
+
+设导管中心线的位置矢量为
+
+\begin{equation}
+\label{eq:rod-1-2}
+\mathbf{r} = \mathbf{r}(S,t) \in \mathbb{R}^{3}.
+\end{equation}
+
+在每个横截面上引入右手正交标架
+
+\begin{equation}
+\label{eq:rod-1-3}
+\{\mathbf{d}_{1}(S,t),\mathbf{d}_{2}(S,t),\mathbf{d}_{3}(S,t)\},
+\end{equation}
+
+并定义旋转矩阵
+
+\begin{equation}
+\label{eq:rod-1-4}
+\mathbf{R}(S,t) = \left\lbrack \mathbf{d}_{1}\ \mathbf{d}_{2}\ \mathbf{d}_{3} \right\rbrack \in SO(3),
+\end{equation}
+
+满足
+
+\begin{equation}
+\label{eq:rod-1-5}
+\mathbf{R}^{T}\mathbf{R} = \mathbf{I},\quad\quad\det\mathbf{R} = 1.
+\end{equation}
+
+完整模型中不预先令 \(\mathbf{d}_{3}\) 与中心线切向平行，因此允许横向剪切。中心线的伸长率和单位切向量分别定义为
+
+\begin{equation}
+\label{eq:rod-1-6}
+\lambda(S,t) = \parallel \mathbf{r}_{,S} \parallel ,\quad\quad\mathbf{t}(S,t) = \frac{\mathbf{r}_{,S}}{\lambda}.
+\end{equation}
+
+\subsubsection{反对称算子}\label{sec:rod-1-2-2}
+
+对任意 \(\mathbf{a} \in \mathbb{R}^{3}\)，定义反对称矩阵 \(\widehat{\mathbf{a}} \in \mathfrak{so}(3)\)，使得\cite{Sola2018MicroLie,MarsdenRatiu1999MechanicsSymmetry}
+
+\begin{equation}
+\label{eq:rod-1-7}
+\widehat{\mathbf{a}}\,\mathbf{b} = \mathbf{a} \times \mathbf{b},\quad\quad\forall\mathbf{b} \in \mathbb{R}^{3}.
+\end{equation}
+
+其逆映射记为 \(( \cdot )^{\vee}\)。因此，旋转矩阵的空间导数和时间导数均可由三维向量表示。
+
+\subsubsection{剪切---拉伸应变}\label{sec:rod-1-2-3}
+
+定义材料坐标系中的剪切---拉伸应变矢量
+
+\begin{equation}
+\label{eq:rod-1-8}
+\bm{\nu}(S,t) = \mathbf{R}^{T}\mathbf{r}_{,S} = \begin{bmatrix}
+\nu_{1} \\
+\nu_{2} \\
+\nu_{3}
+\end{bmatrix}.
+\end{equation}
+
+其中，\(\nu_{1}\) 和 \(\nu_{2}\) 为两个横向剪切应变分量，\(\nu_{3}\) 为沿截面第三方向的轴向伸长分量。参考应变记为
+
+\begin{equation}
+\label{eq:rod-1-9}
+\bm{\nu}_{0}(S) = \begin{bmatrix}
+\nu_{01} \\
+\nu_{02} \\
+\nu_{03}
+\end{bmatrix}.
+\end{equation}
+
+对于无初始剪切且参考长度未伸长的直杆，可取
+
+\begin{equation}
+\label{eq:rod-1-10}
+\bm{\nu}_{0} = (0,0,1)^{T}.
+\end{equation}
+
+在完整可剪切 Cosserat 母模型中，应区分截面第三方向的材料轴向应变分量与中心线伸长应变。前者定义为
+
+\begin{equation}
+\label{eq:rod-1-11}
+\varepsilon_{3} = \nu_{3} - \nu_{03}.
+\end{equation}
+
+另一方面，由 \(\mathbf{r}_{,S} = \mathbf{R}\bm{\nu}\) 以及 \(\mathbf{R}^{T}\mathbf{R} = \mathbf{I}\) 可得 \(\lambda = \parallel \mathbf{r}_{,S} \parallel = \parallel \bm{\nu} \parallel\)。因此，中心线伸长应变定义为
+
+\begin{equation}
+\label{eq:rod-1-12}
+\varepsilon_{\lambda} = \lambda - \lambda_{0} = \parallel \bm{\nu} \parallel - \parallel \bm{\nu}_{0} \parallel .
+\end{equation}
+
+在 Kirchhoff 无剪切条件 \(\nu_{1} = \nu_{2} = 0\) 下，若参考构形同时满足 \(\nu_{03} = \lambda_{0}\)，则 \(\varepsilon_{3} = \varepsilon_{\lambda}\)。后文中的本构矩阵仍以材料应变分量 \(\bm{\nu} - \bm{\nu}_{0}\) 为基本变量。
+
+\subsubsection{曲率---扭转运动学}\label{sec:rod-1-2-4}
+
+定义材料坐标系中的曲率---扭转矢量
+
+\begin{equation}
+\label{eq:rod-1-13}
+\widehat{\bm{\kappa}} = \mathbf{R}^{T}\mathbf{R}_{,S},\quad\quad\bm{\kappa} = \begin{bmatrix}
+\kappa_{1} \\
+\kappa_{2} \\
+\kappa_{3}
+\end{bmatrix}.
+\end{equation}
+
+其中，\(\kappa_{1}\) 和 \(\kappa_{2}\) 为两个主方向的弯曲曲率，\(\kappa_{3}\) 为独立扭转率。局部标架沿参考坐标的变化满足
+
+\begin{equation}
+\label{eq:rod-1-14}
+\mathbf{d}_{i,S} = \left( \mathbf{R}\bm{\kappa} \right) \times \mathbf{d}_{i},\quad\quad i = 1,2,3.
+\end{equation}
+
+参考曲率---扭转矢量记为
+
+\begin{equation}
+\label{eq:rod-1-15}
+\bm{\kappa}_{0}(S) = \left( \kappa_{01},\kappa_{02},\kappa_{03} \right)^{T}.
+\end{equation}
+
+\subsubsection{截面角速度与相容条件}\label{sec:rod-1-2-5}
+
+定义材料坐标系中的截面角速度
+
+\begin{equation}
+\label{eq:rod-1-16}
+\widehat{\bm{\omega}} = \mathbf{R}^{T}\mathbf{R}_{,t}.
+\end{equation}
+
+空间坐标系中的角速度为
+
+\begin{equation}
+\label{eq:rod-1-17}
+\bm{\omega}_{s} = \mathbf{R}\bm{\omega}.
+\end{equation}
+
+由 \(\mathbf{r}_{,St} = \mathbf{r}_{,tS}\) 和 \(\mathbf{R}_{,St} = \mathbf{R}_{,tS}\) 得到运动学相容关系\cite{Simo1985FiniteStrainBeam,Antman2005Elasticity,Sola2018MicroLie}
+
+\begin{equation}
+\label{eq:rod-1-18}
+\dot{\bm{\nu}} = \mathbf{R}^{T}{\dot{\mathbf{r}}}_{,S} - \bm{\omega} \times \bm{\nu},
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-19}
+\dot{\bm{\kappa}} = \bm{\omega}_{,S} + \bm{\kappa} \times \bm{\omega}.
+\end{equation}
+
+第二式保证截面姿态在空间方向和时间方向上的演化相容，是完整弯曲---扭转动力学不可缺少的运动学方程。
+
+\subsubsection{截面内材料点运动}\label{sec:rod-1-2-6}
+
+设截面内材料坐标为
+
+\begin{equation}
+\label{eq:rod-1-20}
+\bm{\xi} = \xi_{1}\mathbf{e}_{1} + \xi_{2}\mathbf{e}_{2},
+\end{equation}
+
+则杆内材料点的空间位置写为
+
+\begin{equation}
+\label{eq:rod-1-21}
+\mathbf{x}\left( S,\bm{\xi},t \right) = \mathbf{r}(S,t) + \mathbf{R}(S,t)\bm{\xi}.
+\end{equation}
+
+其速度为
+
+\begin{equation}
+\label{eq:rod-1-22}
+\dot{\mathbf{x}} = \dot{\mathbf{r}} + \mathbf{R}\left( \bm{\omega} \times \bm{\xi} \right) = \dot{\mathbf{r}} - \mathbf{R}\widehat{\bm{\xi}}\bm{\omega}.
+\end{equation}
+
+该表达式同时包含中心线平动速度和截面转动速度，是后续完整动能及构形相关质量矩阵的起点。
+
+\subsection{完整动能、弹性势能与本构关系}\label{sec:rod-1-3}
+
+\subsubsection{截面质量参数与质量中心线约定}\label{sec:rod-1-3-1}
+
+设材料密度为 \(\rho\left( S,\bm{\xi} \right)\)。定义单位参考长度质量
+
+\begin{equation}
+\label{eq:rod-1-23}
+\mu(S) = \int_{A(S)}^{}\rho\, dA,
+\end{equation}
+
+截面一阶质量矩
+
+\begin{equation}
+\label{eq:rod-1-24}
+\mathbf{c}_{\rho}(S) = \int_{A(S)}^{}\rho\bm{\xi}\, dA,
+\end{equation}
+
+以及材料坐标系中的单位参考长度质量惯性张量
+
+\begin{equation}
+\label{eq:rod-1-25}
+\mathbf{J}_{c}(S) = \int_{A(S)}^{}\rho\left( \parallel \bm{\xi} \parallel^{2}\mathbf{I} - \bm{\xi}\bm{\xi}^{T} \right)dA.
+\end{equation}
+
+上述定义首先保留一般截面质量分布。为使后续连续动量平衡、弱形式和离散质量矩阵使用同一惯性基线，本文从\Cref{sec:rod-1-4}起将基础导管中心线 \(\mathbf{r}(S,t)\) 选为各截面的质量中心线，因而分布杆体满足
+
+\begin{equation}
+\label{eq:rod-1-26}
+\boxed{\mathbf{c}_{\rho}(S) = \mathbf{0}.}
+\end{equation}
+
+该约定不删除任何截面转动自由度，也不令转动惯量消失。磁性头端、传感器或其他质心偏离中心线的局部部件不并入 \(\mathbf{c}_{\rho}\)，而作为附加刚体单独计入其平动---转动耦合动能。这样可同时保持基础杆方程的闭合性和偏心部件的真实惯性耦合。
+
+若截面主轴与 \(\mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\) 一致，则
+
+\begin{equation}
+\label{eq:rod-1-27}
+\mathbf{J}_{c} = diag\left( \rho I_{1},\rho I_{2},\rho I_{3} \right),
+\end{equation}
+
+其中 \(I_{1},I_{2}\) 为截面两个主方向的面积惯性矩，\(I_{3} = I_{1} + I_{2}\) 为极惯性矩。对于非均匀密度截面，应直接使用面积积分定义，不能简单将密度提出积分号。
+
+\subsubsection{完整结构动能}\label{sec:rod-1-3-2}
+
+由材料点速度得到基础杆体的三维结构动能
+
+\begin{equation}
+\label{eq:rod-1-28}
+T_{str} = \frac{1}{2}\int_{0}^{L}{\int_{A(S)}^{}\rho}\left| \dot{\mathbf{r}} + \mathbf{R}\left( \bm{\omega} \times \bm{\xi} \right) \right|^{2}dA\, dS.
+\end{equation}
+
+对截面积分后，一般形式为
+
+\begin{equation}
+\label{eq:rod-1-29}
+T_{str} = \frac{1}{2}\int_{0}^{L}\left\lbrack \mu\left| \dot{\mathbf{r}} \right|^{2} + 2{\dot{\mathbf{r}}}^{T}\mathbf{R}\left( \bm{\omega} \times \mathbf{c}_{\rho} \right) + \bm{\omega}^{T}\mathbf{J}_{c}\bm{\omega} \right\rbrack dS.
+\end{equation}
+
+采用\Cref{sec:rod-1-3-1}的质量中心线约定后，\(\mathbf{c}_{\rho} = \mathbf{0}\)，从而基础杆体动能化为
+
+\begin{equation}
+\label{eq:rod-1-30}
+\boxed{T_{str} = \frac{1}{2}\int_{0}^{L}\left\lbrack \mu\left| \dot{\mathbf{r}} \right|^{2} + \bm{\omega}^{T}\mathbf{J}_{c}\bm{\omega} \right\rbrack dS.}
+\end{equation}
+
+若存在偏心附加部件，其动能 \(T_{e}\) 另行加入，且一般重新产生平移---转动交叉项。无论基础杆体是否采用质量中心线，该动能均保留两向转动惯性和绕切向方向的扭转惯性；后续不允许通过删除转动项将模型降为中心线单场模型。
+
+\subsubsection{弹性势能密度}\label{sec:rod-1-3-3}
+
+设剪切---拉伸刚度矩阵和弯曲---扭转刚度矩阵分别为
+
+\begin{equation}
+\label{eq:rod-1-31}
+\mathbf{K}_{\nu}(S) = diag\left( k_{1}GA,k_{2}GA,EA \right),
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-32}
+\mathbf{K}_{\kappa}(S) = diag\left( EI_{1},EI_{2},GJ \right),
+\end{equation}
+
+其中，\(E\) 为杨氏模量，\(G\) 为剪切模量，\(k_{1},k_{2}\) 为剪切修正系数，\(J\) 为截面扭转常数。若材料或截面非对称，\(\mathbf{K}_{\nu}\) 和 \(\mathbf{K}_{\kappa}\) 可采用一般对称正定矩阵，以保留方向耦合。
+
+单位参考长度弹性势能密度定义为
+
+\begin{equation}
+\label{eq:rod-1-33}
+W\left( \bm{\nu},\bm{\kappa};S \right) = \frac{1}{2}\left( \bm{\nu} - \bm{\nu}_{0} \right)^{T}\mathbf{K}_{\nu}\left( \bm{\nu} - \bm{\nu}_{0} \right) + \frac{1}{2}\left( \bm{\kappa} - \bm{\kappa}_{0} \right)^{T}\mathbf{K}_{\kappa}\left( \bm{\kappa} - \bm{\kappa}_{0} \right).
+\end{equation}
+
+内部弹性势能为
+
+\begin{equation}
+\label{eq:rod-1-34}
+V_{int} = \int_{0}^{L}W\, dS.
+\end{equation}
+
+\subsubsection{内力与内力矩本构}\label{sec:rod-1-3-4}
+
+材料坐标系中的截面合内力和合内力矩由势能密度的梯度给出：
+
+\begin{equation}
+\label{eq:rod-1-35}
+\mathbf{n}_{b} = \frac{\partial W}{\partial\bm{\nu}} = \mathbf{K}_{\nu}\left( \bm{\nu} - \bm{\nu}_{0} \right),
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-36}
+\mathbf{m}_{b} = \frac{\partial W}{\partial\bm{\kappa}} = \mathbf{K}_{\kappa}\left( \bm{\kappa} - \bm{\kappa}_{0} \right).
+\end{equation}
+
+空间坐标系中的内力和内力矩分别为
+
+\begin{equation}
+\label{eq:rod-1-37}
+\mathbf{n} = \mathbf{R}\mathbf{n}_{b},\quad\quad\mathbf{m} = \mathbf{R}\mathbf{m}_{b}.
+\end{equation}
+
+上述本构同时保留拉伸、两个剪切方向、两向弯曲和独立扭转。若采用一般非线性超弹性材料，只需将二次型 \(W\) 替换为相应的客观势能密度，本构仍由其梯度得到。
+
+\subsection{动量平衡与多物理载荷}\label{sec:rod-1-4}
+
+\subsubsection{平动平衡}\label{sec:rod-1-4-1}
+
+以下连续平衡方程采用\Cref{sec:rod-1-3-1}规定的质量中心线作为基础导管中心线。单位参考长度的线动量平衡为
+
+\begin{equation}
+\label{eq:rod-1-38}
+\mu\ddot{\mathbf{r}} = \mathbf{n}_{,S} + \mathbf{f}_{ext},
+\end{equation}
+
+其中
+
+\begin{equation}
+\label{eq:rod-1-39}
+\mathbf{f}_{ext} = \mathbf{f}_{mag} + \mathbf{f}_{hydro} + \mathbf{f}_{cont} + \mathbf{f}_{g}.
+\end{equation}
+
+各项均表示单位参考长度的空间分布力。偏心附加部件的惯性不隐含在该式的 \(\mu\ddot{\mathbf{r}}\) 中，而在离散阶段由其独立动能一致加入。采用\Cref{sec:rod-1-4-4}的能量一致流体主线时，附加惯性算子置于左端，右端流体加速度输入仅保留纯 Froude--Krylov 项及拖曳项；完整工程 Morison 分支与该主线不得同时启用。
+
+\subsubsection{转动平衡}\label{sec:rod-1-4-2}
+
+以中心线为矩心的角动量平衡写为
+
+\begin{equation}
+\label{eq:rod-1-40}
+\mathbf{m}_{,S} + \mathbf{r}_{,S} \times \mathbf{n} + \mathbf{l}_{ext} = \frac{\partial}{\partial t}\left( \mathbf{R}\mathbf{J}_{c}\bm{\omega} \right),
+\end{equation}
+
+其中
+
+\begin{equation}
+\label{eq:rod-1-41}
+\mathbf{l}_{ext} = \mathbf{l}_{mag} + \mathbf{l}_{hydro} + \mathbf{l}_{cont}.
+\end{equation}
+
+利用 \(\dot{\mathbf{R}} = \mathbf{R}\widehat{\bm{\omega}}\)，可得展开形式
+
+\begin{equation}
+\label{eq:rod-1-42}
+\mathbf{m}_{,S} + \mathbf{r}_{,S} \times \mathbf{n} + \mathbf{l}_{ext} = \mathbf{R}\left\lbrack \mathbf{J}_{c}\dot{\bm{\omega}} + \bm{\omega} \times \left( \mathbf{J}_{c}\bm{\omega} \right) \right\rbrack.
+\end{equation}
+
+其中，\(\bm{\omega} \times \left( \mathbf{J}_{c}\bm{\omega} \right)\) 为陀螺惯性项。该项来自角动量的精确时间导数，不是可任意增删的经验修正项。
+
+\subsubsection{Maxwell 应力张量下的磁力与磁力矩}\label{sec:rod-1-4-3}
+
+在包围磁性导管微段的空气或真空区域中，Maxwell 应力张量写为\cite{Jackson1998Electrodynamics,Abbott2020MagneticRobotics}
+
+\begin{equation}
+\label{eq:rod-1-43}
+\mathbf{T}_{M} = \frac{1}{\mu_{0}}\left( \mathbf{B} \otimes \mathbf{B} - \frac{1}{2}\left| \mathbf{B} \right|^{2}\mathbf{I} \right),
+\end{equation}
+
+其中，\(\mathbf{B}\) 为磁感应强度，\(\mu_{0}\) 为真空磁导率。对参考长度为 \(\Delta S\) 的微段，单位参考长度磁力和关于中心线的磁力矩分别定义为
+
+\begin{equation}
+\label{eq:rod-1-44}
+\mathbf{f}_{mag} = \lim_{\Delta S \rightarrow 0}\frac{1}{\Delta S}\int_{\partial\Omega_{\Delta S}}^{}\mathbf{T}_{M}\mathbf{n}_{A}\, dA,
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-45}
+\mathbf{l}_{mag} = \lim_{\Delta S \rightarrow 0}\frac{1}{\Delta S}\int_{\partial\Omega_{\Delta S}}^{}\left( \mathbf{x} - \mathbf{r} \right) \times \left( \mathbf{T}_{M}\mathbf{n}_{A} \right)\, dA,
+\end{equation}
+
+其中，\(\mathbf{n}_{A}\) 为闭合积分曲面的单位外法向量。
+
+当磁性微段可由磁偶极近似描述时，设材料坐标系中的单位参考长度磁矩为 \(\bm{\mu}_{0}^{b}(S)\)，空间磁矩为\cite{Jackson1998Electrodynamics,Abbott2020MagneticRobotics}
+
+\begin{equation}
+\label{eq:rod-1-46}
+\bm{\mu}(S,t) = \mathbf{R}(S,t)\bm{\mu}_{0}^{b}(S).
+\end{equation}
+
+给定外磁场 \(\mathbf{B}\left( \mathbf{r},t \right)\) 时，磁势能可写为
+
+\begin{equation}
+\label{eq:rod-1-47}
+V_{mag} = - \int_{0}^{L}\bm{\mu} \cdot \mathbf{B}\left( \mathbf{r},t \right)\, dS.
+\end{equation}
+
+相应磁力和磁力矩为
+
+\begin{equation}
+\label{eq:rod-1-48}
+\mathbf{f}_{mag} = \nabla_{\mathbf{r}}\left( \bm{\mu} \cdot \mathbf{B} \right),\quad\quad\mathbf{l}_{mag} = \bm{\mu} \times \mathbf{B}.
+\end{equation}
+
+Maxwell 应力积分和磁偶极势能是同一磁作用的两种尺度表述，应根据模型精度选择其一作为主载荷模型，不能重复叠加。
+
+\subsubsection{修正 Morison 流体作用力与能量一致附加质量}\label{sec:rod-1-4-4}
+
+设流体速度为 \(\mathbf{v}_{f}\left( \mathbf{r},t \right)\)，流体质点加速度为
+
+\begin{equation}
+\label{eq:rod-1-49}
+\mathbf{a}_{f} = \frac{\partial\mathbf{v}_{f}}{\partial t} + \left( \mathbf{v}_{f} \cdot \nabla \right)\mathbf{v}_{f}.
+\end{equation}
+
+定义流体相对于导管的速度
+
+\begin{equation}
+\label{eq:rod-1-50}
+\mathbf{u}_{r} = \mathbf{v}_{f} - \dot{\mathbf{r}}.
+\end{equation}
+
+若仅保留相对于当前中心线的法向作用，定义
+
+\begin{equation}
+\label{eq:rod-1-51}
+\mathbf{P}_{\bot} = \mathbf{I} - \mathbf{t} \otimes \mathbf{t},\quad\quad\mathbf{u}_{r\bot} = \mathbf{P}_{\bot}\mathbf{u}_{r}.
+\end{equation}
+
+工程 Morison 验证分支可写为\cite{Morison1950,Newman1977MarineHydrodynamics,Faltinsen1990SeaLoads}
+
+\begin{equation}
+\label{eq:rod-1-52}
+\mathbf{f}_{hydro}^{M} = \mathbf{f}_{in}^{M} + \mathbf{f}_{add}^{M} + \mathbf{f}_{drag},
+\end{equation}
+
+其中
+
+\begin{equation}
+\label{eq:rod-1-53}
+\mathbf{f}_{in}^{M} = \rho_{f}C_{M}A_{d}\mathbf{P}_{\bot}\mathbf{a}_{f},
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-54}
+\mathbf{f}_{add}^{M} = - \rho_{f}C_{A}A_{d}\mathbf{P}_{\bot}\ddot{\mathbf{r}},
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-55}
+\mathbf{f}_{drag} = \frac{1}{2}\rho_{f}C_{D}D \parallel \mathbf{u}_{r\bot} \parallel \mathbf{u}_{r\bot}.
+\end{equation}
+
+这里 \(\rho_{f}\) 为流体密度，\(A_{d}\) 为单位长度排开流体的特征面积，\(D\) 为导管外径，\(C_{A},C_{M},C_{D}\) 分别为附加质量、惯性和拖曳系数；常用约定下 \(C_{M} = 1 + C_{A}\)。该经验分支必须整体使用，且不再引入下述 \(T_{A}\)。
+
+为将构形相关附加质量纳入完整惯性结构，理论主线改由速度型附加流体惯性泛函定义。令\cite{Newman1977MarineHydrodynamics,Faltinsen1990SeaLoads}
+
+\begin{equation}
+\label{eq:rod-1-56}
+m_{A}(S) = \rho_{f}C_{A}A_{d},\quad\quad\mathbf{w}_{\bot} = \mathbf{P}_{\bot}\left( \dot{\mathbf{r}} - \mathbf{v}_{f} \right),
+\end{equation}
+
+并取
+
+\begin{equation}
+\label{eq:rod-1-57}
+T_{A}\left\lbrack \mathbf{r},\dot{\mathbf{r}};t \right\rbrack = \frac{1}{2}\int_{0}^{L}m_{A}\,\mathbf{w}_{\bot}^{T}\mathbf{w}_{\bot}\, dS.
+\end{equation}
+
+其对应惯性作用由泛函 Euler--Lagrange 导数
+
+\begin{equation}
+\label{eq:rod-1-58}
+\mathbf{I}_{A} = \frac{d}{dt}\frac{\delta T_{A}}{\delta\dot{\mathbf{r}}} - \frac{\delta T_{A}}{\delta\mathbf{r}}
+\end{equation}
+
+统一产生。冻结 \(\mathbf{P}_{\bot}\) 时，主项为
+
+\begin{equation}
+\label{eq:rod-1-59}
+\mathbf{I}_{A} = \rho_{f}C_{A}A_{d}\mathbf{P}_{\bot}\left( \ddot{\mathbf{r}} - \mathbf{a}_{f} \right),
+\end{equation}
+
+而 \(\mathbf{P}_{\bot}\) 的构形变化及流场的空间变化还会产生附加几何项。启用 \(T_{A}\) 的理论主线时，右端显式流体加速度输入仅保留纯 Froude--Krylov 项
+
+\begin{equation}
+\label{eq:rod-1-60}
+\boxed{\mathbf{f}_{FK} = \rho_{f}A_{d}\mathbf{P}_{\bot}\mathbf{a}_{f}},
+\end{equation}
+
+并取
+
+\begin{equation}
+\label{eq:rod-1-61}
+\mathbf{f}_{hydro,rem} = \mathbf{f}_{FK} + \mathbf{f}_{drag}.
+\end{equation}
+
+此时 \(T_{A}\) 已经提供 \(C_{A}\left( \mathbf{a}_{f} - \ddot{\mathbf{r}} \right)\) 的完整附加质量作用；它与系数为 \(1\) 的 Froude--Krylov 项合并后恢复 \(C_{M} = 1 + C_{A}\)，因此不得再保留 \(\mathbf{f}_{in}^{M}\) 中的 \(C_{A}\mathbf{a}_{f}\)，也不得再加入 \(\mathbf{f}_{add}^{M}\)。当 \(\mathbf{v}_{f} = \mathbf{0}\) 且 \(m_{A}\) 不显含时间时，\(T_{A}\) 退化为可并入保守惯性骨架的附加动能；一般规定流场下，其交叉项与显式时间项整体作为流场端口处理。
+
+对于二次拖曳，定义非负的瞬时状态相关系数
+
+\begin{equation}
+\label{eq:rod-1-62}
+d_{f} = \frac{1}{2}\rho_{f}C_{D}D\, \parallel \mathbf{u}_{r\bot} \parallel \geq 0.
+\end{equation}
+
+则拖曳力必须按被动耗散核与背景流输入排他分解为
+
+\begin{equation}
+\label{eq:rod-1-63}
+\boxed{\mathbf{f}_{drag} = d_{f}\mathbf{P}_{\bot}\left( \mathbf{v}_{f} - \dot{\mathbf{r}} \right) = \underset{\mathbf{f}_{drag,diss}}{\underbrace{- d_{f}\mathbf{P}_{\bot}\dot{\mathbf{r}}}} + \underset{\mathbf{f}_{drag,flow}}{\underbrace{d_{f}\mathbf{P}_{\bot}\mathbf{v}_{f}}}.}
+\end{equation}
+
+其中只有被动核对导管机械能具有确定耗散号：
+
+\begin{equation}
+\label{eq:rod-1-64}
+{\dot{\mathbf{r}}}^{T}\mathbf{f}_{drag,diss} = - d_{f} \parallel \mathbf{P}_{\bot}\dot{\mathbf{r}} \parallel^{2} \leq 0,
+\end{equation}
+
+而 \({\dot{\mathbf{r}}}^{T}\mathbf{f}_{drag,flow}\) 一般不定号，应进入流场输入端口。完整拖曳还满足相对运动被动性恒等式
+
+\begin{equation}
+\label{eq:rod-1-65}
+\left( \dot{\mathbf{r}} - \mathbf{v}_{f} \right)^{T}\mathbf{f}_{drag} = - d_{f} \parallel \mathbf{P}_{\bot}\left( \dot{\mathbf{r}} - \mathbf{v}_{f} \right) \parallel^{2} \leq 0,
+\end{equation}
+
+但该恒等式不能替代结构机械能中的端口分账。因此，在 \(\mathbf{v}_{f} \neq \mathbf{0}\) 时不得把完整二次拖曳整体归入 \(\mathbf{Q}_{diss}\)。由于 \(d_{f}\) 依赖相对速度，上述被动核是逐状态半正定的非线性算子，而不是常阻尼矩阵。
+
+若需要考虑流体对截面自转的阻尼，可另外引入单位参考长度流体力矩，例如
+
+\begin{equation}
+\label{eq:rod-1-66}
+\mathbf{l}_{hydro} = - c_{\omega}(S)\left| \omega_{3} - \omega_{f3} \right|\left( \omega_{3} - \omega_{f3} \right)\mathbf{d}_{3},
+\end{equation}
+
+其中 \(\omega_{f3}\) 为流体绕导管切向的等效角速度。若该效应相对于磁力矩和结构扭矩可忽略，可在具体工况中令 \(\mathbf{l}_{hydro} = \mathbf{0}\)，但截面转动自由度仍被保留。
+
+本文主计算路线采用固定血管壁与法向横流 Morison 作用，忽略轴向切向蒙皮摩擦；流体绕导管切向的等效自转在基线工况中取 \(\omega_{f3} = 0\)。这些是环境载荷的中等精度约化，不删除结构侧的截面姿态、独立扭转、角速度或转动惯量。若后续工况需要运动壁、切向摩擦或流体自转，只需按相同的输入--耗散原则增设对应端口。
+
+\subsubsection{导管---血管壁接触力与接触力矩}\label{sec:rod-1-4-5}
+
+设导管表面与血管壁之间的间隙函数为 \(g(S,t)\)，接触判定阈值为 \(g_{0}\)。定义侵入量
+
+\begin{equation}
+\label{eq:rod-1-67}
+\delta_{c} = \max\left( g_{0} - g,0 \right).
+\end{equation}
+
+为同时表示 Hertz 弹性、法向冲击耗散和正则化摩擦，令 \({\dot{\delta}}_{c}\) 表示接触点侵入量的物质时间导数。接触激活 \(\delta_{c} > 0\) 时，法向力取为\cite{Johnson1985ContactMechanics,HuntCrossley1975Restitution,BrownMcPhee2016Friction}
+
+\begin{equation}
+\label{eq:rod-1-68}
+f_{n} = k_{c}\delta_{c}^{\alpha} + c_{n}{\dot{\delta}}_{c},\quad\quad\delta_{c} > 0.
+\end{equation}
+
+当上述表达式为负或 \(\delta_{c} = 0\) 时，规定 \(f_{n} = 0\)；这等价于对法向力采用非负截断，从而避免未接触和分离阶段产生非物理拉力。切向摩擦力和总接触力分别为
+
+\begin{equation}
+\label{eq:rod-1-69}
+\mathbf{f}_{t} = - \mu_{c}f_{n}\frac{\mathbf{v}_{t}}{\sqrt{\mathbf{v}_{t} \cdot \mathbf{v}_{t} + v_{0}^{2}}},
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-70}
+\mathbf{f}_{cont} = f_{n}\mathbf{n}_{w} + \mathbf{f}_{t}.
+\end{equation}
+
+其中，\(k_{c}\) 为接触刚度，\(c_{n}\) 为法向接触阻尼，\(\alpha\) 为接触指数，Hertz 接触常取 \(\alpha = 3/2\)；\(\mathbf{n}_{w}\) 为使导管离开管壁方向的单位法向量，\(\mathbf{v}_{t}\) 为接触点相对管壁的切向速度，\(\mu_{c}\) 为摩擦系数，\(v_{0}\) 为正则化参数。若需自动微分或一致 Newton 迭代，可将接触激活和非负截断替换为光滑正则化。若只研究无耗散接触，可令 \(c_{n} = \mu_{c} = 0\)，此时接触弹性部分可由势能表示。
+
+若接触力作用点相对于中心线的偏置矢量为 \(\bm{\rho}_{c}\)，则接触力矩为
+
+\begin{equation}
+\label{eq:rod-1-71}
+\mathbf{l}_{cont} = \bm{\rho}_{c} \times \mathbf{f}_{cont} + \mathbf{l}_{spin},
+\end{equation}
+
+其中，\(\mathbf{l}_{spin}\) 可用于描述接触区对截面自转的附加阻尼或摩擦力矩。法向阻尼、切向摩擦和 \(\mathbf{l}_{spin}\) 均归入非保守功率。
+
+\subsubsection{微重力项}\label{sec:rod-1-4-6}
+
+若空间站内存在残余加速度 \(\mathbf{g}_{res}(t)\)，则单位参考长度残余重力为
+
+\begin{equation}
+\label{eq:rod-1-72}
+\mathbf{f}_{g} = \mu\mathbf{g}_{res}.
+\end{equation}
+
+在理想微重力近似下，取
+
+\begin{equation}
+\label{eq:rod-1-73}
+\mathbf{g}_{res} = \mathbf{0}.
+\end{equation}
+
+\subsubsection{完整强形式方程组}\label{sec:rod-1-4-7}
+
+将运动学、平衡方程和本构关系统一整理，得到基础杆体的几何精确系统：
+
+\begin{equation}
+\label{eq:rod-1-74}
+\left\{ \begin{matrix}
+ & \mathbf{r}_{,S} = \mathbf{R}\bm{\nu}, \\
+ & \mathbf{R}_{,S} = \mathbf{R}\widehat{\bm{\kappa}}, \\
+ & \mathbf{R}_{,t} = \mathbf{R}\widehat{\bm{\omega}}, \\
+ & \mu\ddot{\mathbf{r}} = \mathbf{n}_{,S} + \mathbf{f}_{ext}, \\
+ & \mathbf{m}_{,S} + \mathbf{r}_{,S} \times \mathbf{n} + \mathbf{l}_{ext} = \mathbf{R}\left\lbrack \mathbf{J}_{c}\dot{\bm{\omega}} + \bm{\omega} \times \left( \mathbf{J}_{c}\bm{\omega} \right) \right\rbrack, \\
+ & \mathbf{n} = \mathbf{R}\mathbf{K}_{\nu}\left( \bm{\nu} - \bm{\nu}_{0} \right), \\
+ & \mathbf{m} = \mathbf{R}\mathbf{K}_{\kappa}\left( \bm{\kappa} - \bm{\kappa}_{0} \right).
+\end{matrix} \right.\ \ \ \
+\end{equation}
+
+并满足相容条件
+
+\begin{equation}
+\label{eq:rod-1-75}
+\dot{\bm{\nu}} = \mathbf{R}^{T}{\dot{\mathbf{r}}}_{,S} - \bm{\omega} \times \bm{\nu},\quad\quad\dot{\bm{\kappa}} = \bm{\omega}_{,S} + \bm{\kappa} \times \bm{\omega}.
+\end{equation}
+
+若采用能量一致附加质量主线，则将 \(\mathbf{I}_{A}\) 与结构惯性共同置于左端，并在右端仅保留 \(\mathbf{f}_{FK}\)、拖曳及其他流体端口；若采用工程 Morison 验证分支，则保留完整的 \(\mathbf{f}_{in}^{M} + \mathbf{f}_{add}^{M}\) 组合而不再引入 \(T_{A}\)。两种表述必须二选一。
+
+主要未知量为 \(\mathbf{r},\mathbf{R},\bm{\nu},\bm{\kappa},\bm{\omega},\mathbf{n},\mathbf{m}\)。该系统属于具有 Lie 群姿态变量的几何非线性混合偏微分---代数系统。
+
+\subsection{变分形式与完整弱形式}\label{sec:rod-1-5}
+
+\subsubsection{虚位移与虚转角}\label{sec:rod-1-5-1}
+
+取中心线虚位移 \(\delta\mathbf{r}\)，并以材料虚转角 \(\bm{\eta}\) 表示姿态变分：
+
+\begin{equation}
+\label{eq:rod-1-76}
+\delta\mathbf{R} = \mathbf{R}\widehat{\bm{\eta}}.
+\end{equation}
+
+对应的空间虚转角为
+
+\begin{equation}
+\label{eq:rod-1-77}
+\bm{\eta}_{s} = \mathbf{R}\bm{\eta}.
+\end{equation}
+
+由应变定义得到
+
+\begin{equation}
+\label{eq:rod-1-78}
+\delta\bm{\nu} = \mathbf{R}^{T}\delta\mathbf{r}_{,S} - \bm{\eta} \times \bm{\nu},
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-79}
+\delta\bm{\kappa} = \bm{\eta}_{,S} + \bm{\kappa} \times \bm{\eta}.
+\end{equation}
+
+\subsubsection{内部虚功}\label{sec:rod-1-5-2}
+
+内部虚功为
+
+\begin{equation}
+\label{eq:rod-1-80}
+\delta W_{int} = \int_{0}^{L}\left( \mathbf{n}_{b} \cdot \delta\bm{\nu} + \mathbf{m}_{b} \cdot \delta\bm{\kappa} \right)dS.
+\end{equation}
+
+代入应变变分并对空间导数分部积分，得到
+
+\begin{equation}
+\label{eq:rod-1-81}
+\delta W_{int} = \left\lbrack \mathbf{n} \cdot \delta\mathbf{r} + \mathbf{m}_{b} \cdot \bm{\eta} \right\rbrack_{0}^{L} - I_{r} - I_{R},
+\end{equation}
+
+其中
+
+\begin{equation}
+\label{eq:rod-1-82}
+I_{r} = \int_{0}^{L}\mathbf{n}_{,S} \cdot \delta\mathbf{r}\, dS,
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-83}
+I_{R} = \int_{0}^{L}\left( \mathbf{m}_{b,S} + \bm{\kappa} \times \mathbf{m}_{b} + \bm{\nu} \times \mathbf{n}_{b} \right) \cdot \bm{\eta}\, dS.
+\end{equation}
+
+其中，材料形式的转动平衡项满足
+
+\begin{equation}
+\label{eq:rod-1-84}
+\mathbf{m}_{b,S} + \bm{\kappa} \times \mathbf{m}_{b} + \bm{\nu} \times \mathbf{n}_{b} + \mathbf{l}_{b} = \mathbf{J}_{c}\dot{\bm{\omega}} + \bm{\omega} \times \left( \mathbf{J}_{c}\bm{\omega} \right),
+\end{equation}
+
+且 \(\mathbf{l}_{b} = \mathbf{R}^{T}\mathbf{l}_{ext}\)。
+
+\subsubsection{惯性虚功与外力虚功}\label{sec:rod-1-5-3}
+
+基础杆体的惯性虚功为
+
+\begin{equation}
+\label{eq:rod-1-85}
+\delta W_{in,str} = \int_{0}^{L}\left\lbrack \mu\ddot{\mathbf{r}} \cdot \delta\mathbf{r} + \left( \mathbf{J}_{c}\dot{\bm{\omega}} + \bm{\omega} \times \left( \mathbf{J}_{c}\bm{\omega} \right) \right) \cdot \bm{\eta} \right\rbrack dS.
+\end{equation}
+
+若采用\Cref{sec:rod-1-4-4}的能量一致附加质量，附加惯性虚功写为
+
+\begin{equation}
+\label{eq:rod-1-86}
+\delta W_{in,A} = \left\langle \frac{d}{dt}\frac{\delta T_{A}}{\delta\dot{\mathbf{r}}} - \frac{\delta T_{A}}{\delta\mathbf{r}},\,\delta\mathbf{r} \right\rangle,
+\end{equation}
+
+其中 \(\langle \cdot , \cdot \rangle\) 表示沿杆长的对偶配对。若存在偏心附加部件，其惯性虚功由对应刚体动能 \(T_{e}\) 的 Euler---Lagrange 导数给出。因此总惯性虚功为
+
+\begin{equation}
+\label{eq:rod-1-87}
+\delta W_{in} = \delta W_{in,str} + \delta W_{in,A} + \delta W_{in,e}.
+\end{equation}
+
+外部分布载荷虚功为
+
+\begin{equation}
+\label{eq:rod-1-88}
+\delta W_{ext} = \int_{0}^{L}\left( \mathbf{f}_{ext,rem} \cdot \delta\mathbf{r} + \mathbf{l}_{ext} \cdot \bm{\eta}_{s} \right)dS + \delta W_{\partial},
+\end{equation}
+
+其中 \(\mathbf{f}_{ext,rem}\) 不再包含已经通过 \(T_{A}\) 计入的附加惯性；在能量一致流体主线中，流体部分仅保留 \(\mathbf{f}_{FK}\)、拖曳及其他未由 \(T_{A}\) 表示的输入。由于 \(\bm{\eta}_{s} = \mathbf{R}\bm{\eta}\)，亦可写为
+
+\begin{equation}
+\label{eq:rod-1-89}
+\mathbf{l}_{ext} \cdot \bm{\eta}_{s} = \mathbf{l}_{b} \cdot \bm{\eta}.
+\end{equation}
+
+\subsubsection{联合弱形式}\label{sec:rod-1-5-4}
+
+根据 D'Alembert 原理，任意满足本质边界条件的 \(\delta\mathbf{r}\) 和 \(\bm{\eta}\) 均满足
+
+\begin{equation}
+\label{eq:rod-1-90}
+\delta W_{in} + \delta W_{int} - \delta W_{ext} = 0.
+\end{equation}
+
+展开后得到完整平移---转动联合弱形式：
+
+\begin{equation}
+\label{eq:rod-1-91}
+\begin{matrix}
+ & \int_{0}^{L}\mu\ddot{\mathbf{r}} \cdot \delta\mathbf{r}\, dS + \int_{0}^{L}\left\lbrack \mathbf{J}_{c}\dot{\bm{\omega}} + \bm{\omega} \times \left( \mathbf{J}_{c}\bm{\omega} \right) \right\rbrack \cdot \bm{\eta}\, dS \\
+ & + \,\delta W_{in,A} + \delta W_{in,e} + \int_{0}^{L}\left( \mathbf{n}_{b} \cdot \delta\bm{\nu} + \mathbf{m}_{b} \cdot \delta\bm{\kappa} \right)dS \\
+ & - \int_{0}^{L}\left( \mathbf{f}_{ext,rem} \cdot \delta\mathbf{r} + \mathbf{l}_{b} \cdot \bm{\eta} \right)dS - \delta W_{\partial} = 0.
+\end{matrix}
+\end{equation}
+
+在不计附加流体惯性泛函和偏心部件时，令 \(\delta W_{in,A} = \delta W_{in,e} = 0\) 即恢复基础杆体弱形式。该弱形式仅含中心线和姿态场的一阶空间导数，可采用 \(C^{0}\) 连续的平移和转动近似空间；不需要将转动方程消去后构造中心线四阶方程。
+
+在函数空间意义下，可将中心线和姿态分别视为 \(\mathbf{r} \in H^{1}\left( 0,L;\mathbb{R}^{3} \right)\) 与 \(\mathbf{R} \in H^{1}\left( 0,L;SO(3) \right)\) 的映射；虚位移 \(\delta\mathbf{r}\) 和材料虚转角 \(\bm{\eta}\) 属于满足齐次本质边界条件的相应 \(H^{1}\) 试验空间。该表述说明联合弱形式只要求一阶空间正则性。
+
+\subsubsection{边界项与边界条件}\label{sec:rod-1-5-5}
+
+分部积分产生的自然边界项为
+
+\begin{equation}
+\label{eq:rod-1-92}
+\left\lbrack \mathbf{n} \cdot \delta\mathbf{r} + \mathbf{m} \cdot \bm{\eta}_{s} \right\rbrack_{0}^{L}.
+\end{equation}
+
+在端点 \(S = S_{e}\) 上，可以指定以下两类边界条件之一：
+
+\begin{equation}
+\label{eq:rod-1-93}
+\mathbf{r}\left( S_{e},t \right) = \overline{\mathbf{r}}(t)\quad\text{或}\quad\mathbf{n}\left( S_{e},t \right) = \overline{\mathbf{n}}(t),
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-94}
+\mathbf{R}\left( S_{e},t \right) = \overline{\mathbf{R}}(t)\quad\text{或}\quad\mathbf{m}\left( S_{e},t \right) = \overline{\mathbf{m}}(t).
+\end{equation}
+
+对于夹持端，\(\delta\mathbf{r} = \mathbf{0}\) 且 \(\bm{\eta} = \mathbf{0}\)；对于无端载荷的自由端，自然边界条件为 \(\mathbf{n} = \mathbf{0}\) 和 \(\mathbf{m} = \mathbf{0}\)。边界力和边界力矩必须在弱形式中保留，不能在未指定边界条件时直接删除。
+
+完整动力学初边值问题还需给定初始条件
+
+\begin{equation}
+\label{eq:rod-1-95}
+\mathbf{r}(S,0) = \mathbf{r}^{0}(S),\quad\quad\dot{\mathbf{r}}(S,0) = \mathbf{v}^{0}(S),
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-96}
+\mathbf{R}(S,0) = \mathbf{R}^{0}(S) \in SO(3),\quad\quad\bm{\omega}(S,0) = \bm{\omega}^{0}(S).
+\end{equation}
+
+初始场应满足几何相容关系 \(\bm{\nu}^{0} = \left( \mathbf{R}^{0} \right)^{T}\mathbf{r}_{,S}^{0}\) 与 \({\widehat{\bm{\kappa}}}^{0} = \left( \mathbf{R}^{0} \right)^{T}\mathbf{R}_{,S}^{0}\)，并与本质边界条件一致。严格 Kirchhoff 分支还需满足初始位置约束及其速度级相容条件。
+
+\subsection{Kirchhoff 无剪切约束}\label{sec:rod-1-6}
+
+对于细长导管，可施加可伸长 Kirchhoff 无剪切约束
+
+\begin{equation}
+\label{eq:rod-1-97}
+\nu_{1} = 0,\quad\quad\nu_{2} = 0,\quad\quad\nu_{3} = \lambda.
+\end{equation}
+
+于是
+
+\begin{equation}
+\label{eq:rod-1-98}
+\mathbf{r}_{,S} = \lambda\mathbf{d}_{3},\quad\quad\mathbf{d}_{3} = \mathbf{t}.
+\end{equation}
+
+该条件只确定截面第三方向与中心线切向一致，并不确定 \(\mathbf{d}_{1},\mathbf{d}_{2}\) 绕 \(\mathbf{d}_{3}\) 的旋转。因此，\(\kappa_{3}\)、\(\omega_{3}\)、\(GJ\)、截面极惯性和磁力矩仍必须保留。
+
+在强形式中，横向剪力是维持无剪切约束的反力，并不因 \(\nu_{1} = \nu_{2} = 0\) 而等于零。可以使用拉格朗日乘子严格施加约束，也可以保留较大的有限剪切刚度作为数值正则化。无论采用哪种方式，均不应消去截面姿态场。\cite{MarsdenRatiu1999MechanicsSymmetry,HairerLubichWanner2006GNI}
+
+\subsection{连续能量平衡}\label{sec:rod-1-7}
+
+\subsubsection{结构能量与扩展惯性能量}\label{sec:rod-1-7-1}
+
+基础杆体结构机械能定义为
+
+\begin{equation}
+\label{eq:rod-1-99}
+E_{str} = T_{str} + V_{int}.
+\end{equation}
+
+若存在偏心附加部件，加入其动能 \(T_{e}\)。在静止流场 \(\mathbf{v}_{f} = \mathbf{0}\) 且 \(m_{A}\) 不显含时间的能量一致附加质量分支中，定义总动能
+
+\begin{equation}
+\label{eq:rod-1-100}
+T_{tot} = T_{str} + T_{A} + T_{e}.
+\end{equation}
+
+若磁作用、无摩擦接触或残余重力可由势能表示，则定义
+
+\begin{equation}
+\label{eq:rod-1-101}
+V = V_{int} + V_{mag} + V_{cont} + V_{g},
+\end{equation}
+
+以及扩展机械能
+
+\begin{equation}
+\label{eq:rod-1-102}
+\boxed{E = T_{tot} + V.}
+\end{equation}
+
+对于一般给定流场，\(T_{A}\) 可能显含时间并含有相对流速交叉项，此时它是速度相关的附加流体 Lagrangian 惯性泛函，而不是封闭系统的普通机械动能。流场贡献应在功率平衡中作为独立端口显式保留，不能据此宣称结构---规定流场组合的总机械能守恒。
+
+\subsubsection{功率平衡}\label{sec:rod-1-7-2}
+
+将平动方程与 \(\dot{\mathbf{r}}\) 点乘，将转动方程与空间角速度 \(\bm{\omega}_{s}\) 点乘并积分，可写成
+
+\begin{equation}
+\label{eq:rod-1-103}
+\frac{d}{dt}\left( T_{tot} + V_{int} \right) = P_{\partial} + P_{mag} + P_{flow} + P_{cont} + P_{g},
+\end{equation}
+
+其中边界功率为
+
+\begin{equation}
+\label{eq:rod-1-104}
+P_{\partial} = \left\lbrack \mathbf{n} \cdot \dot{\mathbf{r}} + \mathbf{m} \cdot \bm{\omega}_{s} \right\rbrack_{0}^{L}.
+\end{equation}
+
+将所有保守外载荷并入 \(V\) 后，得到
+
+\begin{equation}
+\label{eq:rod-1-105}
+\boxed{\frac{dE}{dt} = P_{\partial} + P_{diss} + P_{in} + P_{flow} + \frac{\partial V_{ext}}{\partial t}.}
+\end{equation}
+
+其中 \(P_{diss}\) 只包含已经完成输入--耗散拆分的被动部分，包括 \(P_{drag,diss}\)、固定壁条件下的接触法向阻尼与摩擦以及所保留的自转阻尼，并满足 \(P_{diss} \leq 0\)。\(P_{flow}\) 收纳背景流拖曳功率 \(P_{drag,flow}\)、Froude--Krylov 输入以及按所选表示进入端口的反应性流场功率，因而一般不定号；\(P_{in}\) 仅包含非流体的非保守体输入和控制输入。端部驱动只通过 \(P_{\partial}\) 计入。若非自治磁作用已经写成 \(V_{mag}\left( \mathbf{r},\mathbf{R},t \right)\)，其显式时间功率只通过 \(\partial V_{ext}/\partial t\) 计入，不得再次并入 \(P_{in}\)。只有在 \(P_{diss} = P_{in} = P_{flow} = P_{\partial} = 0\) 且势能不显含时间时，扩展机械能才守恒。
+
+\subsection{本章小结}\label{sec:rod-1-8}
+
+本章以中心线 \(\mathbf{r}\) 和截面姿态 \(\mathbf{R}\) 为独立未知场，建立了同时包含伸长、剪切、两向弯曲、独立扭转、截面转动惯量、磁力矩、流体载荷和接触力矩的几何精确杆动力学模型。基础导管采用质量中心线约定，偏心磁性头端和传感器通过独立刚体动能保留平移---转动耦合；能量一致流体表述由 \(T_{A}\) 产生附加惯性，并以纯 Froude--Krylov 项补足流体加速度输入，从而与工程 Morison 表述保持互斥，避免 \(C_{A}\mathbf{a}_{f}\) 的重复计入。
+
+完整弱形式保留了平移与转动试验函数、端部合力和合力矩边界项，并将二次拖曳的被动核、接触法向阻尼和摩擦归入耗散功率，将背景流拖曳输入及规定流场惯性作用归入独立流场端口。Kirchhoff 无剪切条件被作为约束保留，而没有通过删除截面姿态、独立扭转或转动惯量实现约化。该联合弱形式为\Cref{sec:galerkin-discretization}的平移---转动 Galerkin 离散提供理论基础。

@@ -1,0 +1,9 @@
+\ifProjectPrintBibliography
+  \begingroup
+  \ifdefstring{\ProjectLanguage}{en}{\renewcommand{\refname}{References}}{\renewcommand{\refname}{参考文献}}
+  \sloppy
+  \hbadness=10000
+  \bibliographystyle{\ProjectBibliographyStyle}
+  \bibliography{bibliography/references}
+  \endgroup
+\fi

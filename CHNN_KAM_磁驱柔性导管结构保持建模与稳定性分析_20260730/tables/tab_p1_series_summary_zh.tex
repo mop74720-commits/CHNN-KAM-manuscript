@@ -1,0 +1,21 @@
+\begin{table}[htbp]
+\centering
+\caption{P1 系列结果与解释边界。五个 seed 均为算法重复，物理轨迹数始终为三。}
+\label{tab:p1-series-summary}
+\small
+\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+实验 & 数值结果 & 适用范围 \\
+\midrule
+P1 &
+标准 CHNN 的联合场、rollout、线性化误差分别为 \(0.1417\%\)--\(0.2444\%\)、\(0.2131\%\)--\(1.5237\%\)、\(0.3125\%\)--\(0.3286\%\)。 &
+仅适用于三条轨迹的 derivative-only 小样本比较。 \\
+P1.5 &
+residual 相对 physics-only 的场/rollout 平均降幅为 \(90.37\%\)--\(97.29\%\)/\(53.40\%\)--\(95.14\%\)；CHNN 对 gray Real 的场平均降幅为 \(-2.195\%\)。 &
+收益有条件且计算更贵；不支持稳定一步场优势。 \\
+P1.6 &
+\(30/30\) 个约束模型精确通过平衡门，但 Real/CHNN 联合场均值分别恶化至 \(2.872\times10^{-2}\)/\(2.623\times10^{-2}\)。 &
+约束满足不等于精度改善。 \\
+\bottomrule
+\end{tabularx}
+\end{table}

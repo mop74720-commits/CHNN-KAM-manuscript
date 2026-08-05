@@ -1,0 +1,19 @@
+\begin{table}[!ht]
+\centering
+\caption{Canonical 数据合同的异常诊断与误差来源隔离。}
+\label{tab:canonical-diagnostic-chain}
+\scriptsize
+\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+诊断步骤 & 观察与分析 & 科学解释 \\
+\midrule
+同轨迹比较 & 修正跨轨迹比较后，mode1 满足判据而 mixed 仍未满足。 & 消除比较对象不一致造成的假阳性。 \\
+重复单模态工况 & 单一 mode1 重复也可能出现闭合误差。 & 模态混合不是异常的必要条件。 \\
+余切投影 & \(N=2\) 截断不足并非根因，projected momentum 的闭合更好。 & 动量应按固定基投影到余切空间。 \\
+求解器输出语义 & generalized-alpha 内部 stage 不可由公共 API 直接取得；BDF \texttt{tsteps} 可输出同一 solver step 的状态。 & BDF 仅用于状态采样和标签生成。 \\
+固定基初值 & 对位移和速度应用 normalization/sign transform 后，\(12/12\) 初值一致且 mixed 短窗闭合。 & 异常来自初值与固定基定义不一致。 \\
+双层时间步比较 & G2 从 \(0.00147337\) 增至 \(0.00155680\)。 & 两层结果不足以满足预设单调收敛判据。 \\
+三层与 \(1\,\mathrm{s}\) 验证 & 观察阶为 \(1.64186\)--\(2.00088\)，延长工况的闭合与能量指标满足阈值。 & 数据合同满足后续多幅值实验的数据生成要求。 \\
+\bottomrule
+\end{tabularx}
+\end{table}

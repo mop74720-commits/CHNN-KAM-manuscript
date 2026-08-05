@@ -1,0 +1,21 @@
+\begin{table}[htbp]
+\centering
+\caption{P1-series results and interpretation boundaries. The five seeds are algorithmic repetitions; the number of physical trajectories remains three.}
+\label{tab:p1-series-summary}
+\small
+\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+Experiment & Numerical result & Domain of validity \\
+\midrule
+P1 &
+Standard-CHNN joint-field, rollout, and linearization errors are \(0.1417\%\)--\(0.2444\%\), \(0.2131\%\)--\(1.5237\%\), and \(0.3125\%\)--\(0.3286\%\). &
+Restricted to a three-trajectory, derivative-only small-sample comparison. \\
+P1.5 &
+Residual-over-physics-only mean reductions are \(90.37\%\)--\(97.29\%\) for the field and \(53.40\%\)--\(95.14\%\) for rollout; the CHNN-over-gray-Real mean field reduction is \(-2.195\%\). &
+Conditional and more expensive; no stable one-step-field advantage. \\
+P1.6 &
+All \(30/30\) constrained models pass the equilibrium gates exactly, while the mean Real/CHNN joint-field errors worsen to \(2.872\times10^{-2}\)/\(2.623\times10^{-2}\). &
+Constraint satisfaction does not imply improved accuracy. \\
+\bottomrule
+\end{tabularx}
+\end{table}

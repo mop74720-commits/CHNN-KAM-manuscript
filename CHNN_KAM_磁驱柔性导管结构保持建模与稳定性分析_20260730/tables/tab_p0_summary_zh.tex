@@ -1,0 +1,16 @@
+\begin{table}[htbp]
+\centering
+\caption{P0 quadratic-physics 分支的模型比较。向量场网络不使用 physics baseline。}
+\label{tab:p0-summary}
+\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+模型 & 向量场相对 L2 & rollout 相对 L2 & 能量漂移 \\
+\midrule
+向量场网络 & 0.0200837 & 0.103076 & 0.0245256 \\
+Real HNN & 0.0122422 & 0.0444270 & 0.00402084 \\
+标准 CHNN & \textbf{0.0109144} & \textbf{0.0351959} & 0.00455759 \\
+广义复线性 CHNN & 0.0121700 & 0.0458872 & 0.00403167 \\
+\bottomrule
+\end{tabular}
+\end{table}

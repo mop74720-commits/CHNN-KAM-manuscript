@@ -1,0 +1,6 @@
+quantity,observed_order,result_id
+q,1.9978492,RES-B0-R2-001
+p_projected,2.0008768,RES-B0-R2-001
+M_N_inverse_p,2.0008769,RES-B0-R2-001
+B_transpose_L,1.9976914,RES-B0-R2-001
+total_energy,1.6418624,RES-B0-R2-001

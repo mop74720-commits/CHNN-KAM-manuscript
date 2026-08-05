@@ -1,0 +1,4 @@
+trajectory,energy_drift_percent,strict_energy_threshold_percent,candidate_energy_threshold_percent,force_v2_joint_l2_percent,force_v2_threshold_percent,result_id_energy,result_id_force
+mode1,0.8150901239521587,0.5,1.0,1.5136767647845,2.0,RES-BRIDGE-001,RES-FORCE-V2-001
+mode2,0.3293686612204759,0.5,1.0,0.0625512881899599,2.0,RES-BRIDGE-001,RES-FORCE-V2-001
+mixed12,0.5233284180039073,0.5,1.0,1.08074806437607,2.0,RES-BRIDGE-001,RES-FORCE-V2-001

@@ -1,0 +1,29 @@
+\usepackage{iftex}
+\ifXeTeX\else
+  \PackageError{CHNN-KAM}{This project requires XeLaTeX}{Run: python tools/build.py}
+\fi
+
+\usepackage{fontspec}
+\usepackage{xeCJK}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{bm}
+\usepackage{mathrsfs}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{listings}
+\usepackage{pdfpages}
+\usepackage{fancyvrb}
+\usepackage{etoolbox}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{comment}
+
+\ifProjectClassLoadsNatbib\else
+  \usepackage[numbers,sort&compress]{natbib}
+\fi
+\usepackage[colorlinks=true,linkcolor=blue!55!black,citecolor=green!40!black,urlcolor=blue!60!black]{hyperref}
+\usepackage[nameinlink,noabbrev]{cleveref}

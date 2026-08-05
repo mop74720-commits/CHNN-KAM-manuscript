@@ -1,0 +1,16 @@
+\begin{table}[htbp]
+\centering
+\caption{Model comparison for the P0 quadratic-physics branch. The vector-field network does not use a physics baseline.}
+\label{tab:p0-summary}
+\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Model & Vector-field relative L2 & Rollout relative L2 & Energy drift \\
+\midrule
+Vector-field network & 0.0200837 & 0.103076 & 0.0245256 \\
+Real HNN & 0.0122422 & 0.0444270 & 0.00402084 \\
+Standard CHNN & \textbf{0.0109144} & \textbf{0.0351959} & 0.00455759 \\
+Widely linear CHNN & 0.0121700 & 0.0458872 & 0.00403167 \\
+\bottomrule
+\end{tabular}
+\end{table}

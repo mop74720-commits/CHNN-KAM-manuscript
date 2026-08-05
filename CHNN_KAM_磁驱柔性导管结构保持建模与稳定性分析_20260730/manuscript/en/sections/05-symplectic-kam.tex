@@ -1,0 +1,217 @@
+% English translation of the verified Chinese baseline. Structural identifiers must remain synchronized.
+\section{Symplectic Discretization, Birkhoff Structures, and Invariant-Torus Validation}\label{sec:symplectic-kam}
+
+\subsection{Analysis branches}\label{sec:symplectic-kam-5-1}
+
+A fixed-dimensional Galerkin truncation has already been completed before the KAM analysis. The principal theorem should therefore use a finite-dimensional Hamiltonian-flow theorem or a finite-dimensional symplectic-map theorem. Kuksin's infinite-dimensional KAM theory\cite{Kuksin1993InfiniteDimensionalKAM} is not used as a direct theorem for the fixed truncated system; it is retained only as a theoretical extension for discussions of the limit of infinitely many modes, the PDE limit, or consistency of the truncation. Moser's invariant-curve theorem for area-preserving annulus maps\cite{Moser1962InvariantCurves} primarily concerns two-dimensional twist maps. It may be used for low-dimensional sections and methodological comparison, but it cannot replace the Pöschel/Shang conditions required for multi-degree-of-freedom continuous Hamiltonian systems or high-dimensional symplectic maps.\cite{Shang1999KAMAlgorithms,Shang2000KAMMappings,Poschel2001KAMLecture}
+
+Rather than describing every dynamical branch as a \(K\left( \mathbf{z},t \right)\)-symplectic system, this section distinguishes among:
+
+\begin{itemize}
+\tightlist
+\item
+  standard \(\mathbf{J}\)-symplectic discretization of an autonomous conservative Hamiltonian system;
+\item
+  standard nonautonomous or extended-phase-space symplectic discretization of an exact nonautonomous Hamiltonian system;
+\item
+  time-dependent \(\mathbf{K}\left( \mathbf{z},t \right)\)-symplectic discretization of a Birkhoff system that passes the variational self-adjointness test.
+\end{itemize}
+
+The Hamiltonian Birkhoff normal form is used in Sections 3 and 4 to construct \(H_{0} + \varepsilon H_{1}\). The self-adjoint Birkhoff representation considered here is used to test the structure of a general first-order system. The names are similar, but the mathematical objects are different.
+
+\subsection{Standard symplectic branch and generating functions}\label{sec:symplectic-kam-5-2}
+
+For the autonomous conservative CHNN
+
+\begin{equation}
+\label{eq:symplectic-kam-5-1}
+\dot{\mathbf{Z}} = \mathbf{J}\nabla{\widehat{H}}_{\lambda}\left( \mathbf{Z} \right),
+\end{equation}
+
+the exact flow satisfies
+
+\begin{equation}
+\label{eq:symplectic-kam-5-2}
+\left( D\Phi_{t} \right)^{T}\mathbf{J}\left( D\Phi_{t} \right) = \mathbf{J}.
+\end{equation}
+
+If the one-step map \(F_{h}^{cons}\) is an exact symplectic map sufficiently close to the identity and the relevant Jacobian block of the chosen projection is nondegenerate, a local generating function exists. Retaining the leading term of a center-type generating function gives the implicit midpoint rule
+
+\begin{equation}
+\label{eq:symplectic-kam-5-3}
+\frac{\mathbf{Z}_{n + 1} - \mathbf{Z}_{n}}{h} = \mathbf{J}\nabla{\widehat{H}}_{\lambda}\left( \frac{\mathbf{Z}_{n + 1} + \mathbf{Z}_{n}}{2} \right),
+\end{equation}
+
+which is a second-order symplectic method. Higher-order methods may be constructed through generating-function expansions, composition methods, or other proven symplectic algorithms\cite{FengQin2010}.
+
+For a nonautonomous Hamiltonian \(H\left( \mathbf{Z},t \right)\), introduce the extended phase space
+
+\begin{equation}
+\label{eq:symplectic-kam-5-4}
+\mathcal{H}\left( \mathbf{Z},t,p_{t} \right) = H\left( \mathbf{Z},t \right) + p_{t},
+\end{equation}
+
+and integrate with respect to the extended canonical symplectic form. A transition to the formulation of the next subsection is needed only when the variables are noncanonical or when the system possesses a special Birkhoff representation.
+
+The order-2 BDF scheme used for canonical data processing is not a symplectic stepper of the type defined in this section. It supplies only an observable \texttt{tsteps} sequence for COMSOL solver-step state sampling and canonical vector-field label generation. Three-level observed convergence and satisfaction of the predefined G0--G6 thresholds show only that the data contract is suitable for subsequent amplitude-sentinel experiments. Neither BDF energy drift nor second-order convergence is used to infer symplecticity; a subsequent KAM computation must use a separately proven symplectic map and quantify its discretization defect.
+
+\subsection{Self-adjoint representation of a Birkhoff system}\label{sec:symplectic-kam-5-3}
+
+Let \(\mathbf{z} \in \mathbb{R}^{2n}\), let \(F_{i}\left( \mathbf{z},t \right)\) be Birkhoff functions, let \(B\left( \mathbf{z},t \right)\) be the Birkhoffian, and define
+
+\begin{equation}
+\label{eq:symplectic-kam-5-5}
+K_{ij}\left( \mathbf{z},t \right) = \frac{\partial F_{j}}{\partial z_{i}} - \frac{\partial F_{i}}{\partial z_{j}}.
+\end{equation}
+
+The Birkhoff equations are
+
+\begin{equation}
+\label{eq:symplectic-kam-5-6}
+\boxed{K_{ij}\left( \mathbf{z},t \right){\dot{z}}_{j} - \frac{\partial B}{\partial z_{i}} - \frac{\partial F_{i}}{\partial t} = 0.}
+\end{equation}
+
+Consider a general system written as
+
+\begin{equation}
+\label{eq:symplectic-kam-5-7}
+K_{ij}{\dot{z}}_{j} + D_{i} = 0.
+\end{equation}
+
+On a local star-shaped domain, if \(\mathbf{K}\) is nondegenerate and satisfies skew symmetry, the spatial closure condition, and the temporal compatibility condition, then the system admits a regular self-adjoint Birkhoff representation. Equivalently, functions \(F_{i}\) and \(B\) can be found such that the preceding equation holds\cite[Chap.~15]{COMSOLWeakContribution2025}. Define the time-dependent two-form
+
+\begin{equation}
+\label{eq:symplectic-kam-5-8}
+\Omega_{K} = \frac{1}{2}K_{ij}\left( \mathbf{z},t \right)\, dz_{i} \land dz_{j}.
+\end{equation}
+
+Its phase flow satisfies the time-dependent structure-preservation relation
+
+\begin{equation}
+\label{eq:symplectic-kam-5-9}
+\left( D\Phi_{t,t_{0}} \right)^{T}\mathbf{K}\left( \Phi_{t,t_{0}},t \right)D\Phi_{t,t_{0}} = \mathbf{K}\left( \mathbf{z}_{0},t_{0} \right).
+\end{equation}
+
+When \(\mathbf{K} = \mathbf{J}^{- 1}\) is constant, this condition reduces to the canonical symplectic condition.
+
+\subsection{Identification of a Birkhoff structure for the residual vector field}\label{sec:symplectic-kam-5-4}
+
+The analysis is applied only to \(X_{res}\), as defined in \Cref{sec:chnn-model}. Parameterize the one-form directly as
+
+\begin{equation}
+\label{eq:symplectic-kam-5-10}
+\mathcal{F}_{\rho} = \sum_{i = 1}^{2n}F_{\rho,i}\left( \mathbf{z},t \right)\, dz_{i},\quad\quad K_{\rho,ij} = \partial_{z_{i}}F_{\rho,j} - \partial_{z_{j}}F_{\rho,i},
+\end{equation}
+
+introduce \(B_{\beta}\), and define the candidate vector field
+
+\begin{equation}
+\label{eq:symplectic-kam-5-11}
+{\widetilde{X}}_{\rho,\beta} = \mathbf{K}_{\rho}^{- 1}\left( \nabla B_{\beta} + \partial_{t}\mathbf{F}_{\rho} \right).
+\end{equation}
+
+The training loss is
+
+\begin{equation}
+\label{eq:symplectic-kam-5-12}
+\mathcal{L}_{Birk} = \frac{1}{N}\sum_{\ell = 1}^{N}\left. \  \parallel \mathbf{K}_{\rho}X_{res} - \nabla B_{\beta} - \partial_{t}\mathbf{F}_{\rho} \right.\  \parallel_{2}^{2} + \mu_{nd}\frac{1}{N}\sum_{\ell = 1}^{N}\left\lbrack \max\{ 0,\kappa - \sigma_{min}\left( \mathbf{K}_{\rho} \right)\} \right\rbrack^{2}.
+\end{equation}
+
+On the domain \(\mathcal{D}\), define the defect of the self-adjoint Birkhoff representation by
+
+\begin{equation}
+\label{eq:symplectic-kam-5-13}
+\boxed{\delta_{Birk} = \inf_{F,B,\ \inf_{\mathcal{D}}\sigma_{min}\left( K_{F} \right) \geq \kappa}\left. \  \parallel K_{F}X_{res} - \nabla B - \partial_{t}F \right.\  \parallel_{\mathcal{X}\left( \mathcal{D} \right)}.}
+\end{equation}
+
+If \(\delta_{Birk} = 0\), an exact representation is obtained. If \(\delta_{Birk} > 0\), only the projected vector field \(\widetilde{X}\) has an exact \(K\)-symplectic structure, and the remaining error must be controlled separately. The complete open system containing a nonstructured residual cannot therefore be described as a strictly \(K\left( \mathbf{z},t \right)\)-symplectic system.
+
+\subsection{\texorpdfstring{A \(K\left( \mathbf{z},t \right)\)-symplectic discretization for Birkhoff systems}{A K-symplectic discretization for Birkhoff systems}}\label{sec:symplectic-kam-5-5}
+
+Under regularity, self-adjointness, analyticity, and nondegeneracy conditions, the Birkhoff phase flow admits a gradient map and a scalar generating function under an appropriate local projection. If the generating function is analytic in the step size, it can be expanded as
+
+\begin{equation}
+\label{eq:symplectic-kam-5-14}
+S\left( \mathbf{Z},h \right) = \sum_{r = 1}^{\infty}S_{r}\left( \mathbf{Z} \right)h^{r}.
+\end{equation}
+
+Truncation at order \(m\) gives an implicit order-\(m\) \(K\left( \mathbf{z},t \right)\)-symplectic method satisfying
+
+\begin{equation}
+\label{eq:symplectic-kam-5-15}
+\left( D\Psi_{h} \right)^{T}\mathbf{K}\left( \Psi_{h}\left( \mathbf{z} \right),t + h \right)D\Psi_{h} = \mathbf{K}\left( \mathbf{z},t \right) + O\left( h^{m + 1} \right).
+\end{equation}
+
+This result guarantees structure preservation and the stated order when its hypotheses hold; it does not by itself imply persistence of classical Hamiltonian KAM tori. If a nonstructured residual is superposed, the resulting structural defect must enter the error budget.
+
+\subsection{Invariant-torus computation by the parameterization method}\label{sec:symplectic-kam-5-6}
+
+For the exact symplectic one-step map \(F_{h}^{cons}\) of the autonomous conservative branch, seek an embedding
+
+\begin{equation}
+\label{eq:symplectic-kam-5-16}
+K:\mathbb{T}^{d} \rightarrow \mathcal{M}
+\end{equation}
+
+satisfying
+
+\begin{equation}
+\label{eq:symplectic-kam-5-17}
+\boxed{F_{h}^{cons}\left( K\left( \bm{\theta} \right) \right) = K\left( \bm{\theta} + \bm{\omega} \right).}
+\end{equation}
+
+Use the Fourier truncation
+
+\begin{equation}
+\label{eq:symplectic-kam-5-18}
+K_{N}\left( \bm{\theta} \right) = \sum_{|k| \leq N}^{}{\widehat{K}}_{k}e^{2\pi ik \cdot \bm{\theta}},\quad\quad{\widehat{K}}_{- k} = \overline{{\widehat{K}}_{k}},
+\end{equation}
+
+and define the invariance residual
+
+\begin{equation}
+\label{eq:symplectic-kam-5-19}
+E_{N}\left( \bm{\theta} \right) = F_{h}^{cons}\left( K_{N}\left( \bm{\theta} \right) \right) - K_{N}\left( \bm{\theta} + \bm{\omega} \right).
+\end{equation}
+
+FFT analysis, Poincaré sections, and long trajectories are used only to initialize \(K_{N}\) and \(\bm{\omega}\); a Newton-like method is then used for correction. The a posteriori KAM theorems of Haro et al. require the map to be analytic and exact symplectic, the frequency to satisfy a Diophantine condition, the dynamics to be nondegenerate, and \(\parallel E_{N} \parallel\) to satisfy an explicit smallness condition. Existence of a true invariant torus can be certified only after all constants have been verified. A small residual alone supports only the statement that a numerical approximate torus has been obtained\cite{Haro2016Parameterization}.
+
+\subsection{Parameter continuation and safe operating domain}\label{sec:symplectic-kam-5-7}
+
+Continuation is performed with respect to magnetic-field strength, insertion speed, flow velocity, contact clearance, and material parameters. At each parameter point, record:
+
+\begin{itemize}
+\tightlist
+\item
+  \(\varepsilon_{map}\) and the Hamiltonian learning error;
+\item
+  the symplectic or \(K\)-symplectic structural defect;
+\item
+  the invariance residual \(\parallel E_{N} \parallel\);
+\item
+  the minimum singular value of the twist matrix/frequency map;
+\item
+  the finite-order Diophantine margin and decay of the Fourier coefficients;
+\item
+  the energy balance, port power, peak contact response, and trajectory error;
+\item
+  the discrepancy between the Kirchhoff model and the high-fidelity model.
+\end{itemize}
+
+Define the KAM-theoretic guarantee domain as
+
+\begin{equation}
+\label{eq:symplectic-kam-5-20}
+\mathcal{S}_{KAM} = \{\mu:\text{\footnotesize the symplecticity, nondegeneracy, nonresonance, and a posteriori smallness conditions all hold}\}.
+\end{equation}
+
+The complete engineering safe domain is defined as
+
+\begin{equation}
+\label{eq:symplectic-kam-5-21}
+\boxed{\mathcal{S}_{safe} = \mathcal{S}_{KAM} \cap \mathcal{S}_{energy} \cap \mathcal{S}_{contact} \cap \mathcal{S}_{model} \cap \mathcal{S}_{control}.}
+\end{equation}
+
+Here, KAM theory provides only a conditional long-time stability guarantee for the conservative backbone. Open ports, dissipation, contact switching, and high-fidelity model discrepancy are addressed by additional indicators. The safe domain is neither a single ``chaos threshold'' nor evidence of clinical efficacy.
+
+At present, \(\mathcal{S}_{KAM}\), \(\mathcal{S}_{safe}\), the invariant-torus embedding \(K_N\), and its a posteriori constants have not been instantiated numerically. The complete algorithms and criteria in this section define the subsequent numerical validation program; the current results do not constitute numerical KAM certification and do not establish a true invariant torus or an engineering safe domain.

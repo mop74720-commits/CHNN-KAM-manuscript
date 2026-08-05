@@ -1,0 +1,60 @@
+\renewcommand{\abstractname}{摘\quad 要}
+\renewcommand{\keywordsname}{关键词}
+\renewcommand{\subjclassname}{2020 年数学主题分类}
+\renewcommand{\contentsname}{目\quad 录}
+\renewcommand{\proofname}{证明}
+\renewcommand{\refname}{参考文献}
+\makeatletter
+\def\emailaddrname{{\itshape 通讯邮箱}}
+\makeatother
+
+\crefname{section}{第~}{第~}
+\crefname{subsection}{第~}{第~}
+\crefname{subsubsection}{第~}{第~}
+\crefname{equation}{式}{式}
+\crefname{figure}{图}{图}
+\crefname{table}{表}{表}
+\crefname{assumption}{假设}{假设}
+\crefname{remark}{注}{注}
+\crefname{problem}{问题}{问题}
+\crefname{proposition}{命题}{命题}
+\crefname{theorem}{定理}{定理}
+\crefname{lemma}{引理}{引理}
+\crefname{corollary}{推论}{推论}
+\crefname{definition}{定义}{定义}
+\crefname{conjecture}{猜想}{猜想}
+\crefname{example}{例}{例}
+\crefname{part}{第~}{第~}
+\AtBeginDocument{%
+% Chinese formatting for single, multiple, and ranged section references.
+% Keep the suffix only once, e.g. “第 1、2 节” rather than “第 1 节、第 2 节”.
+\crefformat{section}{第~#2#1#3~节}
+\Crefformat{section}{第~#2#1#3~节}
+\crefmultiformat{section}{第~#2#1#3}{、#2#1#3~节}{、#2#1#3}{、#2#1#3~节}
+\Crefmultiformat{section}{第~#2#1#3}{、#2#1#3~节}{、#2#1#3}{、#2#1#3~节}
+\crefrangeformat{section}{第~#3#1#4~至~#5#2#6~节}
+\Crefrangeformat{section}{第~#3#1#4~至~#5#2#6~节}
+
+\crefformat{subsection}{第~#2#1#3~节}
+\Crefformat{subsection}{第~#2#1#3~节}
+\crefmultiformat{subsection}{第~#2#1#3}{、#2#1#3~节}{、#2#1#3}{、#2#1#3~节}
+\Crefmultiformat{subsection}{第~#2#1#3}{、#2#1#3~节}{、#2#1#3}{、#2#1#3~节}
+\crefrangeformat{subsection}{第~#3#1#4~至~#5#2#6~节}
+\Crefrangeformat{subsection}{第~#3#1#4~至~#5#2#6~节}
+
+\crefformat{subsubsection}{第~#2#1#3~节}
+\Crefformat{subsubsection}{第~#2#1#3~节}
+\crefmultiformat{subsubsection}{第~#2#1#3}{、#2#1#3~节}{、#2#1#3}{、#2#1#3~节}
+\Crefmultiformat{subsubsection}{第~#2#1#3}{、#2#1#3~节}{、#2#1#3}{、#2#1#3~节}
+\crefrangeformat{subsubsection}{第~#3#1#4~至~#5#2#6~节}
+\Crefrangeformat{subsubsection}{第~#3#1#4~至~#5#2#6~节}
+
+  \renewcommand{\crefpairconjunction}{、}%
+  \renewcommand{\crefmiddleconjunction}{、}%
+  \renewcommand{\creflastconjunction}{、}%
+  \renewcommand{\crefrangeconjunction}{至}%
+  \renewcommand{\subjclassname}{2020 年数学主题分类}%
+  \renewcommand{\appendixname}{附录}%
+  \renewcommand{\tablename}{表}%
+  \renewcommand{\figurename}{图}%
+}

@@ -1,0 +1,10 @@
+% Numbering follows the Word baseline: section.equation, section.figure, section.table.
+\numberwithin{equation}{section}
+\numberwithin{figure}{section}
+\numberwithin{table}{section}
+\renewcommand{\theequation}{\arabic{section}.\arabic{equation}}
+\renewcommand{\thefigure}{\arabic{section}.\arabic{figure}}
+\renewcommand{\thetable}{\arabic{section}.\arabic{table}}
+\renewcommand{\theHequation}{\theequation}
+\renewcommand{\theHfigure}{\thefigure}
+\renewcommand{\theHtable}{\thetable}

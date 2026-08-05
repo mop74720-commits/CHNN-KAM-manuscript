@@ -1,0 +1,36 @@
+{
+  "latex-workshop.latex.outDir": "%DIR%/build",
+  "latex-workshop.latex.tools": [
+    {
+      "name": "project-build-zh",
+      "command": "python",
+      "args": ["%DIR%/tools/build.py", "--language", "zh", "--clean"]
+    },
+    {
+      "name": "project-build-en",
+      "command": "python",
+      "args": ["%DIR%/tools/build.py", "--language", "en", "--clean"]
+    },
+    {
+      "name": "project-build-both",
+      "command": "python",
+      "args": ["%DIR%/tools/build.py", "--language", "both", "--clean"]
+    }
+  ],
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "CHNN-KAM: Chinese baseline",
+      "tools": ["project-build-zh"]
+    },
+    {
+      "name": "CHNN-KAM: English draft",
+      "tools": ["project-build-en"]
+    },
+    {
+      "name": "CHNN-KAM: bilingual validation",
+      "tools": ["project-build-both"]
+    }
+  ],
+  "latex-workshop.latex.recipe.default": "first",
+  "latex-workshop.view.pdf.viewer": "tab"
+}

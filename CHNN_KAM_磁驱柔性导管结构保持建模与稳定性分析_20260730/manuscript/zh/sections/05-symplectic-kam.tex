@@ -1,0 +1,217 @@
+% Migrated from the Word baseline; do not duplicate content in other section files.
+\section{辛离散、Birkhoff 结构与不变环面核验}\label{sec:symplectic-kam}
+
+\subsection{分析分支}\label{sec:symplectic-kam-5-1}
+
+本文在 KAM 分析前已经完成固定维数的 Galerkin 截断，因此主定理应使用有限维 Hamiltonian 流或有限维辛映射版本。Kuksin 的无限维 KAM 理论\cite{Kuksin1993InfiniteDimensionalKAM}不作为该固定截断系统的直接定理依据，仅保留用于讨论模态数趋于无穷、PDE 极限或截断一致性时的理论扩展。Moser 的环带保面积映射定理\cite{Moser1962InvariantCurves}主要适用于二维扭转映射，可用于低维截面和方法学比较，但不能替代多自由度连续 Hamiltonian 或高维辛映射所需的 Pöschel／Shang 条件。\cite{Shang1999KAMAlgorithms,Shang2000KAMMappings,Poschel2001KAMLecture}
+
+本章不把所有动力学统一称为 \(K\left( \mathbf{z},t \right)\)-辛系统，而是区分：
+
+\begin{itemize}
+\tightlist
+\item
+  自治保守 Hamiltonian 的标准 \(\mathbf{J}\)-辛离散；
+\item
+  精确非自治 Hamiltonian 的标准非自治／扩展相空间辛离散；
+\item
+  经变分自伴检验成立的 Birkhoff 系统的时变 \(\mathbf{K}\left( \mathbf{z},t \right)\)-辛离散。
+\end{itemize}
+
+Hamiltonian Birkhoff 正规形用于第三、四部分构造 \(H_{0} + \varepsilon H_{1}\)；本章的 Birkhoff 系统自伴表示用于一般一阶系统的结构检验。二者名称相近但数学对象不同。
+
+\subsection{标准辛分支与生成函数}\label{sec:symplectic-kam-5-2}
+
+对自治保守 CHNN
+
+\begin{equation}
+\label{eq:symplectic-kam-5-1}
+\dot{\mathbf{Z}} = \mathbf{J}\nabla{\widehat{H}}_{\lambda}\left( \mathbf{Z} \right),
+\end{equation}
+
+精确流满足
+
+\begin{equation}
+\label{eq:symplectic-kam-5-2}
+\left( D\Phi_{t} \right)^{T}\mathbf{J}\left( D\Phi_{t} \right) = \mathbf{J}.
+\end{equation}
+
+若一步映射 \(F_{h}^{cons}\) 为近恒等的精确辛映射，且所选投影的 Jacobi 分块非退化，则局部存在生成函数。对中心型生成函数取首项可得隐式中点格式
+
+\begin{equation}
+\label{eq:symplectic-kam-5-3}
+\frac{\mathbf{Z}_{n + 1} - \mathbf{Z}_{n}}{h} = \mathbf{J}\nabla{\widehat{H}}_{\lambda}\left( \frac{\mathbf{Z}_{n + 1} + \mathbf{Z}_{n}}{2} \right),
+\end{equation}
+
+该格式为二阶辛格式。更高阶格式可由生成函数展开、组合方法或其他已证明的辛算法获得\cite{FengQin2010}。
+
+对于非自治 \(H\left( \mathbf{Z},t \right)\)，引入扩展相空间
+
+\begin{equation}
+\label{eq:symplectic-kam-5-4}
+\mathcal{H}\left( \mathbf{Z},t,p_{t} \right) = H\left( \mathbf{Z},t \right) + p_{t},
+\end{equation}
+
+在扩展标准辛形式上积分。只有在变量本身非正则或系统满足特殊 Birkhoff 表示时，才需要转入下一节。
+
+canonical 数据处理所用的 BDF order-2 不是本节所述辛步进器。它只为 COMSOL solver-step 状态采样和 canonical 向量场标签生成提供可观察的 \texttt{tsteps} 序列；三层观察收敛及 G0--G6 满足预设阈值仅说明数据合同适用于后续幅值哨兵实验。本文不从 BDF 的能量漂移或二阶收敛推断辛性，后续 KAM 计算必须采用另行证明的辛映射并评估其离散缺陷。
+
+\subsection{Birkhoff 系统自伴表示}\label{sec:symplectic-kam-5-3}
+
+令 \(\mathbf{z} \in \mathbb{R}^{2n}\)，\(F_{i}\left( \mathbf{z},t \right)\) 为 Birkhoff 函数组，\(B\left( \mathbf{z},t \right)\) 为 Birkhoff 函数，并定义
+
+\begin{equation}
+\label{eq:symplectic-kam-5-5}
+K_{ij}\left( \mathbf{z},t \right) = \frac{\partial F_{j}}{\partial z_{i}} - \frac{\partial F_{i}}{\partial z_{j}}.
+\end{equation}
+
+Birkhoff 方程写为
+
+\begin{equation}
+\label{eq:symplectic-kam-5-6}
+\boxed{K_{ij}\left( \mathbf{z},t \right){\dot{z}}_{j} - \frac{\partial B}{\partial z_{i}} - \frac{\partial F_{i}}{\partial t} = 0.}
+\end{equation}
+
+设一般系统写成
+
+\begin{equation}
+\label{eq:symplectic-kam-5-7}
+K_{ij}{\dot{z}}_{j} + D_{i} = 0.
+\end{equation}
+
+在局部星形区域内，若 \(\mathbf{K}\) 非退化并满足反对称性、空间闭合条件和时间相容条件，则系统具有正则、自伴 Birkhoff 表示；等价地，可找到 \(F_{i}\) 与 \(B\) 使上述方程成立\cite[第15章]{COMSOLWeakContribution2025}。定义时变二形式
+
+\begin{equation}
+\label{eq:symplectic-kam-5-8}
+\Omega_{K} = \frac{1}{2}K_{ij}\left( \mathbf{z},t \right)\, dz_{i} \land dz_{j}.
+\end{equation}
+
+其相流满足时变结构保持关系
+
+\begin{equation}
+\label{eq:symplectic-kam-5-9}
+\left( D\Phi_{t,t_{0}} \right)^{T}\mathbf{K}\left( \Phi_{t,t_{0}},t \right)D\Phi_{t,t_{0}} = \mathbf{K}\left( \mathbf{z}_{0},t_{0} \right).
+\end{equation}
+
+当 \(\mathbf{K} = \mathbf{J}^{- 1}\) 为常矩阵时退化为标准辛条件。
+
+\subsection{剩余向量场的 Birkhoff 结构辨识}\label{sec:symplectic-kam-5-4}
+
+分析仅针对\Cref{sec:chnn-model}定义的 \(X_{res}\) 展开。直接参数化一形式
+
+\begin{equation}
+\label{eq:symplectic-kam-5-10}
+\mathcal{F}_{\rho} = \sum_{i = 1}^{2n}F_{\rho,i}\left( \mathbf{z},t \right)\, dz_{i},\quad\quad K_{\rho,ij} = \partial_{z_{i}}F_{\rho,j} - \partial_{z_{j}}F_{\rho,i},
+\end{equation}
+
+并引入 \(B_{\beta}\)，定义候选向量场
+
+\begin{equation}
+\label{eq:symplectic-kam-5-11}
+{\widetilde{X}}_{\rho,\beta} = \mathbf{K}_{\rho}^{- 1}\left( \nabla B_{\beta} + \partial_{t}\mathbf{F}_{\rho} \right).
+\end{equation}
+
+训练损失取
+
+\begin{equation}
+\label{eq:symplectic-kam-5-12}
+\mathcal{L}_{Birk} = \frac{1}{N}\sum_{\ell = 1}^{N}\left. \  \parallel \mathbf{K}_{\rho}X_{res} - \nabla B_{\beta} - \partial_{t}\mathbf{F}_{\rho} \right.\  \parallel_{2}^{2} + \mu_{nd}\frac{1}{N}\sum_{\ell = 1}^{N}\left\lbrack \max\{ 0,\kappa - \sigma_{min}\left( \mathbf{K}_{\rho} \right)\} \right\rbrack^{2}.
+\end{equation}
+
+在研究域 \(\mathcal{D}\) 上定义 Birkhoff 系统自伴表示缺陷
+
+\begin{equation}
+\label{eq:symplectic-kam-5-13}
+\boxed{\delta_{Birk} = \inf_{F,B,\ \inf_{\mathcal{D}}\sigma_{min}\left( K_{F} \right) \geq \kappa}\left. \  \parallel K_{F}X_{res} - \nabla B - \partial_{t}F \right.\  \parallel_{\mathcal{X}\left( \mathcal{D} \right)}.}
+\end{equation}
+
+若 \(\delta_{Birk} = 0\)，得到精确表示；若 \(\delta_{Birk} > 0\)，只有投影向量场 \(\widetilde{X}\) 具有严格 \(K\)-辛结构，剩余误差必须单独控制。不能据此把包含非结构残差的完整开放系统称为严格 \(K\left( \mathbf{z},t \right)\)-辛系统。
+
+\subsection{\texorpdfstring{Birkhoff 系统的 \(K\left( \mathbf{z},t \right)\)-辛离散格式}{Birkhoff 系统的 K\textbackslash left( \textbackslash mathbf\{z\},t \textbackslash right)-辛离散格式}}\label{sec:symplectic-kam-5-5}
+
+在正则、自伴、解析和非退化条件下，Birkhoff 相流在适当局部投影中具有梯度映射和标量生成函数。若生成函数关于步长解析，可展开为
+
+\begin{equation}
+\label{eq:symplectic-kam-5-14}
+S\left( \mathbf{Z},h \right) = \sum_{r = 1}^{\infty}S_{r}\left( \mathbf{Z} \right)h^{r}.
+\end{equation}
+
+截断至 \(m\) 阶得到隐式 \(m\) 阶 \(K\left( \mathbf{z},t \right)\)-辛格式，并满足
+
+\begin{equation}
+\label{eq:symplectic-kam-5-15}
+\left( D\Psi_{h} \right)^{T}\mathbf{K}\left( \Psi_{h}\left( \mathbf{z} \right),t + h \right)D\Psi_{h} = \mathbf{K}\left( \mathbf{z},t \right) + O\left( h^{m + 1} \right).
+\end{equation}
+
+该结论保证条件成立时的结构保持和阶数，不自动推出经典 Hamiltonian KAM 环面持续性。若再叠加非结构残差，结构缺陷应进入误差预算。
+
+\subsection{参数化方法计算不变环面}\label{sec:symplectic-kam-5-6}
+
+对自治保守分支的精确辛步进映射 \(F_{h}^{cons}\)，寻找嵌入
+
+\begin{equation}
+\label{eq:symplectic-kam-5-16}
+K:\mathbb{T}^{d} \rightarrow \mathcal{M}
+\end{equation}
+
+满足
+
+\begin{equation}
+\label{eq:symplectic-kam-5-17}
+\boxed{F_{h}^{cons}\left( K\left( \bm{\theta} \right) \right) = K\left( \bm{\theta} + \bm{\omega} \right).}
+\end{equation}
+
+采用 Fourier 截断
+
+\begin{equation}
+\label{eq:symplectic-kam-5-18}
+K_{N}\left( \bm{\theta} \right) = \sum_{|k| \leq N}^{}{\widehat{K}}_{k}e^{2\pi ik \cdot \bm{\theta}},\quad\quad{\widehat{K}}_{- k} = \overline{{\widehat{K}}_{k}},
+\end{equation}
+
+并定义不变性残差
+
+\begin{equation}
+\label{eq:symplectic-kam-5-19}
+E_{N}\left( \bm{\theta} \right) = F_{h}^{cons}\left( K_{N}\left( \bm{\theta} \right) \right) - K_{N}\left( \bm{\theta} + \bm{\omega} \right).
+\end{equation}
+
+FFT、Poincaré 截面和长时间轨迹只用于提供 \(K_{N}\) 与 \(\bm{\omega}\) 的初值；随后使用 Newton-like 方法校正。Haro 等人的后验 KAM 定理要求映射解析且精确辛、频率满足 Diophantine 条件、动力学非退化且 \(\parallel E_{N} \parallel\) 满足具体小量条件。全部常数经核验后，才能认证真实不变环面的存在；仅有小残差时只能称为数值近似环面\cite{Haro2016Parameterization}。
+
+\subsection{参数延拓与安全操控域}\label{sec:symplectic-kam-5-7}
+
+沿磁场强度、推进速度、流速、接触间隙和材料参数进行延拓。对每个参数点记录：
+
+\begin{itemize}
+\tightlist
+\item
+  \(\varepsilon_{map}\) 与 Hamiltonian 学习误差；
+\item
+  辛结构或 \(K\)-辛结构缺陷；
+\item
+  不变性残差 \(\parallel E_{N} \parallel\)；
+\item
+  扭转矩阵／频率映射的最小奇异值；
+\item
+  有限阶 Diophantine 裕度和 Fourier 系数衰减；
+\item
+  能量收支、端口功率、接触峰值和轨迹误差；
+\item
+  Kirchhoff 与高保真模型差异。
+\end{itemize}
+
+定义 KAM 理论保证域
+
+\begin{equation}
+\label{eq:symplectic-kam-5-20}
+\mathcal{S}_{KAM} = \{\mu:\text{辛性、非退化、非共振及后验小量条件全部成立}\}.
+\end{equation}
+
+完整工程安全域定义为
+
+\begin{equation}
+\label{eq:symplectic-kam-5-21}
+\boxed{\mathcal{S}_{safe} = \mathcal{S}_{KAM} \cap \mathcal{S}_{energy} \cap \mathcal{S}_{contact} \cap \mathcal{S}_{model} \cap \mathcal{S}_{control}.}
+\end{equation}
+
+其中 KAM 只提供保守骨架的条件性长期稳定保证；开放端口、耗散、接触切换和高保真模型偏差由其他指标补充。安全域不是单一``混沌临界值''，也不等同于临床有效性验证。
+
+目前，\(\mathcal{S}_{KAM}\)、\(\mathcal{S}_{safe}\)、不变环面嵌入 \(K_N\) 及其后验常数均尚未数值实例化。本章给出的完整算法和判据构成后续数值验证方案；现有结果不构成数值 KAM 认证，也未证明真实不变环面或工程安全域。

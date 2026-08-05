@@ -1,0 +1,16 @@
+\begin{table}[htbp]
+\centering
+\caption{Trajectory-level comparison of Bridge perturbation energy and force-v2 force closure. Energy drift is evaluated against the \(0.5\%\) criterion and the exploratory \(1\%\) criterion; force-v2 uses an independent joint-L2 criterion.}
+\label{tab:bridge-gate-summary}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Trajectory & Energy drift (\%) & \(<0.5\%\) & \(<1\%\) & force-v2 (\%) & \(<2\%\) \\
+\midrule
+mode1  & 0.815090 & fail & pass & 1.513677 & pass \\
+mode2  & 0.329369 & pass & pass & 0.062551 & pass \\
+mixed12 & 0.523328 & fail & pass & 1.080748 & pass \\
+\bottomrule
+\end{tabular}
+\end{table}

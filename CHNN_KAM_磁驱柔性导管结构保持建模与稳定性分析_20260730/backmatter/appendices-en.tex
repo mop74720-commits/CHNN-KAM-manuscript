@@ -1,0 +1,44 @@
+\appendix
+
+\section{Diagnostic Methods for the Canonical Data Contract}\label{app:canonical-diagnostic-chain}
+
+This appendix organizes the canonical data-contract diagnosis by error source and scientific interpretation.
+
+\input{tables/tab_canonical_diagnostic_chain_en}
+
+The diagnosis successively examines comparison objects, modal mixing, reduced-order truncation, the cotangent-momentum definition, solver-output semantics, and fixed-basis initialization. The false positive caused by a cross-trajectory comparison shows that closure errors must be computed on the same physical trajectory and at the same sampling times. A repeated single-mode case can still exhibit the anomaly, so the error cannot be attributed directly to modal mixing. Increasing the reduced representation did not reveal the signature of an \(N=2\)-truncation error; projected momentum closed more accurately than \(M_N\dot q_{\mathrm{native}}\).
+
+Because the internal generalized-alpha stage is unavailable through the public API, exported displacement, velocity, and load cannot be guaranteed to correspond to the same internal solution stage. Order-2 BDF with \texttt{tsteps} is used to obtain states and vector-field labels at the same solver step. This choice does not imply that BDF is symplectic and does not interpret the discrete trajectory as a symplectic map.
+
+Force closure and perturbation-energy drift use independent criteria. An earlier force comparison was sensitive to endpoints and the momentum anchor. On common-support indices \(2\ldots998\), with a fixed \(p[2]\) anchor, the force-v2 joint L2 is below \(2\%\) for all three trajectories. This result does not alter the trajectory-level conclusions obtained with the original \(0.5\%\) Bridge perturbation-energy criterion.
+
+\section{Metric Definitions and Numerical Settings}\label{app:numerical-settings}
+
+\subsection{Canonical mapping and closure quantities}
+
+For the fixed \(N=2\) basis, the mapping is
+\begin{align}
+q &= \Pi_{\mathrm{conf}}(U), &
+p &= B^{T}P_{\mathrm{full}}, \\
+\dot q &= M_N^{-1}p, &
+\dot p &= B^{T}L .
+\end{align}
+Here \(q\) is a configuration coordinate and \(p\) is its associated cotangent coordinate. Closure errors compare the exported \(\dot q\) with \(M_N^{-1}p\) and the exported \(\dot p\) with \(B^{T}L\), while the time-discretization study also examines \(q\), \(p\), and total energy.
+
+The three-level study uses coarse, middle, and fine grids. If the errors on two adjacent levels are \(e_h\) and \(e_{h/2}\), the observed order is
+\[
+r_{\mathrm{obs}}=\log_2\!\left(\frac{e_h}{e_{h/2}}\right).
+\]
+The resulting observed orders span \(1.64186\)--\(2.00088\). In the \(1\,\mathrm{s}\) case, the thresholds for G2, pointwise G3, and impulse G3 are all \(0.02\), and the peak-to-peak perturbation-energy-drift threshold is \(0.005\).
+
+\subsection{Bridge and low-dimensional network experiments}
+
+Bridge perturbation-energy drift is compared trajectory by trajectory with the \(0.5\%\) criterion and the exploratory \(1\%\) criterion. Force-v2 uses an independent \(2\%\) joint-L2 criterion. The energy and force quantities are not combined into a single conclusion.
+
+P0 uses a four-dimensional nonlinear coupled oscillator. The training, validation, and test sets contain 80, 16, and 20 trajectories, respectively; each trajectory has 80 steps, \(\Delta t=0.025\), and the models are trained for 300 epochs. Five random seeds estimate algorithmic repeatability.
+
+P1 and P1.5 each comprise \(60/60\) completed training-and-evaluation runs, and P1.6 comprises \(30/30\) hard-constrained models. The three physical trajectories---mode1, mode2, and mixed12---are partitioned by leave-one-whole-trajectory-out. Different random seeds share the same physical trajectory set and therefore do not increase the physical sample size. P1.5 compares physics-only and residual learning, whereas P1.6 compares predictive accuracy and structural residuals before and after imposing the hard equilibrium constraint.
+
+\subsection{Subsequent numerical instantiation}
+
+Multi-amplitude statistics, the full 96-trajectory data set, and the P2 model comparison will retain whole-trajectory partitioning and report cross-condition means, variances, and paired comparisons. Open-port studies additionally require power-balance, dissipation-sign, and port-leakage quantities, while high-fidelity studies must quantify the discrepancy of the Kirchhoff model relative to Timoshenko-beam and solid models. Numerical KAM analysis requires nondegeneracy and Diophantine margins, high-order errors, symplectic-map defects, and invariant-torus residuals in a common norm. Implementation code and supplementary data will be provided with the accompanying code and supplementary materials.

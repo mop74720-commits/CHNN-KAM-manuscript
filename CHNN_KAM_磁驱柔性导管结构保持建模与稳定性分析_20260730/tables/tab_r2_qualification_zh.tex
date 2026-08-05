@@ -1,0 +1,22 @@
+\begin{table}[htbp]
+\centering
+\caption{Canonical 数据合同的三层收敛与 \(1\,\mathrm{s}\) 验证结果。}
+\label{tab:canonical-time-step}
+\small
+\begin{tabular}{@{}llcc@{}}
+\toprule
+工况 & 指标 & 数值 & 判据/结论 \\
+\midrule
+三层 & \(q\) 观察阶 & 1.9978492 & 通过 \\
+三层 & \(p_{\mathrm{projected}}\) 观察阶 & 2.0008768 & 通过 \\
+三层 & \(M_N^{-1}p\) 观察阶 & 2.0008769 & 通过 \\
+三层 & \(B^{T}L\) 观察阶 & 1.9976914 & 通过 \\
+三层 & total energy 观察阶 & 1.6418624 & 通过 \\
+\midrule
+\(1\,\mathrm{s}\) & G2 联合相对 L2 & 0.00146226 & \(<0.02\) \\
+\(1\,\mathrm{s}\) & G3 点态相对 L2 & 0.000221162 & \(<0.02\) \\
+\(1\,\mathrm{s}\) & G3 impulse 相对 L2 & 0.0000563606 & \(<0.02\) \\
+\(1\,\mathrm{s}\) & 扰动能量峰峰漂移 & 0.00307057 & \(<0.005\) \\
+\bottomrule
+\end{tabular}
+\end{table}

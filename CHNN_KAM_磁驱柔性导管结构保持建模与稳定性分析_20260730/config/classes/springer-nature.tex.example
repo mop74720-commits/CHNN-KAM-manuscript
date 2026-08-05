@@ -1,0 +1,5 @@
+% Example only. Replace options according to the target Springer journal.
+% \documentclass[pdflatex,sn-mathphys-num]{sn-jnl}
+% \newif\ifProjectClassLoadsNatbib
+% \ProjectClassLoadsNatbibtrue
+% \providecommand{\ProjectBibliographyStyle}{sn-mathphys-num}

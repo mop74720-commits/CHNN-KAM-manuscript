@@ -1,0 +1,16 @@
+{
+  "complex_round_trip_error": 2.2887833992611187e-16,
+  "conservative": {
+    "max_quadratic_energy_drift": 3.1086244689504383e-15,
+    "observed_order": 1.9935495992663073
+  },
+  "dissipative": {
+    "midpoint_discrete_conformal_defect": 1.3136096125723746e-09,
+    "midpoint_power_balance_error": 1.6994869053710282e-16,
+    "strang_exact_conformal_defect": 1.927026523107604e-09
+  },
+  "environment": {
+    "date": "2026-07-13",
+    "scope": "V1--V3 NumPy verification skeleton"
+  }
+}

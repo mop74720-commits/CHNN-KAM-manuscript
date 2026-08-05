@@ -1,0 +1,957 @@
+% Migrated from the Word baseline; do not duplicate content in other section files.
+\section{有限维 Hamiltonian 结构与正则化}\label{sec:hamiltonian-structure}
+
+\subsection{有限维相空间变量与 Hamilton 表述}\label{sec:hamiltonian-3-1}
+
+\subsubsection{联合广义坐标}\label{sec:hamiltonian-3-1-1}
+
+\Cref{sec:galerkin-discretization}通过中心线位置与截面姿态的联合 Galerkin 投影得到
+
+\begin{equation}
+\label{eq:hamiltonian-3-1}
+\boxed{\mathbf{q} = \begin{bmatrix}
+\mathbf{a} \\
+\mathbf{b}
+\end{bmatrix} \in \mathbb{R}^{n},\quad\quad n = n_{a} + n_{b},}
+\end{equation}
+
+其中，\(\mathbf{a}\) 为中心线平移广义坐标，\(\mathbf{b}\) 为截面姿态局部旋转坐标的有限维系数。\(\mathbf{b}\) 是独立构形变量，用于描述截面弯曲姿态、绕切向扭转、角速度及转动惯量，并非由中心线位移派生的附属变量。因此，\(\mathbf{q}\) 表示完整的平移---截面姿态联合广义构形坐标。
+
+有限剪切刚度 Cosserat 几何精确母模型的离散动力学可写为
+
+\begin{equation}
+\label{eq:hamiltonian-3-2}
+\boxed{\mathbf{M}\left( \mathbf{q} \right)\ddot{\mathbf{q}} + \mathbf{g}_{M}\left( \mathbf{q},\dot{\mathbf{q}} \right) + \mathbf{g}_{f}\left( \mathbf{q},\dot{\mathbf{q}},t \right) + \nabla_{\mathbf{q}}V_{h}\left( \mathbf{q},t \right) = \mathbf{Q}_{port}.}
+\end{equation}
+
+质量---惯性矩阵
+
+\begin{equation}
+\label{eq:hamiltonian-3-3}
+\mathbf{M}\left( \mathbf{q} \right) = \mathbf{M}_{str}\left( \mathbf{q} \right) + \sum_{e}^{}\mathbf{M}_{e}\left( \mathbf{q} \right) + \mathbf{M}_{A}\left( \mathbf{q} \right)
+\end{equation}
+
+同时包含杆体平移动能、截面转动动能、偏心部件的平移---转动耦合以及能量一致的附加质量。故下文的 Hamilton 结构始终建立在完整弯曲---扭转模型上，不采用常质量、小转角、中心线单场化或删除扭转的替代模型。
+
+\subsubsection{Hamilton 表述的基本框架}\label{sec:hamiltonian-3-1-2}
+
+有限维 Hamilton 表述采用如下推导链：\cite{MarsdenRatiu1999MechanicsSymmetry,Arnold1989ClassicalMechanics}
+
+\begin{equation}
+\label{eq:hamiltonian-3-4}
+\mathbf{q} \rightarrow \mathbf{p} \rightarrow H\left( \mathbf{q},\mathbf{p} \right) \rightarrow \left\{ \begin{matrix}
+\dot{\mathbf{q}} = \nabla_{\mathbf{p}}H, \\
+\dot{\mathbf{p}} = - \nabla_{\mathbf{q}}H + \mathbf{Q},
+\end{matrix} \right.\ \  \rightarrow \frac{dH}{dt}.
+\end{equation}
+
+上述推导链适用于自治保守骨架及其受迫---耗散扩展。一般规定流场在 Lagrangian 中产生速度线性项，并相应引起正则动量平移；\Cref{sec:hamiltonian-3-5}将对此给出完整的非自治 Hamilton 表述。
+
+\subsection{自治保守骨架的 Lagrangian、动量与 Hamiltonian}\label{sec:hamiltonian-3-2}
+
+\subsubsection{自治势能的选取}\label{sec:hamiltonian-3-2-1}
+
+设外部驱动由参数 \(\bm{\lambda}(t)\) 控制，选择参考参数 \(\bar{\bm{\lambda}}\)。将离散势能写成
+
+\begin{equation}
+\label{eq:hamiltonian-3-5}
+V_{h}\left( \mathbf{q},t;\bm{\lambda}(t) \right) = V_{cons}\left( \mathbf{q};\bar{\bm{\lambda}} \right) + V_{drv}\left( \mathbf{q},t;\bm{\lambda}(t),\bar{\bm{\lambda}} \right),
+\end{equation}
+
+并规定
+
+\begin{equation}
+\label{eq:hamiltonian-3-6}
+V_{cons}\left( \mathbf{q};\bar{\bm{\lambda}} \right): = V_{h}\left( \mathbf{q},t;\bm{\lambda}(t) \right)|_{\bm{\lambda}(t) \equiv \bar{\bm{\lambda}}},\quad\quad V_{drv}: = V_{h} - V_{cons}.
+\end{equation}
+
+参考参数冻结后不再残留显含时间项，因此
+
+\begin{equation}
+\label{eq:hamiltonian-3-7}
+\boxed{V_{drv}\left( \mathbf{q},t;\bar{\bm{\lambda}},\bar{\bm{\lambda}} \right) = 0,\quad\quad\partial_{t}V_{cons} = 0.}
+\end{equation}
+
+\(V_{cons}\) 包含离散 Cosserat 应变能以及在参考工况下选定的保守磁势、弹性接触势和其他保守外势。其定义冻结的是驱动参数，而不是任意选择某个时间截面。
+
+\subsubsection{自治骨架 Lagrangian 与广义动量}\label{sec:hamiltonian-3-2-2}
+
+在自治、无端口骨架中，Lagrangian 为
+
+\begin{equation}
+\label{eq:hamiltonian-3-8}
+\boxed{L_{cons}\left( \mathbf{q},\dot{\mathbf{q}} \right) = \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - V_{cons}\left( \mathbf{q} \right).}
+\end{equation}
+
+与 \(\mathbf{q}\) 共轭的正则动量定义为\cite{MarsdenRatiu1999MechanicsSymmetry,Arnold1989ClassicalMechanics}
+
+\begin{equation}
+\label{eq:hamiltonian-3-9}
+\mathbf{p}_{0} = \frac{\partial L_{cons}}{\partial\dot{\mathbf{q}}},
+\end{equation}
+
+由此得到正则动量与广义速度之间的关系
+
+\begin{equation}
+\label{eq:hamiltonian-3-10}
+\boxed{\mathbf{p}_{0} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}},\quad\quad\dot{\mathbf{q}} = \mathbf{M}^{- 1}\left( \mathbf{q} \right)\mathbf{p}_{0}.}
+\end{equation}
+
+这里使用下标 \(0\) 是为了与\Cref{sec:hamiltonian-3-5}一般规定流场下发生平移的正则动量 \(\mathbf{p}\) 区分。\(\mathbf{p}_{0}\) 的姿态分量 \(\mathbf{p}_{0b}\) 是与局部坐标 \(\mathbf{b}\) 共轭的离散动量，一般不等于某一截面的材料角动量分量。
+
+\subsubsection{Legendre 正则性}\label{sec:hamiltonian-3-2-3}
+
+速度 Hessian 为\cite{MarsdenRatiu1999MechanicsSymmetry,Arnold1989ClassicalMechanics}
+
+\begin{equation}
+\label{eq:hamiltonian-3-11}
+\frac{\partial^{2}L_{cons}}{\partial\dot{\mathbf{q}}\,\partial\dot{\mathbf{q}}} = \mathbf{M}\left( \mathbf{q} \right).
+\end{equation}
+
+若联合基函数不存在速度冗余，材料密度、转动惯量和附加质量参数满足物理正性，并且在所考察构形域内
+
+\begin{equation}
+\label{eq:hamiltonian-3-12}
+\boxed{\mathbf{y}^{T}\mathbf{M}\left( \mathbf{q} \right)\mathbf{y} > 0\quad\left( \forall\mathbf{y} \neq \mathbf{0} \right),}
+\end{equation}
+
+则 \(\mathbf{M}\left( \mathbf{q} \right) = \mathbf{M}^{T}\left( \mathbf{q} \right) \succ 0\)，Legendre 映射局部可逆。几何上，\(\mathbf{M}\) 是构形空间切空间上的质量度量，\(\mathbf{M}^{- 1}\) 是余切空间上的对偶度量。
+
+对固定 \(N\) 维约化流形 \(\mathcal{Q}_{N}\)，构形坐标 \(q_N\in\mathcal{Q}_{N}\)，广义速度 \(\dot q_N\in T_{q_N}\mathcal{Q}_{N}\)，而共轭动量 \(p_N\in T_{q_N}^{*}\mathcal{Q}_{N}\)。在同一 paired-coordinate trivialization 中，\(\dot p_N\) 保存为与 \(p_N\) 配对的动量率分量；若跨坐标图比较，则必须同时指定相应的连接或坐标变换。COMSOL 全阶输出到该余切合同的数据映射定义为
+
+\begin{equation}
+\label{eq:hamiltonian-canonical-data-contract}
+\boxed{
+q_N=\Pi_{\mathrm{conf},N}(U),\qquad
+p_N=B_N(q_N)^{T}P_{\mathrm{full}},\qquad
+\dot q_N=M_N(q_N)^{-1}p_N,\qquad
+\dot p_N=B_N(q_N)^{T}L.}
+\end{equation}
+
+这里 \(B_N(q_N)\) 是固定平移---\(SO(3)\) 基在当前构形的切向提升，\(P_{\mathrm{full}}\) 与 \(L\) 分别是同一 solver step 的全阶动量和未行缩放载荷，\(M_N=B_N^{T}EB_N\)。量 \(p_{\mathrm{mass}}=M_N\dot q_{\mathrm{native}}\) 仅作为诊断量；只有全阶速度位于固定切空间且时间存储与投影一致时，它才可与 \(B_N^{T}P_{\mathrm{full}}\) 等同。离线比较显示，projected-momentum closure 优于 mass diagnostic；求解器输出语义和三层时间步分析进一步支持\Cref{eq:hamiltonian-canonical-data-contract}所采用的余切投影定义。
+
+\subsubsection{Hamiltonian 的构造}\label{sec:hamiltonian-3-2-4}
+
+Hamiltonian 定义为
+
+\begin{equation}
+\label{eq:hamiltonian-3-13}
+H_{cons}\left( \mathbf{q},\mathbf{p}_{0} \right) = \mathbf{p}_{0}^{T}\dot{\mathbf{q}} - L_{cons}\left( \mathbf{q},\dot{\mathbf{q}} \right).
+\end{equation}
+
+代入 \(\dot{\mathbf{q}} = \mathbf{M}^{- 1}\mathbf{p}_{0}\) 得
+
+\begin{equation}
+\label{eq:hamiltonian-3-14}
+\boxed{H_{cons}\left( \mathbf{q},\mathbf{p}_{0} \right) = \frac{1}{2}\mathbf{p}_{0}^{T}\mathbf{M}^{- 1}\left( \mathbf{q} \right)\mathbf{p}_{0} + V_{cons}\left( \mathbf{q} \right).}
+\end{equation}
+
+该 Hamiltonian 具有 \(H = T + V\) 的标准结构，并同时包含平移与截面转动自由度。质量矩阵对构形的依赖不影响 Legendre 变换的成立，其贡献通过 Hamiltonian 关于 \(\mathbf{q}\) 的导数进入几何惯性项。
+
+\subsubsection{非线性势能与恢复力}\label{sec:hamiltonian-3-2-5}
+
+Cosserat 杆的离散内势由\Cref{sec:galerkin-discretization}的应变能泛函确定。定义
+
+\begin{equation}
+\label{eq:hamiltonian-3-15}
+\boxed{\mathbf{f}_{int}\left( \mathbf{q} \right) = \nabla_{\mathbf{q}}V_{int,h}\left( \mathbf{q} \right),\quad\quad\mathbf{K}_{tan}\left( \mathbf{q} \right) = \frac{\partial\mathbf{f}_{int}}{\partial\mathbf{q}} = \nabla_{\mathbf{q}}^{2}V_{int,h}\left( \mathbf{q} \right).}
+\end{equation}
+
+相对于参考构形 \(\mathbf{q}_{*}\)，保守势能也可写成路径无关线积分
+
+\begin{equation}
+\label{eq:hamiltonian-3-16}
+V_{int,h}\left( \mathbf{q} \right) - V_{int,h}\left( \mathbf{q}_{*} \right) = \int_{0}^{1}\mathbf{f}_{int}\left( \mathbf{q}_{*} + s\left( \mathbf{q} - \mathbf{q}_{*} \right) \right)^{T}\left( \mathbf{q} - \mathbf{q}_{*} \right)\, ds.
+\end{equation}
+
+由此，保守势能可以表示为恢复力沿构形路径的线积分。一般情况下，不能无条件令 \(\mathbf{f}_{int} = \mathbf{K}_{tan}\left( \mathbf{q} \right)\mathbf{q}\)；仅在线性化邻域或恢复力确实具有该因子分解时，才可采用二次型近似
+
+\begin{equation}
+\label{eq:hamiltonian-3-17}
+V_{int,h}\left( \mathbf{q}_{*} + \bm{\eta} \right) \approx V_{int,h}\left( \mathbf{q}_{*} \right) + \frac{1}{2}\bm{\eta}^{T}\mathbf{K}_{tan}\left( \mathbf{q}_{*} \right)\bm{\eta}.
+\end{equation}
+
+全局二次型通常不成立，其根本原因在于势能与恢复力的几何非线性。
+
+\subsection{正则 Hamilton 方程与几何惯性}\label{sec:hamiltonian-3-3}
+
+\subsubsection{标准辛结构}\label{sec:hamiltonian-3-3-1}
+
+定义相空间变量和标准辛矩阵
+
+\begin{equation}
+\label{eq:hamiltonian-3-18}
+\mathbf{z}_{0} = \begin{bmatrix}
+\mathbf{q} \\
+\mathbf{p}_{0}
+\end{bmatrix},\quad\quad\mathbf{J} = \begin{bmatrix}
+\mathbf{0} & \mathbf{I} \\
+ - \mathbf{I} & \mathbf{0}
+\end{bmatrix},\quad\quad\mathbf{J}^{T} = - \mathbf{J}.
+\end{equation}
+
+自治保守骨架满足
+
+\begin{equation}
+\label{eq:hamiltonian-3-19}
+\boxed{{\dot{\mathbf{z}}}_{0} = \mathbf{J}\nabla_{\mathbf{z}_{0}}H_{cons},}
+\end{equation}
+
+即
+
+\begin{equation}
+\label{eq:hamiltonian-3-20}
+\boxed{\dot{\mathbf{q}} = \nabla_{\mathbf{p}_{0}}H_{cons},\quad\quad{\dot{\mathbf{p}}}_{0} = - \nabla_{\mathbf{q}}H_{cons}.}
+\end{equation}
+
+相应标准 Poisson 括号为
+
+\begin{equation}
+\label{eq:hamiltonian-3-21}
+\{ F,G\} = \nabla_{\mathbf{q}}F^{T}\nabla_{\mathbf{p}_{0}}G - \nabla_{\mathbf{p}_{0}}F^{T}\nabla_{\mathbf{q}}G.
+\end{equation}
+
+本文采用局部姿态坐标及其共轭动量，因此使用标准正则括号；若改用全局旋转矩阵和材料角动量变量，则必须另行构造 Lie--Poisson 或约束辛结构。
+
+\subsubsection{构形相关质量矩阵产生的项}\label{sec:hamiltonian-3-3-2}
+
+对第 \(i\) 个构形分量，有
+
+\begin{equation}
+\label{eq:hamiltonian-3-22}
+\frac{\partial H_{cons}}{\partial q_{i}} = \frac{1}{2}\mathbf{p}_{0}^{T}\frac{\partial\mathbf{M}^{- 1}}{\partial q_{i}}\mathbf{p}_{0} + \frac{\partial V_{cons}}{\partial q_{i}}.
+\end{equation}
+
+因此动量方程为
+
+\begin{equation}
+\label{eq:hamiltonian-3-23}
+\boxed{{\dot{p}}_{0i} = - \frac{1}{2}\mathbf{p}_{0}^{T}\frac{\partial\mathbf{M}^{- 1}}{\partial q_{i}}\mathbf{p}_{0} - \frac{\partial V_{cons}}{\partial q_{i}}.}
+\end{equation}
+
+利用矩阵逆的导数恒等式
+
+\begin{equation}
+\label{eq:hamiltonian-3-24}
+\frac{\partial\mathbf{M}^{- 1}}{\partial q_{i}} = - \mathbf{M}^{- 1}\mathbf{M}_{,i}\mathbf{M}^{- 1}
+\end{equation}
+
+可得
+
+\begin{equation}
+\label{eq:hamiltonian-3-25}
+- \frac{1}{2}\mathbf{p}_{0}^{T}\frac{\partial\mathbf{M}^{- 1}}{\partial q_{i}}\mathbf{p}_{0} = \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}_{,i}\dot{\mathbf{q}}.
+\end{equation}
+
+该项已经完整描述了 Hamilton 动量方程中由构形相关质量矩阵产生的贡献；只有在将动量方程重新转换为二阶加速度方程时，才需要与 \({\dot{\mathbf{p}}}_{0}\) 中的 \(\dot{\mathbf{M}}\dot{\mathbf{q}}\) 合并。
+
+\subsubsection{与 Euler--Lagrange 方程的等价性}\label{sec:hamiltonian-3-3-3}
+
+由
+
+\begin{equation}
+\label{eq:hamiltonian-3-26}
+{\dot{\mathbf{p}}}_{0} = \mathbf{M}\ddot{\mathbf{q}} + \dot{\mathbf{M}}\dot{\mathbf{q}}
+\end{equation}
+
+以及前述 Hamilton 动量方程，得到
+
+\begin{equation}
+\label{eq:hamiltonian-3-27}
+\boxed{\mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{M}\left( \mathbf{q},\dot{\mathbf{q}} \right) + \nabla_{\mathbf{q}}V_{cons}\left( \mathbf{q} \right) = \mathbf{0},}
+\end{equation}
+
+其中
+
+\begin{equation}
+\label{eq:hamiltonian-3-28}
+\boxed{\mathbf{g}_{M} = \dot{\mathbf{M}}\dot{\mathbf{q}} - \frac{1}{2}\nabla_{\mathbf{q}}\left( {\dot{\mathbf{q}}}^{T}\mathbf{M}\dot{\mathbf{q}} \right).}
+\end{equation}
+
+该结果与\Cref{sec:galerkin-discretization}的自治保守 Euler--Lagrange 方程一致，从而说明正则动量方程与二阶广义坐标方程具有等价的几何惯性表述。
+
+\subsubsection{能量守恒}\label{sec:hamiltonian-3-3-4}
+
+由于 \(\mathbf{J}\) 反对称且 \(H_{cons}\) 不显含时间，
+
+\begin{equation}
+\label{eq:hamiltonian-3-29}
+\frac{dH_{cons}}{dt} = \nabla H_{cons}^{T}\mathbf{J}\nabla H_{cons} = 0.
+\end{equation}
+
+故
+
+\begin{equation}
+\label{eq:hamiltonian-3-30}
+\boxed{H_{cons}\left( \mathbf{q}(t),\mathbf{p}_{0}(t) \right) = const.}
+\end{equation}
+
+\subsection{受迫---耗散 Hamilton 结构}\label{sec:hamiltonian-3-4}
+
+\subsubsection{非保守广义力的统一入口}\label{sec:hamiltonian-3-4-1}
+
+非保守广义力通过 Hamilton 动量方程的右端统一引入：
+
+\begin{equation}
+\label{eq:hamiltonian-3-31}
+\boxed{\dot{\mathbf{q}} = \nabla_{\mathbf{p}_{0}}H_{cons},\quad\quad{\dot{\mathbf{p}}}_{0} = - \nabla_{\mathbf{q}}H_{cons} + \mathbf{Q}_{port}.}
+\end{equation}
+
+根据\Cref{sec:rod-model,sec:galerkin-discretization}建立的排他功率记账，写成
+
+\begin{equation}
+\label{eq:hamiltonian-3-32}
+\boxed{\mathbf{Q}_{port} = \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial}.}
+\end{equation}
+
+其中：
+
+\begin{itemize}
+\tightlist
+\item
+  \(\mathbf{Q}_{diss}\) 只包含对结构机械能具有非正功率的被动核；
+\item
+  \(\mathbf{Q}_{in}\) 包含未进入势能的磁控制、驱动和其他非流体输入；
+\item
+  \(\mathbf{Q}_{flow}\) 包含背景流拖曳输入、Froude--Krylov 输入以及表示相关的反应性流场作用；
+\item
+  \(\mathbf{Q}_{\partial}\) 单列端部合力、合力矩和边界驱动。
+\end{itemize}
+
+\Cref{sec:galerkin-discretization}已给出上述力与力矩的联合虚功投影，本章直接采用相应的有限维广义力结果。
+
+\subsubsection{等效黏性阻尼特例}\label{sec:hamiltonian-3-4-2}
+
+若某一工况下非保守力可等效写为
+
+\begin{equation}
+\label{eq:hamiltonian-3-33}
+\mathbf{Q}_{port} = \mathbf{F}_{ext}\left( \mathbf{q},t \right) - \mathbf{C}\left( \mathbf{q},\dot{\mathbf{q}},t \right)\dot{\mathbf{q}},\quad\quad\mathbf{C} = \mathbf{C}^{T} \succcurlyeq 0,
+\end{equation}
+
+则由 \(\dot{\mathbf{q}} = \nabla_{\mathbf{p}_{0}}H_{cons}\) 得
+
+\begin{equation}
+\label{eq:hamiltonian-3-34}
+\boxed{{\dot{\mathbf{p}}}_{0} = - \nabla_{\mathbf{q}}H_{cons} + \mathbf{F}_{ext} - \mathbf{C}\nabla_{\mathbf{p}_{0}}H_{cons}.}
+\end{equation}
+
+上述方程构成自治骨架上的受迫---阻尼 Hamilton 特例。\(\mathbf{C}\) 可以是状态相关的有效耗散算子，无须限定为常矩阵。对于二次拖曳，仅其被动耗散核进入 \(\mathbf{C}\dot{\mathbf{q}}\)，背景流输入仍归入 \(\mathbf{Q}_{flow}\)。库仑摩擦、接触切换和冲击可作为独立广义力端口处理，而不要求存在全局光滑的单一耗散矩阵。
+
+若磁力和弹性接触力未写入势能，则可令
+
+\begin{equation}
+\label{eq:hamiltonian-3-35}
+\mathbf{F}_{ext} = \mathbf{F}_{mag} + \mathbf{F}_{cont}
+\end{equation}
+
+若相同作用已由 \(V_{mag,cons}\) 或 \(V_{cont,el}\) 的梯度产生，则不再重复计入 \(\mathbf{F}_{ext}\)。
+
+\subsubsection{能量变化率}\label{sec:hamiltonian-3-4-3}
+
+对自治 Hamiltonian，有\cite{MarsdenRatiu1999MechanicsSymmetry,Zhong2020Dissipative,Desai2021PHNN}
+
+\begin{equation}
+\label{eq:hamiltonian-3-36}
+\frac{dH_{cons}}{dt} = \nabla_{\mathbf{q}}H_{cons}^{T}\dot{\mathbf{q}} + \nabla_{\mathbf{p}_{0}}H_{cons}^{T}{\dot{\mathbf{p}}}_{0}.
+\end{equation}
+
+代入受迫正则方程，辛结构项相消，得到
+
+\begin{equation}
+\label{eq:hamiltonian-3-37}
+\boxed{\frac{dH_{cons}}{dt} = {\dot{\mathbf{q}}}^{T}\mathbf{Q}_{port}.}
+\end{equation}
+
+在\Cref{sec:hamiltonian-3-4-2}的等效阻尼条件下，有
+
+\begin{equation}
+\label{eq:hamiltonian-3-38}
+\boxed{\frac{dH_{cons}}{dt} = \nabla_{\mathbf{p}_{0}}H_{cons}^{T}\left( \mathbf{F}_{ext} - \mathbf{C}\nabla_{\mathbf{p}_{0}}H_{cons} \right).}
+\end{equation}
+
+其中
+
+\begin{equation}
+\label{eq:hamiltonian-3-39}
+- \nabla_{\mathbf{p}_{0}}H_{cons}^{T}\mathbf{C}\nabla_{\mathbf{p}_{0}}H_{cons} \leq 0,
+\end{equation}
+
+外部输入功率的符号由具体工况决定。该能量率表达式清晰区分了外部输入与被动耗散，并与端口分类保持一致。
+
+\subsubsection{完整受迫系统的相空间形式}\label{sec:hamiltonian-3-4-4}
+
+定义
+
+\begin{equation}
+\label{eq:hamiltonian-3-40}
+\mathbf{B} = \begin{bmatrix}
+\mathbf{0} \\
+\mathbf{I}
+\end{bmatrix},
+\end{equation}
+
+则自治骨架上的完整受迫---耗散系统写为
+
+\begin{equation}
+\label{eq:hamiltonian-3-41}
+\boxed{{\dot{\mathbf{z}}}_{0} = \mathbf{J}\nabla_{\mathbf{z}_{0}}H_{cons} + \mathbf{B}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} \right).}
+\end{equation}
+
+因此，该系统属于受迫---耗散 Hamilton 系统，也可视为具有正则 Hamilton 骨架的开放系统。仅当所有端口关闭且 Hamiltonian 自治时，系统才退化为经典闭合保守 Hamilton 系统。若需将耗散环境纳入闭合 Hamilton 描述，则应额外引入储能环境或热浴自由度，而这些自由度不属于\Cref{sec:rod-model,sec:galerkin-discretization}所建立的有限维变量集合。
+
+\subsection{一般规定流场下的正则动量与 Hamiltonian}\label{sec:hamiltonian-3-5}
+
+\subsubsection{一般离散 Lagrangian}\label{sec:hamiltonian-3-5-1}
+
+\Cref{sec:rod-model,sec:galerkin-discretization}的能量一致规定流场表述会产生速度线性项。一般离散 Lagrangian 为\cite{MarsdenRatiu1999MechanicsSymmetry,Arnold1989ClassicalMechanics}
+
+\begin{equation}
+\label{eq:hamiltonian-3-42}
+\boxed{L_{h}\left( \mathbf{q},\dot{\mathbf{q}},t \right) = \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - {\dot{\mathbf{q}}}^{T}\mathbf{b}_{A}\left( \mathbf{q},t \right) + c_{A}\left( \mathbf{q},t \right) - V_{h}\left( \mathbf{q},t \right).}
+\end{equation}
+
+其中，\(\mathbf{M}\) 仍包含附加质量的速度二次部分，\(\mathbf{b}_{A}\) 和 \(c_{A}\) 描述规定流场产生的交叉项与纯流场项。已经进入 \(\mathbf{M}_{A},\mathbf{b}_{A},c_{A}\) 的附加惯性不得再次作为完整 Morison 附加质量广义力加入右端。
+
+\subsubsection{一般正则动量与 Hamiltonian}\label{sec:hamiltonian-3-5-2}
+
+由定义
+
+\begin{equation}
+\label{eq:hamiltonian-3-43}
+\mathbf{p} = \frac{\partial L_{h}}{\partial\dot{\mathbf{q}}}
+\end{equation}
+
+得到
+
+\begin{equation}
+\label{eq:hamiltonian-3-44}
+\boxed{\mathbf{p} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - \mathbf{b}_{A}\left( \mathbf{q},t \right),\quad\quad\dot{\mathbf{q}} = \mathbf{M}^{- 1}\left( \mathbf{q} \right)\left( \mathbf{p} + \mathbf{b}_{A} \right).}
+\end{equation}
+
+当 \(\mathbf{b}_{A} = \mathbf{0}\) 时，上式退化为自治骨架或骨架---端口表示中的 \(\mathbf{p}_{0} = \mathbf{M}\dot{\mathbf{q}}\)。当规定流场速度线性项被显式保留时，应采用一般正则动量 \(\mathbf{p}\)。
+
+Legendre 变换给出
+
+\begin{equation}
+\label{eq:hamiltonian-3-45}
+\boxed{H\left( \mathbf{q},\mathbf{p},t \right) = \frac{1}{2}\left( \mathbf{p} + \mathbf{b}_{A} \right)^{T}\mathbf{M}^{- 1}\left( \mathbf{q} \right)\left( \mathbf{p} + \mathbf{b}_{A} \right) + V_{h}\left( \mathbf{q},t \right) - c_{A}\left( \mathbf{q},t \right).}
+\end{equation}
+
+其中 \(- c_{A}\) 是 Legendre 变换的直接结果。若 \(\mathbf{M} = \mathbf{M}\left( \mathbf{q} \right)\) 不显含时间，则
+
+\begin{equation}
+\label{eq:hamiltonian-3-46}
+\boxed{\nabla_{\mathbf{p}}H = \mathbf{M}^{- 1}\left( \mathbf{p} + \mathbf{b}_{A} \right) = \dot{\mathbf{q}},}
+\end{equation}
+
+\begin{equation}
+\label{eq:hamiltonian-3-47}
+\boxed{\frac{\partial H}{\partial q_{i}} = - \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}_{,i}\dot{\mathbf{q}} + \mathbf{b}_{A,i}^{T}\dot{\mathbf{q}} + \frac{\partial V_{h}}{\partial q_{i}} - \frac{\partial c_{A}}{\partial q_{i}},}
+\end{equation}
+
+以及固定 \(\left( \mathbf{q},\mathbf{p} \right)\) 时
+
+\begin{equation}
+\label{eq:hamiltonian-3-48}
+\boxed{\left. \ \ \frac{\partial H}{\partial t} \right|_{\mathbf{q},\mathbf{p}} = {\dot{\mathbf{q}}}^{T}\partial_{t}\mathbf{b}_{A} + \partial_{t}V_{h} - \partial_{t}c_{A}.}
+\end{equation}
+
+\subsubsection{与一般 Euler--Lagrange 方程的等价性}\label{sec:hamiltonian-3-5-3}
+
+无外部端口时仍满足标准非自治正则方程
+
+\begin{equation}
+\label{eq:hamiltonian-3-49}
+\dot{\mathbf{q}} = \nabla_{\mathbf{p}}H,\quad\quad\dot{\mathbf{p}} = - \nabla_{\mathbf{q}}H.
+\end{equation}
+
+由
+
+\begin{equation}
+\label{eq:hamiltonian-3-50}
+\dot{\mathbf{p}} = \mathbf{M}\ddot{\mathbf{q}} + \dot{\mathbf{M}}\dot{\mathbf{q}} - {\dot{\mathbf{b}}}_{A}
+\end{equation}
+
+可恢复
+
+\begin{equation}
+\label{eq:hamiltonian-3-51}
+\boxed{\mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{M} + \mathbf{g}_{f} + \nabla_{\mathbf{q}}V_{h} = \mathbf{0},}
+\end{equation}
+
+其中
+
+\begin{equation}
+\label{eq:hamiltonian-3-52}
+\boxed{\mathbf{g}_{f} = - {\dot{\mathbf{b}}}_{A} + \left( \nabla_{\mathbf{q}}\mathbf{b}_{A} \right)^{T}\dot{\mathbf{q}} - \nabla_{\mathbf{q}}c_{A}.}
+\end{equation}
+
+该结果与\Cref{sec:galerkin-discretization}的规定流场 Euler--Lagrange 方程一致。\(\mathbf{g}_{M}\) 和 \(\mathbf{g}_{f}\) 均由 Legendre 变换自动产生，因而不再作为额外广义力重复加入。
+
+\subsubsection{精确表示与骨架---端口表示}\label{sec:hamiltonian-3-5-4}
+
+保留 \(\mathbf{b}_{A},c_{A}\) 时，定义\cite{MarsdenRatiu1999MechanicsSymmetry,Arnold1989ClassicalMechanics}
+
+\begin{equation}
+\label{eq:hamiltonian-3-53}
+\mathbf{z} = \begin{bmatrix}
+\mathbf{q} \\
+\mathbf{p}
+\end{bmatrix},
+\end{equation}
+
+完整受迫系统为
+
+\begin{equation}
+\label{eq:hamiltonian-3-54}
+\boxed{\dot{\mathbf{z}} = \mathbf{J}\nabla_{\mathbf{z}}H\left( \mathbf{z},t \right) + \mathbf{B}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{H} + \mathbf{Q}_{\partial} \right).}
+\end{equation}
+
+在精确表示中，\(\mathbf{g}_{f}\) 已包含于 Hamiltonian，\(\mathbf{Q}_{flow}^{H}\) 不再附加 \(- \mathbf{g}_{f}\)。
+
+在骨架---端口表示中，取
+
+\begin{equation}
+\label{eq:hamiltonian-3-55}
+\mathbf{p}_{0} = \mathbf{M}\dot{\mathbf{q}}
+\end{equation}
+
+并定义
+
+\begin{equation}
+\label{eq:hamiltonian-3-56}
+H_{sk}\left( \mathbf{q},\mathbf{p}_{0},t \right) = \frac{1}{2}\mathbf{p}_{0}^{T}\mathbf{M}^{- 1}\mathbf{p}_{0} + V_{h}\left( \mathbf{q},t \right),
+\end{equation}
+
+则规定流场交叉项整体转入端口：
+
+\begin{equation}
+\label{eq:hamiltonian-3-57}
+\boxed{\mathbf{Q}_{flow}^{sk} = \mathbf{Q}_{flow}^{H} - \mathbf{g}_{f}.}
+\end{equation}
+
+两种表示产生相同的构形轨道，但必须成套使用：
+
+\begin{equation}
+\label{eq:hamiltonian-3-58}
+\boxed{\left( \mathbf{p},H,\mathbf{Q}_{flow}^{H} \right) \neq \left( \mathbf{p}_{0},H_{sk},\mathbf{Q}_{flow}^{sk} \right).}
+\end{equation}
+
+两组变量与生成函数必须保持配套：发生动量平移的 \(\mathbf{p}\) 与精确 Hamiltonian \(H\) 配合使用，而 \(\mathbf{p}_{0}\) 与 \(H_{sk}\) 配合使用；精确 Hamiltonian 中不再重复加入 \(- \mathbf{g}_{f}\)。
+
+\subsubsection{一般能量变化率}\label{sec:hamiltonian-3-5-5}
+
+精确表示满足
+
+\begin{equation}
+\label{eq:hamiltonian-3-59}
+\boxed{\frac{dH}{dt} = \frac{\partial H}{\partial t} + {\dot{\mathbf{q}}}^{T}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{H} + \mathbf{Q}_{\partial} \right).}
+\end{equation}
+
+骨架---端口表示满足
+
+\begin{equation}
+\label{eq:hamiltonian-3-60}
+\boxed{\frac{dH_{sk}}{dt} = \partial_{t}V_{h} + {\dot{\mathbf{q}}}^{T}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{sk} + \mathbf{Q}_{\partial} \right).}
+\end{equation}
+
+上述两式分别给出非自治势能、规定流场及多端口作用下的能量变化率，并在相应变量表示中保持动力学等价性。
+
+\subsection{适用范围与严格 Kirchhoff 约束分支}\label{sec:hamiltonian-3-6}
+
+\subsubsection{局部姿态坐标}\label{sec:hamiltonian-3-6-1}
+
+指数坐标是 \(SO(3)\) 上的局部坐标。为使用标准正则变量，可在当前坐标图内要求对任意 \(S \in \lbrack 0,L\rbrack\) 均有
+
+\begin{equation}
+\label{eq:hamiltonian-3-61}
+\parallel \bm{\Psi}(S)\mathbf{b} \parallel < \pi.
+\end{equation}
+
+该条件是坐标图限制，而不是小转角力学近似。跨越坐标图时，应切换姿态坐标，并按照余切变换同步更新共轭动量。
+
+\subsubsection{严格 Kirchhoff 主分支与有限剪切验证分支}\label{sec:hamiltonian-3-6-2}
+
+\Cref{sec:rod-model}以有限剪切 Cosserat 杆作为几何精确母模型，为与 Kirchhoff 细长导管假设保持一致，并向\Cref{sec:chnn-model,sec:symplectic-kam}提供无冗余的正则状态，主结构学习与 KAM 分支优先采用严格无剪切约束的局部约化表示。将约束写成\cite{MarsdenRatiu1999MechanicsSymmetry,HairerLubichWanner2006GNI}
+
+\begin{equation}
+\label{eq:hamiltonian-3-62}
+\mathbf{c}\left( \mathbf{q} \right) = \mathbf{0},\quad\quad\mathbf{G}\left( \mathbf{q} \right) = \frac{\partial\mathbf{c}}{\partial\mathbf{q}},
+\end{equation}
+
+若 \(\mathbf{G}\) 在研究域内保持常秩，则约束集合局部构成光滑流形。全坐标下的方程为
+
+\begin{equation}
+\label{eq:hamiltonian-3-63}
+\boxed{\dot{\mathbf{q}} = \nabla_{\mathbf{p}}H,\quad\quad\dot{\mathbf{p}} = - \nabla_{\mathbf{q}}H + \mathbf{Q}_{port} - \mathbf{G}^{T}\bm{\lambda}_{c},\quad\quad\mathbf{c}\left( \mathbf{q} \right) = \mathbf{0}.}
+\end{equation}
+
+理想约束反力满足 \({\dot{\mathbf{q}}}^{T}\mathbf{G}^{T}\bm{\lambda}_{c} = 0\)。为获得可直接用于 CHNN 与标准辛分析的正则系统，取局部独立坐标 \(\mathbf{q} = \bm{\chi}\left( \mathbf{y} \right)\)，令
+
+\begin{equation}
+\label{eq:hamiltonian-3-64}
+\mathbf{C}\left( \mathbf{y} \right) = \frac{\partial\bm{\chi}}{\partial\mathbf{y}},\quad\quad\mathbf{M}_{r}\left( \mathbf{y} \right) = \mathbf{C}^{T}\mathbf{M}\left( \bm{\chi}\left( \mathbf{y} \right) \right)\mathbf{C},
+\end{equation}
+
+并在 \(\mathbf{M}_{r} \succ 0\) 时构造约化 Hamiltonian。自治骨架中的约化动量为 \(\mathbf{p}_{r} = \mathbf{M}_{r}\dot{\mathbf{y}}\)；若约化后的规定流场仍产生速度线性项，则应改为 \(\mathbf{p}_{r} = \mathbf{M}_{r}\dot{\mathbf{y}} - \mathbf{b}_{A,r}\)。\Cref{sec:chnn-model,sec:symplectic-kam}只使用该独立坐标正则系统，不能把含乘子 \(\bm{\lambda}_{c}\) 的微分---代数方程直接当作全空间标准 Hamilton 系统。
+
+有限剪切刚度 Cosserat 常微分方程保留为 COMSOL 对照、数值正则化和约束收敛验证分支。只有当剪切应变、轨迹、能量和主要频率随剪切刚度增大收敛到 Kirchhoff 结果时，该正则化分支的数据才可替代局部约化数据进入 CHNN 训练。由此既保留完整母模型的优点，也使主计算对象与原始 Kirchhoff 研究意图一致。
+
+\subsection{CHNN、KAM 与结构保持离散接口}\label{sec:hamiltonian-3-7}
+
+本节不在\Cref{sec:hamiltonian-structure}提前展开神经网络或 KAM 定理证明，而是依据\Cref{sec:chnn-model,sec:symplectic-kam}所采用的 HNN、耗散／端口 Hamilton 网络、统计学习---KAM、辛算法和参数化方法文献，规定前后部分之间唯一且可检验的数学对象\cite{Greydanus2019HNN,Zhong2020Dissipative,Desai2021PHNN,Chen2022KAMSLT,Trabelsi2018DeepComplex,Hirose2012CVNN,FengQin2010,Shang1999KAMAlgorithms,Shang2000KAMMappings,Haro2016Parameterization}。
+
+BDF order-2、\texttt{tsteps} 与 \texttt{tstepsstore=1} 只用于在同一 solver step 存储状态并生成\Cref{eq:hamiltonian-canonical-data-contract}的向量场标签。三层时间步比较检验的是该数据合同的离散可观测性与收敛行为，而不是 BDF 的辛性；任何辛/KAM 推断必须另外使用\Cref{sec:symplectic-kam}中满足假设的辛映射。
+
+\subsubsection{正则无量纲化、复坐标与物理 Hamiltonian 基线}\label{sec:hamiltonian-3-7-1}
+
+后续复值表示不能直接把具有不同量纲和不同尺度的 \(\mathbf{q}\) 与 \(\mathbf{p}\) 相加。选定稳定参考状态 \(\left( \mathbf{q}_{*},\mathbf{p}_{*} \right)\)、坐标尺度矩阵 \(\mathbf{S}_{q}\)、动量尺度矩阵 \(\mathbf{S}_{p}\)、时间尺度 \(t_{*}\) 和能量尺度 \(E_{*}\)，并令作用量尺度 \(\mathcal{A}_{*} = E_{*}t_{*}\)。要求
+
+\begin{equation}
+\label{eq:hamiltonian-3-65}
+\boxed{\mathbf{S}_{q}^{T}\mathbf{S}_{p} = \mathcal{A}_{*}\mathbf{I}.}
+\end{equation}
+
+定义
+
+\begin{equation}
+\label{eq:hamiltonian-3-66}
+\mathbf{q} = \mathbf{q}_{*} + \mathbf{S}_{q}\mathbf{Q},\quad\quad\mathbf{p} = \mathbf{p}_{*} + \mathbf{S}_{p}\mathbf{P},\quad\quad t = t_{*}\tau,\quad\quad H = E_{*}\widehat{H}.
+\end{equation}
+
+由上述尺度相容条件可得
+
+\begin{equation}
+\label{eq:hamiltonian-3-67}
+\frac{d\mathbf{Q}}{d\tau} = \nabla_{\mathbf{P}}\widehat{H},\quad\quad\frac{d\mathbf{P}}{d\tau} = - \nabla_{\mathbf{Q}}\widehat{H},
+\end{equation}
+
+故无量纲变量仍满足标准正则 Hamilton 方程。随后定义复坐标\cite{MarsdenRatiu1999MechanicsSymmetry,Arnold1989ClassicalMechanics}
+
+\begin{equation}
+\label{eq:hamiltonian-3-68}
+\boxed{\bm{\xi} = \frac{\mathbf{Q} + i\mathbf{P}}{\sqrt{2}},\quad\quad\overline{\bm{\xi}} = \frac{\mathbf{Q} - i\mathbf{P}}{\sqrt{2}}.}
+\end{equation}
+
+\(\bm{\xi}\) 的实部和虚部分别是正则配对且尺度一致的构形与动量变量；非平凡实值 Hamiltonian 一般写成 \(\widehat{H}\left( \bm{\xi},\overline{\bm{\xi}} \right) \in \mathbb{R}\)，而不是只依赖 \(\bm{\xi}\) 的实值全纯函数\cite{Trabelsi2018DeepComplex,Hirose2012CVNN}。
+
+\Cref{sec:hamiltonian-structure}向\Cref{sec:chnn-model}提供解析物理基线
+
+\begin{equation}
+\label{eq:hamiltonian-3-69}
+{\widehat{H}}_{phys} = {\widehat{H}}_{cons},
+\end{equation}
+
+\Cref{sec:chnn-model}的实值读出宜采用物理残差形式
+
+\begin{equation}
+\label{eq:hamiltonian-3-70}
+\boxed{{\widehat{H}}_{\lambda} = {\widehat{H}}_{phys} + \Delta{\widehat{H}}_{\lambda}.}
+\end{equation}
+
+其中已知质量矩阵、Cosserat 应变能和已确定的保守磁势、弹性接触势不由网络重复学习；\(\Delta{\widehat{H}}_{\lambda}\) 只表示参数修正、Galerkin 截断造成的保守修正和其他未建模保守项。由于 Hamiltonian 从向量场数据中只能确定到加性常数，应固定规范，例如 \({\widehat{H}}_{\lambda}\left( \mathbf{z}_{*} \right) = 0\) 或训练域均值为零\cite{Greydanus2019HNN,Desai2021PHNN}。
+
+\subsubsection{骨架---端口结构与表示一致的数据对象}\label{sec:hamiltonian-3-7-2}
+
+在冻结驱动参数 \(\bm{\lambda}(t) \equiv \overline{\bm{\lambda}}\) 的自治骨架表示中，
+
+\begin{equation}
+\label{eq:hamiltonian-3-71}
+V_{drv} = 0,\quad\quad H_{sk} = H_{cons},\quad\quad\partial_{t}H_{sk} = 0,
+\end{equation}
+
+且
+
+\begin{equation}
+\label{eq:hamiltonian-3-72}
+\boxed{{\dot{\mathbf{z}}}_{0} = \mathbf{J}\nabla_{\mathbf{z}_{0}}H_{cons} + \mathbf{B}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow}^{sk} + \mathbf{Q}_{\partial} \right).}
+\end{equation}
+
+\Cref{sec:chnn-model}应分别参数化或监督各端口，而不是让一个无结构残差同时吸收全部物理作用：
+
+\begin{equation}
+\label{eq:hamiltonian-3-73}
+\mathbf{Q}_{port,\theta} = \mathbf{Q}_{diss,\mu} + \mathbf{Q}_{in,\nu} + \mathbf{Q}_{flow,\kappa} + \mathbf{Q}_{\partial} + \mathbf{r}_{\eta}.
+\end{equation}
+
+其中 \(\mathbf{Q}_{diss,\mu}\) 只承担功率非正的被动核；磁控制、背景流输入和边界驱动保持独立端口；\(\mathbf{r}_{\eta}\) 只承担在已知模型和端口扣除后仍存在的剩余误差。这一分层与耗散 SymODEN 和 port-Hamiltonian 神经网络的结构化建模原则一致\cite{Zhong2020Dissipative,Desai2021PHNN}。
+
+若采用非冻结或脉动工况，\(H_{sk} = H_{cons} + V_{drv}\)。此时以下两种表示互斥：
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  以完整 \(H_{sk}\) 为生成元，则相同的保守驱动力不得再次进入 \(\mathbf{Q}_{in}\)；
+\item
+  以自治 \(H_{cons}\) 为生成元，则令 \(\mathbf{Q}_{drv} = - \nabla_{\mathbf{q}}V_{drv}\)，并只在 \(\mathbf{Q}_{in}\) 中计入一次。
+\end{enumerate}
+
+一般规定流场下使用 \(\mathbf{p} = \mathbf{M}\dot{\mathbf{q}} - \mathbf{b}_{A}\) 和相应非自治 Hamiltonian；自治骨架使用 \(\mathbf{p}_{0} = \mathbf{M}\dot{\mathbf{q}}\)。两类数据必须由 \(representation\) 标签区分。供\Cref{sec:chnn-model}使用的骨架数据和非自治数据分别为
+
+\begin{equation}
+\label{eq:hamiltonian-3-74}
+\mathcal{D}_{sk} = \left( \mathbf{Q},\mathbf{P},\bm{\xi},{\dot{\mathbf{z}}}_{0},{\widehat{H}}_{cons},\nabla{\widehat{H}}_{cons},\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{sk},\mathbf{Q}_{\partial} \right),
+\end{equation}
+
+\begin{equation}
+\label{eq:hamiltonian-3-75}
+\mathcal{D}_{na} = \left( \mathbf{z},\dot{\mathbf{z}},t,H,\nabla H,\partial_{t}H,\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{H},\mathbf{Q}_{\partial} \right).
+\end{equation}
+
+统计学习---KAM 接口优先使用导数监督的自治保守样本，不把轨迹损失、耗散损失和正则项的总和直接解释为 KAM 扰动大小\cite{Chen2022KAMSLT}。
+
+\subsubsection{稳定平衡点、模态正则化与可积参考系统}\label{sec:hamiltonian-3-7-3}
+
+后续 KAM 分析以自治保守骨架 \(H_{cons}\left( \mathbf{q},\mathbf{p}_{0} \right)\) 为起点，但不预设其整体可积。选择平衡点 \(\left( \mathbf{q}_{*},\mathbf{0} \right)\)，要求
+
+\begin{equation}
+\label{eq:hamiltonian-3-76}
+\nabla_{\mathbf{q}}V_{cons}\left( \mathbf{q}_{*} \right) = \mathbf{0},\quad\quad\mathbf{M}_{*} = \mathbf{M}\left( \mathbf{q}_{*} \right) \succ 0,\quad\quad\mathbf{K}_{*} = \nabla_{\mathbf{q}}^{2}V_{cons}\left( \mathbf{q}_{*} \right) \succ 0.
+\end{equation}
+
+求解广义特征值问题
+
+\begin{equation}
+\label{eq:hamiltonian-3-77}
+\mathbf{K}_{*}\bm{\phi}_{j} = \omega_{j}^{2}\mathbf{M}_{*}\bm{\phi}_{j},
+\end{equation}
+
+并取模态矩阵 \(\bm{\Phi}\) 满足
+
+\begin{equation}
+\label{eq:hamiltonian-3-78}
+\bm{\Phi}^{T}\mathbf{M}_{*}\bm{\Phi} = \mathbf{I},\quad\quad\bm{\Phi}^{T}\mathbf{K}_{*}\bm{\Phi} = \bm{\Omega}^{2}.
+\end{equation}
+
+线性正则变换
+
+\begin{equation}
+\label{eq:hamiltonian-3-79}
+\mathbf{q} - \mathbf{q}_{*} = \bm{\Phi}\mathbf{Q}_{m},\quad\quad\mathbf{p}_{0} = \bm{\Phi}^{- T}\mathbf{P}_{m}
+\end{equation}
+
+将二次 Hamiltonian 化为
+
+\begin{equation}
+\label{eq:hamiltonian-3-80}
+H_{2} = \frac{1}{2}\left( \mathbf{P}_{m}^{T}\mathbf{P}_{m} + \mathbf{Q}_{m}^{T}\bm{\Omega}^{2}\mathbf{Q}_{m} \right) = \sum_{j = 1}^{n}\omega_{j}I_{j},
+\end{equation}
+
+其中
+
+\begin{equation}
+\label{eq:hamiltonian-3-81}
+x_{j} = \sqrt{\omega_{j}}Q_{m,j},\quad\quad y_{j} = \frac{P_{m,j}}{\sqrt{\omega_{j}}},\quad\quad I_{j} = \frac{x_{j}^{2} + y_{j}^{2}}{2}.
+\end{equation}
+
+仅有二次项时频率与作用量无关，故
+
+\begin{equation}
+\label{eq:hamiltonian-3-82}
+\frac{\partial^{2}H_{2}}{\partial\mathbf{I}^{2}} = \mathbf{0},
+\end{equation}
+
+即线性谐振子是等时退化的。因而不能以 \(\mathbf{K}_{*} \succ 0\) 代替 Kolmogorov 非退化条件；非退化性必须由几何非线性、材料非线性、保守磁势或其他高阶保守项提供。
+
+若 \(H_{cons}\) 在研究邻域内解析（或满足所选有限光滑 KAM 定理的正则性），且线性频率在所需阶数内避开低阶共振，则可构造有限阶 Birkhoff 正规形\cite{HairerLubichWanner2006GNI,FengQin2010,Arnold1989ClassicalMechanics}
+
+\begin{equation}
+\label{eq:hamiltonian-3-83}
+H_{cons} \circ \bm{\Psi} = H_{*} + \bm{\omega} \cdot \mathbf{I} + Z_{4}\left( \mathbf{I} \right) + \cdots + Z_{r}\left( \mathbf{I} \right) + R_{r + 1}\left( \mathbf{I},\bm{\theta} \right).
+\end{equation}
+
+定义
+
+\begin{equation}
+\label{eq:hamiltonian-3-84}
+\boxed{H_{0}\left( \mathbf{I} \right) = H_{*} + \bm{\omega} \cdot \mathbf{I} + Z_{4}\left( \mathbf{I} \right) + \cdots + Z_{r}\left( \mathbf{I} \right),\quad\quad\varepsilon H_{1} = R_{r + 1}.}
+\end{equation}
+
+最低非平凡情形常有
+
+\begin{equation}
+\label{eq:hamiltonian-3-85}
+Z_{4}\left( \mathbf{I} \right) = \frac{1}{2}\mathbf{I}^{T}\mathbf{A}\mathbf{I},
+\end{equation}
+
+此时 Kolmogorov 非退化条件在所考察作用量域内要求
+
+\begin{equation}
+\label{eq:hamiltonian-3-86}
+\boxed{\det\left( \frac{\partial^{2}H_{0}}{\partial\mathbf{I}^{2}} \right) \neq 0,}
+\end{equation}
+
+近原点时对应 \(\det\mathbf{A} \neq 0\)。若该矩阵奇异，不能继续宣称满足经典 Kolmogorov KAM；只能提高正规形阶数、改选参考族，或另行引用并核验等能量／退化 KAM 定理。
+
+在固定复邻域或 Sobolev 域 \(\mathcal{D}\) 和统一函数范数 \(\parallel \cdot \parallel_{\mathcal{X}\left( \mathcal{D} \right)}\) 下，将无量纲 Hamiltonian 写成
+
+\begin{equation}
+\label{eq:hamiltonian-3-87}
+{\widehat{H}}_{cons} = {\widehat{H}}_{0} + \varepsilon P,\quad\quad \parallel P \parallel_{\mathcal{X}\left( \mathcal{D} \right)} = 1,
+\end{equation}
+
+并定义
+
+\begin{equation}
+\label{eq:hamiltonian-3-88}
+\boxed{\varepsilon = \left. \parallel{\widehat{H}}_{cons} - {\widehat{H}}_{0} \right.\parallel_{\mathcal{X}\left( \mathcal{D} \right)}.}
+\end{equation}
+
+频率向量还需满足相应 Diophantine 条件。若存在低阶共振，则应转入共振正规形与相应理论，不能把共振项简单并入普通小扰动。
+
+\subsubsection{学习误差、离散误差与 KAM 小量预算}\label{sec:hamiltonian-3-7-4}
+
+为了使\Cref{sec:chnn-model}的学习误差和\Cref{sec:symplectic-kam}的辛离散误差真正进入同一数学链，所有误差必须在同一研究域和相容的函数范数中计量。连续 Hamiltonian 层首先定义
+
+\begin{equation}
+\label{eq:hamiltonian-3-89}
+\delta_{model} = \parallel H_{cons} - H_{0} \parallel_{\mathcal{X}},\quad\quad\delta_{learn} = \parallel H_{\lambda} - H_{cons} \parallel_{\mathcal{X}},
+\end{equation}
+
+从而
+
+\begin{equation}
+\label{eq:hamiltonian-3-90}
+\boxed{\parallel H_{\lambda} - H_{0} \parallel_{\mathcal{X}} \leq \delta_{model} + \delta_{learn}.}
+\end{equation}
+
+离散层不无条件假设存在一个全局精确的``离散 Hamiltonian''。令 \(\Phi_{h}^{H}\) 表示 Hamiltonian \(H\) 的精确时间 \(h\) 流，令 \(F_{\lambda,h}\) 表示\Cref{sec:symplectic-kam}实际采用的保守辛步进映射，并取未扰动参考映射 \(F_{0,h} = \Phi_{h}^{H_{0}}\)。在固定紧致域上，以适合所选辛映射 KAM 定理的 \(C^{r}\) 或解析范数定义\cite{HairerLubichWanner2006GNI,FengQin2010}
+
+\begin{equation}
+\label{eq:hamiltonian-3-91}
+\delta_{alg} = \parallel F_{\lambda,h} - \Phi_{h}^{H_{\lambda}} \parallel ,\quad\quad\delta_{map} = \parallel F_{\lambda,h} - F_{0,h} \parallel .
+\end{equation}
+
+由三角不等式有
+
+\begin{equation}
+\label{eq:hamiltonian-3-92}
+\boxed{\delta_{map} \leq \delta_{alg} + \parallel \Phi_{h}^{H_{\lambda}} - \Phi_{h}^{H_{cons}} \parallel + \parallel \Phi_{h}^{H_{cons}} - \Phi_{h}^{H_{0}} \parallel .}
+\end{equation}
+
+在向量场关于 Hamiltonian 扰动局部 Lipschitz 且流在所考察时间内保持于同一域的条件下，后两项可分别由 \(C_{learn}(h)\delta_{learn}\) 和 \(C_{model}(h)\delta_{model}\) 控制，因此
+
+\begin{equation}
+\label{eq:hamiltonian-3-93}
+\boxed{\delta_{map} \leq \delta_{alg} + C_{learn}(h)\delta_{learn} + C_{model}(h)\delta_{model}.}
+\end{equation}
+
+若进一步通过后向误差分析在指定步长和有限时间尺度内构造了修正 Hamiltonian，则可使用等价的修正 Hamiltonian 预算；但该对象必须连同适用域、截断阶数和余项界给出，不能仅凭``积分器为辛''就假定全局精确存在。
+
+只有当连续或离散预算小于所选 KAM 定理依赖于解析域、Diophantine 常数、非退化裕度、维数和步长的具体阈值时，才能得到不变环面持续性结论。Chen--Matsubara--Yaguchi 的统计学习结果只直接控制满足其假设的保守 HNN 分支；复值内部表示必须通过实值读出和相应函数类复杂度分析，才能把同类概率界迁移到 CHNN\cite{Chen2022KAMSLT}。
+
+二次拖曳、接触阻尼与摩擦、非势磁驱动、背景流输入、边界输入和接触开闭切换不计入上述经典自治 Hamiltonian 扰动。它们进入完整安全域时应由能量收支、端口增益、结构缺陷、Lyapunov 指标或专门的耗散不变环面理论另行处理。
+
+\subsubsection{辛映射、Birkhoff 结构与环面方程}\label{sec:hamiltonian-3-7-5}
+
+对自治保守分支，由结构保持积分器得到一步映射
+
+\begin{equation}
+\label{eq:hamiltonian-3-94}
+F_{h} = \Phi_{h}^{cons}.
+\end{equation}
+
+\Cref{sec:symplectic-kam}首先验证 \(F_{h}\) 是否为精确辛映射，再使用 Shang 的辛映射／辛算法 KAM 条件和 Haro 等人的参数化方法\cite{FengQin2010,Shang1999KAMAlgorithms,Shang2000KAMMappings,Haro2016Parameterization}。环面嵌入 \(K:\mathbb{T}^{d} \rightarrow \mathcal{M}\) 满足\cite{Haro2016Parameterization}
+
+\begin{equation}
+\label{eq:hamiltonian-3-95}
+\boxed{F_{h}\left( K\left( \bm{\theta} \right) \right) = K\left( \bm{\theta} + \bm{\omega} \right).}
+\end{equation}
+
+数值近似 \(K_{N}\) 的不变性残差为
+
+\begin{equation}
+\label{eq:hamiltonian-3-96}
+E_{N}\left( \bm{\theta} \right) = F_{h}\left( K_{N}\left( \bm{\theta} \right) \right) - K_{N}\left( \bm{\theta} + \bm{\omega} \right).
+\end{equation}
+
+对完整数据向量场，必须先扣除已知保守主体和已知端口：
+
+\begin{equation}
+\label{eq:hamiltonian-3-97}
+\boxed{X_{res} = X_{data} - \mathbf{J}\nabla H_{\lambda} - \mathbf{B}\left( \mathbf{Q}_{diss,\mu} + \mathbf{Q}_{in,\nu} + \mathbf{Q}_{flow,\kappa} + \mathbf{Q}_{\partial} \right).}
+\end{equation}
+
+这里的``Birkhoff 系统自伴表示''与\Cref{sec:hamiltonian-3-7-3}用于构造 \(H_{0}\) 的``Hamiltonian Birkhoff 正规形''是两个不同概念：前者是一般一阶系统的变分自伴与 \(K\left( \mathbf{z},t \right)\)-辛结构，后者是近椭圆平衡点的 Hamiltonian 正规形。\Cref{sec:symplectic-kam}只对 \(X_{res}\) 检验是否存在正则、自伴 Birkhoff 系统表示。若闭合条件、时间相容条件或非退化条件不满足，则 \(X_{res}\) 保持为一般残差，不能把完整开放系统称为严格 \(K\left( \mathbf{z},t \right)\)-辛系统。显含时间本身也不必然导致非标准辛结构：在正确正则变量和扩展相空间中，精确非自治 Hamiltonian 分支仍应优先按标准辛理论处理。\cite{HairerLubichWanner2006GNI,FengQin2010}
+
+\subsubsection{COMSOL 主训练模型与高保真模型差异的结构分解}\label{sec:hamiltonian-3-7-6}
+
+\Cref{sec:hamiltonian-structure}将 Kirchhoff 一致 COMSOL 分支视为主训练动力学 \(X_{K}\)，将 Weak Form、Timoshenko 或实体模型视为高保真对照 \(X_{HF}\)。定义配对工况下的模型差异
+
+\begin{equation}
+\label{eq:hamiltonian-3-98}
+\Delta X_{HF} = X_{HF} - X_{K}.
+\end{equation}
+
+该差异不能整体加入 Hamiltonian。首先检验其在正则变量中的保守闭合性；若存在实值 \(\Delta H_{HF}\) 使
+
+\begin{equation}
+\label{eq:hamiltonian-3-99}
+\Delta X_{HF}^{cons} = \mathbf{J}\nabla\Delta H_{HF},
+\end{equation}
+
+则该部分可进入\Cref{sec:chnn-model}的保守修正头。若某一动量端口满足
+
+\begin{equation}
+\label{eq:hamiltonian-3-100}
+\nabla_{\mathbf{P}}{\widehat{H}}^{T}\Delta\mathbf{Q}_{HF}^{diss} \leq 0,
+\end{equation}
+
+则可进入耗散修正头。其余不满足闭合性、功率符号或光滑性条件的部分保留为一般模型残差 \(\mathbf{r}_{HF}\)。因此
+
+\begin{equation}
+\label{eq:hamiltonian-3-101}
+\boxed{\Delta X_{HF} = \mathbf{J}\nabla\Delta H_{HF} + \mathbf{B}\Delta\mathbf{Q}_{HF}^{diss} + \mathbf{B}\Delta\mathbf{Q}_{HF}^{port} + \mathbf{r}_{HF}.}
+\end{equation}
+
+以上分解是待辨识、待验证的结构投影，不是对任意高保真差异自动成立的恒等式。用于 KAM 的模型误差只取保守闭合分量及其在统一函数范数中的界；剪切耗散、接触切换和局部实体效应不得未经证明并入 \(H_{1}\)。
+
+\subsubsection{结构化学习与稳定性分析接口}\label{sec:hamiltonian-3-7-7}
+
+由上述推导可得到后续结构学习与稳定性分析所需的三个接口：
+
+\begin{equation}
+\label{eq:hamiltonian-3-102}
+\mathcal{I}_{CHNN} = \left( \mathbf{Q},\mathbf{P},\bm{\xi},{\widehat{H}}_{phys},\nabla{\widehat{H}}_{phys},\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow},\mathbf{Q}_{\partial},model\_ level,representation \right),
+\end{equation}
+
+\begin{equation}
+\label{eq:hamiltonian-3-103}
+\mathcal{I}_{KAM} = \left( H_{0},H_{1},\varepsilon,\bm{\omega}\left( \mathbf{I} \right),\partial_{\mathbf{I}}\bm{\omega},\gamma,\tau,\mathcal{D},\mathcal{X} \right),
+\end{equation}
+
+\begin{equation}
+\label{eq:hamiltonian-3-104}
+\mathcal{I}_{geom} = \left( \mathbf{J},F_{0,h},F_{\lambda,h},X_{res},E_{N},\delta_{model},\delta_{learn},\delta_{alg},\delta_{map} \right).
+\end{equation}
+
+这些对象均可从\Cref{sec:rod-model,sec:galerkin-discretization}的物理模型、Galerkin 输出和本章的正则化过程追溯得到。若某一对象尚未在数值上构造或验证，后文只能将其列为待检验条件，不能把条件性接口写成已经成立的定理结论。
+
+\subsection{本章小结}\label{sec:hamiltonian-3-8}
+
+基于完整平移---截面姿态联合坐标，自治保守骨架的正则动量与 Hamiltonian 为
+
+\begin{equation}
+\label{eq:hamiltonian-3-105}
+\boxed{\mathbf{p}_{0} = \mathbf{M}\dot{\mathbf{q}},\quad\quad H_{cons} = \frac{1}{2}\mathbf{p}_{0}^{T}\mathbf{M}^{- 1}\mathbf{p}_{0} + V_{cons},}
+\end{equation}
+
+以及受迫---耗散正则方程
+
+\begin{equation}
+\label{eq:hamiltonian-3-106}
+\boxed{{\dot{\mathbf{z}}}_{0} = \mathbf{J}\nabla H_{cons} + \mathbf{B}\mathbf{Q}_{port},\quad\quad\frac{dH_{cons}}{dt} = {\dot{\mathbf{q}}}^{T}\mathbf{Q}_{port}.}
+\end{equation}
+
+构形相关质量矩阵在 Hamilton 动量方程中的贡献与\Cref{sec:galerkin-discretization}的几何惯性向量 \(\mathbf{g}_{M}\) 等价。非线性保守势能可表示为恢复力的路径无关线积分；在等效黏性阻尼条件下，能量变化率相应化为外部输入功率与耗散功率之和。
+
+一般规定流场下，正则动量和 Hamiltonian 分别推广为
+
+\begin{equation}
+\label{eq:hamiltonian-3-107}
+\boxed{\mathbf{p} = \mathbf{M}\dot{\mathbf{q}} - \mathbf{b}_{A},\quad\quad H = \frac{1}{2}\left( \mathbf{p} + \mathbf{b}_{A} \right)^{T}\mathbf{M}^{- 1}\left( \mathbf{p} + \mathbf{b}_{A} \right) + V_{h} - c_{A}.}
+\end{equation}
+
+上述一般表示在保留截面姿态、独立扭转、转动惯量、附加质量及外部端口的基础上，统一了自治骨架、规定流场和受迫---耗散动力学。进一步通过正则无量纲化、复坐标、物理残差 Hamiltonian、Birkhoff 正规形、统一 KAM 误差预算以及 \(\mathcal{I}_{CHNN}\)、\(\mathcal{I}_{KAM}\)、\(\mathcal{I}_{geom}\) 三组接口，\Cref{sec:hamiltonian-structure}由此为 CHNN 结构学习、辛离散、参数化环面核验和安全域计算提供相互一致且可追溯的数学对象。

@@ -1,0 +1,1109 @@
+% Migrated from the Word baseline; do not duplicate content in other section files.
+\section{平移---转动联合 Galerkin 离散}\label{sec:galerkin-discretization}
+
+\subsection{离散化原则}\label{sec:galerkin-2-1}
+
+\Cref{sec:rod-model}已得到以 \(\mathbf{r}(S,t)\) 和 \(\mathbf{R}(S,t) \in SO(3)\) 为基本未知场的完整联合弱形式。本章不将其化为中心线单场四阶方程，而是直接在平移空间和旋转群的局部坐标空间中进行联合 Galerkin 离散。
+
+离散化遵循以下原则：第一，中心线位置和截面姿态均保留独立广义坐标；第二，旋转矩阵不能按普通向量进行线性叠加，必须使用指数映射或等价的乘法更新；第三，质量---惯性矩阵必须由完整三维材料点动能推出，而不能预先假定为常矩阵或构形相关矩阵；第四，几何惯性项必须由离散动能的 Euler---Lagrange 导数严格得到；第五，内力应由离散势能梯度得到，边界力和边界力矩应通过弱形式自然进入广义力。\cite{Sola2018MicroLie,MarsdenRatiu1999MechanicsSymmetry,HairerLubichWanner2006GNI}
+
+\subsection{联合有限维近似}\label{sec:galerkin-2-2}
+
+\subsubsection{平移近似}\label{sec:galerkin-2-2-1}
+
+取满足平移本质边界条件的矩阵值基函数 \(\mathbf{N}(S)\)，中心线近似写为
+
+\begin{equation}
+\label{eq:galerkin-2-1}
+\mathbf{r}_{h}(S,t) = \mathbf{r}_{0}(S) + \mathbf{N}(S)\mathbf{a}(t),
+\end{equation}
+
+其中，\(\mathbf{a}(t) \in \mathbb{R}^{n_{a}}\) 为平移广义坐标。于是
+
+\begin{equation}
+\label{eq:galerkin-2-2}
+{\dot{\mathbf{r}}}_{h} = \mathbf{N}\dot{\mathbf{a}},\quad\quad\mathbf{r}_{h,S} = \mathbf{r}_{0,S} + \mathbf{N}_{,S}\mathbf{a}.
+\end{equation}
+
+若本质边界条件随时间变化，可在上式中增加已知提升函数；其时间导数和二阶导数作为已知广义载荷处理。以下为突出主体结构，默认已完成边界条件齐次化。
+
+\subsubsection{截面姿态近似}\label{sec:galerkin-2-2-2}
+
+设参考姿态为 \(\mathbf{R}_{0}(S)\)。在参考姿态附近采用旋转向量的指数坐标：
+
+\begin{equation}
+\label{eq:galerkin-2-3}
+\mathbf{R}_{h}(S,t) = \mathbf{R}_{0}(S)\exp\left( \widehat{\bm{\theta}_{h}(S,t)} \right),
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-4}
+\bm{\theta}_{h}(S,t) = \bm{\Psi}(S)\mathbf{b}(t),
+\end{equation}
+
+其中，\(\mathbf{b}(t) \in \mathbb{R}^{n_{b}}\) 为转动广义坐标，\(\bm{\Psi}(S)\) 为满足转动本质边界条件的矩阵值基函数。定义
+
+\begin{equation}
+\label{eq:galerkin-2-5}
+\mathbf{E}_{h} = \exp\left( \widehat{\bm{\theta}_{h}} \right).
+\end{equation}
+
+因此
+
+\begin{equation}
+\label{eq:galerkin-2-6}
+\mathbf{R}_{h} = \mathbf{R}_{0}\mathbf{E}_{h}.
+\end{equation}
+
+指数坐标是 \(SO(3)\) 上的局部坐标。当转角邻域不跨越指数映射的奇异集合时，该参数化光滑且一一对应，适合有限维模态截断和局部非线性分析。对于跨越大转角的全局时间积分，可采用坐标图切换或单位四元数实现，但基本力学推导不变。
+
+\subsubsection{右 Jacobian 与角速度}\label{sec:galerkin-2-2-3}
+
+令 \(\theta = \parallel \bm{\theta}_{h} \parallel\)。旋转向量的右 Jacobian 定义为
+
+\begin{equation}
+\label{eq:galerkin-2-7}
+\mathbf{J}_{r}\left( \bm{\theta}_{h} \right) = \mathbf{I} - \frac{1 - \cos\theta}{\theta^{2}}\widehat{\bm{\theta}_{h}} + \frac{\theta - \sin\theta}{\theta^{3}}{\widehat{\bm{\theta}_{h}}}^{\, 2}.
+\end{equation}
+
+当 \(\theta \rightarrow 0\) 时，按连续延拓有
+
+\begin{equation}
+\label{eq:galerkin-2-8}
+\mathbf{J}_{r}\left( \bm{\theta}_{h} \right) = \mathbf{I} - \frac{1}{2}\widehat{\bm{\theta}_{h}} + \frac{1}{6}{\widehat{\bm{\theta}_{h}}}^{\, 2} + O\left( \theta^{3} \right).
+\end{equation}
+
+由指数映射的精确微分关系，材料角速度为
+
+\begin{equation}
+\label{eq:galerkin-2-9}
+\bm{\omega}_{h} = \mathbf{J}_{r}\left( \bm{\theta}_{h} \right){\dot{\bm{\theta}}}_{h} = \mathbf{J}_{r}\left( \bm{\theta}_{h} \right)\bm{\Psi}\dot{\mathbf{b}}.
+\end{equation}
+
+定义角速度矩阵
+
+\begin{equation}
+\label{eq:galerkin-2-10}
+\mathbf{B}_{\omega}\left( S,\mathbf{b} \right) = \mathbf{J}_{r}\left( \bm{\theta}_{h} \right)\bm{\Psi}(S),
+\end{equation}
+
+则
+
+\begin{equation}
+\label{eq:galerkin-2-11}
+\bm{\omega}_{h} = \mathbf{B}_{\omega}\left( S,\mathbf{b} \right)\dot{\mathbf{b}}.
+\end{equation}
+
+这说明一般不能直接令 \(\bm{\omega}_{h} = \bm{\Psi}\dot{\mathbf{b}}\)；后者仅是小转角零阶近似。
+
+\subsubsection{联合广义坐标与虚变量}\label{sec:galerkin-2-2-4}
+
+定义总广义坐标
+
+\begin{equation}
+\label{eq:galerkin-2-12}
+\mathbf{q} = \begin{bmatrix}
+\mathbf{a} \\
+\mathbf{b}
+\end{bmatrix} \in \mathbb{R}^{n},\quad\quad n = n_{a} + n_{b}.
+\end{equation}
+
+平移虚位移为
+
+\begin{equation}
+\label{eq:galerkin-2-13}
+\delta\mathbf{r}_{h} = \mathbf{N}\,\delta\mathbf{a}.
+\end{equation}
+
+由 \(\delta\mathbf{R}_{h} = \mathbf{R}_{h}\widehat{\bm{\eta}_{h}}\)，材料虚转角满足
+
+\begin{equation}
+\label{eq:galerkin-2-14}
+\bm{\eta}_{h} = \mathbf{J}_{r}\left( \bm{\theta}_{h} \right)\delta\bm{\theta}_{h} = \mathbf{B}_{\omega}\left( S,\mathbf{b} \right)\delta\mathbf{b}.
+\end{equation}
+
+因此，平移和转动试验函数分别为 \(\mathbf{N}\) 和 \(\mathbf{B}_{\omega}\)，两者共同进入联合 Galerkin 条件。
+
+为使 \(\mathbf{q} = \mathbf{0}\) 对应无应力参考构形，参考中心线、参考姿态和参考应变必须满足相容关系
+
+\begin{equation}
+\label{eq:galerkin-2-15}
+\bm{\nu}_{0}(S) = \mathbf{R}_{0}^{T}(S)\mathbf{r}_{0,S}(S),
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-16}
+{\widehat{\bm{\kappa}}}_{0}(S) = \mathbf{R}_{0}^{T}(S)\mathbf{R}_{0,S}(S).
+\end{equation}
+
+若上述关系不成立，则 \(\mathbf{q} = \mathbf{0}\) 表示具有预伸长、预剪切、预弯曲或预扭转的构形，相应初始内力和初始力矩由 \(V_{int,h}\) 自动产生。后续平衡点、切线刚度和 KAM 展开中心均应采用同一参考约定。
+
+\subsection{离散应变与势能}\label{sec:galerkin-2-3}
+
+\subsubsection{剪切---拉伸应变}\label{sec:galerkin-2-3-1}
+
+离散剪切---拉伸应变为
+
+\begin{equation}
+\label{eq:galerkin-2-17}
+\bm{\nu}_{h}\left( \mathbf{q} \right) = \mathbf{R}_{h}^{T}\mathbf{r}_{h,S} = \mathbf{E}_{h}^{T}\mathbf{R}_{0}^{T}\left( \mathbf{r}_{0,S} + \mathbf{N}_{,S}\mathbf{a} \right).
+\end{equation}
+
+其虚变分可写为
+
+\begin{equation}
+\label{eq:galerkin-2-18}
+\delta\bm{\nu}_{h} = \mathbf{R}_{h}^{T}\mathbf{N}_{,S}\delta\mathbf{a} - \bm{\eta}_{h} \times \bm{\nu}_{h}.
+\end{equation}
+
+从而存在应变---广义坐标矩阵 \(\mathbf{B}_{\nu}\left( S,\mathbf{q} \right)\)，使得
+
+\begin{equation}
+\label{eq:galerkin-2-19}
+\delta\bm{\nu}_{h} = \mathbf{B}_{\nu}\left( S,\mathbf{q} \right)\delta\mathbf{q}.
+\end{equation}
+
+显式写为
+
+\begin{equation}
+\label{eq:galerkin-2-20}
+\mathbf{B}_{\nu} = \begin{bmatrix}
+\mathbf{R}_{h}^{T}\mathbf{N}_{,S} & \widehat{\bm{\nu}_{h}}\mathbf{B}_{\omega}
+\end{bmatrix},
+\end{equation}
+
+因为 \(- \bm{\eta}_{h} \times \bm{\nu}_{h} = \widehat{\bm{\nu}_{h}}\bm{\eta}_{h}\)。
+
+\subsubsection{曲率---扭转应变}\label{sec:galerkin-2-3-2}
+
+定义参考姿态的曲率---扭转矢量
+
+\begin{equation}
+\label{eq:galerkin-2-21}
+\widehat{\bm{\kappa}_{R}} = \mathbf{R}_{0}^{T}\mathbf{R}_{0,S}.
+\end{equation}
+
+由 \(\mathbf{R}_{h} = \mathbf{R}_{0}\mathbf{E}_{h}\) 得
+
+\begin{equation}
+\label{eq:galerkin-2-22}
+\mathbf{R}_{h}^{T}\mathbf{R}_{h,S} = \mathbf{E}_{h}^{T}\widehat{\bm{\kappa}_{R}}\mathbf{E}_{h} + \mathbf{E}_{h}^{T}\mathbf{E}_{h,S}.
+\end{equation}
+
+因此，离散曲率---扭转矢量为
+
+\begin{equation}
+\label{eq:galerkin-2-23}
+\boxed{\bm{\kappa}_{h}\left( \mathbf{q} \right) = \mathbf{E}_{h}^{T}\bm{\kappa}_{R} + \mathbf{J}_{r}\left( \bm{\theta}_{h} \right)\bm{\theta}_{h,S}}
+\end{equation}
+
+其中
+
+\begin{equation}
+\label{eq:galerkin-2-24}
+\bm{\theta}_{h,S} = \bm{\Psi}_{,S}\mathbf{b}.
+\end{equation}
+
+相应虚变分满足
+
+\begin{equation}
+\label{eq:galerkin-2-25}
+\delta\bm{\kappa}_{h} = \bm{\eta}_{h,S} + \bm{\kappa}_{h} \times \bm{\eta}_{h}.
+\end{equation}
+
+因此存在 \(\mathbf{B}_{\kappa}\left( S,\mathbf{q} \right)\)，使得
+
+\begin{equation}
+\label{eq:galerkin-2-26}
+\delta\bm{\kappa}_{h} = \mathbf{B}_{\kappa}\left( S,\mathbf{q} \right)\delta\mathbf{q}.
+\end{equation}
+
+在实际组装中，\(\mathbf{B}_{\kappa}\) 可由上式解析求导，或由自动微分对 \(\bm{\kappa}_{h}\left( \mathbf{q} \right)\) 计算 Jacobian。无论采用何种实现，均必须保留 \(\kappa_{h3}\) 的独立扭转贡献。
+
+\subsubsection{离散内部势能}\label{sec:galerkin-2-3-3}
+
+将离散应变代入\Cref{sec:rod-model}的势能，可将离散内部势能分解为
+
+\begin{equation}
+\label{eq:galerkin-2-27}
+V_{int,h}\left( \mathbf{q} \right) = V_{\nu,h}\left( \mathbf{q} \right) + V_{\kappa,h}\left( \mathbf{q} \right),
+\end{equation}
+
+其中
+
+\begin{equation}
+\label{eq:galerkin-2-28}
+V_{\nu,h}\left( \mathbf{q} \right) = \frac{1}{2}\int_{0}^{L}\left( \bm{\nu}_{h} - \bm{\nu}_{0} \right)^{T}\mathbf{K}_{\nu}\left( \bm{\nu}_{h} - \bm{\nu}_{0} \right)\, dS,
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-29}
+V_{\kappa,h}\left( \mathbf{q} \right) = \frac{1}{2}\int_{0}^{L}\left( \bm{\kappa}_{h} - \bm{\kappa}_{0} \right)^{T}\mathbf{K}_{\kappa}\left( \bm{\kappa}_{h} - \bm{\kappa}_{0} \right)\, dS.
+\end{equation}
+
+离散内部广义力为
+
+\begin{equation}
+\label{eq:galerkin-2-30}
+\mathbf{f}_{int}\left( \mathbf{q} \right) = \nabla_{\mathbf{q}}V_{int,h}\left( \mathbf{q} \right).
+\end{equation}
+
+利用虚功表达，可写为
+
+\begin{equation}
+\label{eq:galerkin-2-31}
+\mathbf{f}_{int} = \int_{0}^{L}\left\lbrack \mathbf{B}_{\nu}^{T}\mathbf{n}_{b} + \mathbf{B}_{\kappa}^{T}\mathbf{m}_{b} \right\rbrack dS.
+\end{equation}
+
+该式同时包含拉伸、剪切、两向弯曲和扭转恢复力。一般情况下，\(\mathbf{f}_{int}\) 是关于 \(\mathbf{q}\) 的非线性向量，不能预先写成常刚度矩阵乘以 \(\mathbf{q}\)。
+
+\subsection{完整离散动能与质量---惯性矩阵}\label{sec:galerkin-2-4}
+
+\subsubsection{材料点速度矩阵}\label{sec:galerkin-2-4-1}
+
+离散材料点位置为
+
+\begin{equation}
+\label{eq:galerkin-2-32}
+\mathbf{x}_{h}\left( S,\bm{\xi},t \right) = \mathbf{r}_{h}(S,t) + \mathbf{R}_{h}(S,t)\bm{\xi}.
+\end{equation}
+
+其速度为
+
+\begin{equation}
+\label{eq:galerkin-2-33}
+{\dot{\mathbf{x}}}_{h} = \mathbf{N}\dot{\mathbf{a}} - \mathbf{R}_{h}\widehat{\bm{\xi}}\mathbf{B}_{\omega}\dot{\mathbf{b}}.
+\end{equation}
+
+定义材料点速度矩阵
+
+\begin{equation}
+\label{eq:galerkin-2-34}
+\mathbf{B}_{x}\left( S,\bm{\xi},\mathbf{q} \right) = \begin{bmatrix}
+\mathbf{N} & - \mathbf{R}_{h}\widehat{\bm{\xi}}\mathbf{B}_{\omega}
+\end{bmatrix},
+\end{equation}
+
+则
+
+\begin{equation}
+\label{eq:galerkin-2-35}
+{\dot{\mathbf{x}}}_{h} = \mathbf{B}_{x}\left( S,\bm{\xi},\mathbf{q} \right)\dot{\mathbf{q}}.
+\end{equation}
+
+\subsubsection{\texorpdfstring{质量---惯性矩阵 \(\mathbf{M}\left( \mathbf{q} \right)\) 的严格定义}{质量---惯性矩阵 \textbackslash mathbf\{M\}\textbackslash left( \textbackslash mathbf\{q\} \textbackslash right) 的严格定义}}\label{sec:galerkin-2-4-2}
+
+离散动能为
+
+\begin{equation}
+\label{eq:galerkin-2-36}
+T_{h}\left( \mathbf{q},\dot{\mathbf{q}} \right) = \frac{1}{2}\int_{0}^{L}{\int_{A(S)}^{}\rho}{\dot{\mathbf{x}}}_{h}^{T}{\dot{\mathbf{x}}}_{h}\, dA\, dS.
+\end{equation}
+
+代入速度矩阵，得到
+
+\begin{equation}
+\label{eq:galerkin-2-37}
+\boxed{T_{h}\left( \mathbf{q},\dot{\mathbf{q}} \right) = \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}}}
+\end{equation}
+
+其中
+
+\begin{equation}
+\label{eq:galerkin-2-38}
+\boxed{\mathbf{M}\left( \mathbf{q} \right) = \int_{0}^{L}{\int_{A(S)}^{}\rho}\mathbf{B}_{x}^{T}\mathbf{B}_{x}\, dA\, dS}
+\end{equation}
+
+是由完整三维平移---转动动能严格推出的质量---惯性矩阵。
+
+\subsubsection{质量---惯性矩阵的分块形式}\label{sec:galerkin-2-4-3}
+
+按照 \(\mathbf{q} = \left( \mathbf{a}^{T},\mathbf{b}^{T} \right)^{T}\)，写成
+
+\begin{equation}
+\label{eq:galerkin-2-39}
+\mathbf{M}\left( \mathbf{q} \right) = \begin{bmatrix}
+\mathbf{M}_{aa} & \mathbf{M}_{ab}\left( \mathbf{q} \right) \\
+\mathbf{M}_{ba}\left( \mathbf{q} \right) & \mathbf{M}_{bb}\left( \mathbf{q} \right)
+\end{bmatrix}.
+\end{equation}
+
+利用\Cref{sec:rod-model}定义的 \(\mu,\mathbf{c}_{\rho},\mathbf{J}_{c}\)，各分块为
+
+\begin{equation}
+\label{eq:galerkin-2-40}
+\mathbf{M}_{aa} = \int_{0}^{L}\mu\mathbf{N}^{T}\mathbf{N}\, dS,
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-41}
+\mathbf{M}_{ab}\left( \mathbf{q} \right) = - \int_{0}^{L}\mathbf{N}^{T}\mathbf{R}_{h}\widehat{\mathbf{c}_{\rho}}\mathbf{B}_{\omega}\, dS,
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-42}
+\mathbf{M}_{ba}\left( \mathbf{q} \right) = \mathbf{M}_{ab}^{T}\left( \mathbf{q} \right),
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-43}
+\boxed{\mathbf{M}_{bb}\left( \mathbf{q} \right) = \int_{0}^{L}\mathbf{B}_{\omega}^{T}\mathbf{J}_{c}\mathbf{B}_{\omega}\, dS}
+\end{equation}
+
+即
+
+\begin{equation}
+\label{eq:galerkin-2-44}
+\mathbf{M}_{bb}\left( \mathbf{q} \right) = \int_{0}^{L}\bm{\Psi}^{T}\mathbf{J}_{r}^{T}\left( \bm{\theta}_{h} \right)\mathbf{J}_{c}\mathbf{J}_{r}\left( \bm{\theta}_{h} \right)\bm{\Psi}\, dS.
+\end{equation}
+
+因此，质量矩阵是否依赖构形不是预设结论，而由中心线定义、姿态参数化、截面质量分布和附加部件共同决定。
+
+\subsubsection{质量中心线与偏心部件}\label{sec:galerkin-2-4-4}
+
+与\Cref{sec:rod-model}保持一致，基础导管中心线取为各截面的质量中心线，因此分布杆体满足
+
+\begin{equation}
+\label{eq:galerkin-2-45}
+\mathbf{c}_{\rho} = \mathbf{0},
+\end{equation}
+
+从而杆体本身的平移---转动交叉块消失：
+
+\begin{equation}
+\label{eq:galerkin-2-46}
+\mathbf{M}_{ab} = \mathbf{M}_{ba} = \mathbf{0}.
+\end{equation}
+
+此时
+
+\begin{equation}
+\label{eq:galerkin-2-47}
+\mathbf{M}_{str}\left( \mathbf{q} \right) = \begin{bmatrix}
+\mathbf{M}_{aa} & \mathbf{0} \\
+\mathbf{0} & \mathbf{M}_{bb}\left( \mathbf{b} \right)
+\end{bmatrix}.
+\end{equation}
+
+但 \(\mathbf{M}_{bb}\) 仍通过 \(\mathbf{J}_{r}\left( \bm{\theta}_{h} \right)\) 依赖转动广义坐标，因此完整结构质量---惯性矩阵一般仍为 \(\mathbf{M}_{str}\left( \mathbf{q} \right)\)。
+
+若磁性头端、传感器或其他附加部件的质心相对于中心线存在偏置，则其动能应单独加入。设附加部件质心位置为
+
+\begin{equation}
+\label{eq:galerkin-2-48}
+\mathbf{x}_{e} = \mathbf{r}_{h}\left( S_{e} \right) + \mathbf{R}_{h}\left( S_{e} \right)\bm{\rho}_{e},
+\end{equation}
+
+其质量为 \(m_{e}\)、材料坐标转动惯量为 \(\mathbf{J}_{e}\)，则
+
+\begin{equation}
+\label{eq:galerkin-2-49}
+T_{e} = \frac{1}{2}m_{e}\left| {\dot{\mathbf{x}}}_{e} \right|^{2} + \frac{1}{2}\bm{\omega}_{e}^{T}\mathbf{J}_{e}\bm{\omega}_{e}.
+\end{equation}
+
+令 \(\mathbf{B}_{e}\left( \mathbf{q} \right)\) 为该部件速度关于 \(\dot{\mathbf{q}}\) 的映射，则
+
+\begin{equation}
+\label{eq:galerkin-2-50}
+T_{e} = \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}_{e}\left( \mathbf{q} \right)\dot{\mathbf{q}},\quad\quad\mathbf{M}_{e} = \mathbf{B}_{e}^{T}\mathbf{M}_{e}^{rig}\mathbf{B}_{e}.
+\end{equation}
+
+该项一般产生非零平移---转动耦合块。由此，基础杆体采用质量中心线并不意味着完整系统的交叉质量块必然为零。
+
+\subsubsection{小转角常质量近似的适用范围}\label{sec:galerkin-2-4-5}
+
+当 \(\parallel \bm{\theta}_{h} \parallel \ll 1\) 时，若仅保留
+
+\begin{equation}
+\label{eq:galerkin-2-51}
+\mathbf{J}_{r}\left( \bm{\theta}_{h} \right) \approx \mathbf{I},
+\end{equation}
+
+则
+
+\begin{equation}
+\label{eq:galerkin-2-52}
+\mathbf{M}_{bb} \approx \int_{0}^{L}\bm{\Psi}^{T}\mathbf{J}_{c}\bm{\Psi}\, dS,
+\end{equation}
+
+成为常矩阵。该结果是小转角零阶惯性近似，而不是完整模型的一般性质。本文主模型保留精确的 \(\mathbf{J}_{r}\) 和 \(\mathbf{M}\left( \mathbf{q} \right)\)。
+
+\subsubsection{流体附加质量的能量一致离散}\label{sec:galerkin-2-4-6}
+
+定义联合平移速度矩阵
+
+\begin{equation}
+\label{eq:galerkin-2-53}
+\mathbf{N}_{q}(S) = \begin{bmatrix}
+\mathbf{N}(S) & \mathbf{0}
+\end{bmatrix},
+\end{equation}
+
+使得 \({\dot{\mathbf{r}}}_{h} = \mathbf{N}_{q}\dot{\mathbf{q}}\)。令
+
+\begin{equation}
+\label{eq:galerkin-2-54}
+\mathbf{w}_{\bot,h} = \mathbf{P}_{\bot}\left( \mathbf{q} \right)\left\lbrack \mathbf{N}_{q}\dot{\mathbf{q}} - \mathbf{v}_{f}\left( \mathbf{r}_{h},t \right) \right\rbrack,\quad\quad m_{A} = \rho_{f}C_{A}A_{d}.
+\end{equation}
+
+\Cref{sec:rod-model}的附加流体惯性泛函离散为（静止流场下即为附加动能）
+
+\begin{equation}
+\label{eq:galerkin-2-55}
+\boxed{T_{A,h} = \frac{1}{2}\int_{0}^{L}m_{A}\,\mathbf{w}_{\bot,h}^{T}\mathbf{w}_{\bot,h}\, dS.}
+\end{equation}
+
+展开可写为
+
+\begin{equation}
+\label{eq:galerkin-2-56}
+T_{A,h} = \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}_{A}\left( \mathbf{q} \right)\dot{\mathbf{q}} - {\dot{\mathbf{q}}}^{T}\mathbf{b}_{A}\left( \mathbf{q},t \right) + c_{A}\left( \mathbf{q},t \right),
+\end{equation}
+
+其中
+
+\begin{equation}
+\label{eq:galerkin-2-57}
+\boxed{\mathbf{M}_{A}\left( \mathbf{q} \right) = \int_{0}^{L}m_{A}\,\mathbf{N}_{q}^{T}\mathbf{P}_{\bot}\left( \mathbf{q} \right)\mathbf{N}_{q}\, dS,}
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-58}
+\mathbf{b}_{A}\left( \mathbf{q},t \right) = \int_{0}^{L}m_{A}\,\mathbf{N}_{q}^{T}\mathbf{P}_{\bot}\left( \mathbf{q} \right)\mathbf{v}_{f}\, dS,
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-59}
+c_{A}\left( \mathbf{q},t \right) = \frac{1}{2}\int_{0}^{L}m_{A}\,\mathbf{v}_{f}^{T}\mathbf{P}_{\bot}\left( \mathbf{q} \right)\mathbf{v}_{f}\, dS.
+\end{equation}
+
+因此，将结构动能、偏心部件动能和附加流体项统一记为速度型惯性泛函
+
+\begin{equation}
+\label{eq:galerkin-2-60}
+T_{h} = T_{str,h} + \sum_{e}^{}T_{e} + T_{A,h}.
+\end{equation}
+
+其关于广义速度的 Hessian 给出总有效质量---惯性矩阵
+
+\begin{equation}
+\label{eq:galerkin-2-61}
+\boxed{\mathbf{M}\left( \mathbf{q} \right) = \mathbf{M}_{str}\left( \mathbf{q} \right) + \sum_{e}^{}\mathbf{M}_{e}\left( \mathbf{q} \right) + \mathbf{M}_{A}\left( \mathbf{q} \right).}
+\end{equation}
+
+只有在 \(\mathbf{v}_{f} = \mathbf{0}\) 时，\(\mathbf{b}_{A} = \mathbf{0}\) 且 \(c_{A} = 0\) 才在物理上成立。对于一般规定流场，若为构造自治保守骨架而将交叉项移至外部端口，则只是从所选 Hamiltonian 骨架中移除 \(\mathbf{b}_{A}\) 和 \(c_{A}\)，并将它们的完整 Euler--Lagrange 作用整体并入 \(\mathbf{Q}_{flow}\)，而不是假定这些量在原系统中消失。一般流场下不能仅保留 \(\mathbf{M}_{A}\dot{\mathbf{q}}\)；冻结 \(\mathbf{P}_{\bot}\) 得到的常附加质量仅作为工程验证分支。
+
+\subsubsection{对称性与正定性}\label{sec:galerkin-2-4-7}
+
+由动能 Hessian 的定义可知
+
+\begin{equation}
+\label{eq:galerkin-2-62}
+\mathbf{M}^{T}\left( \mathbf{q} \right) = \mathbf{M}\left( \mathbf{q} \right).
+\end{equation}
+
+若材料与附加质量参数为正，姿态坐标位于 \(\mathbf{J}_{r}\) 非奇异的局部坐标域内，且联合速度映射对任意非零广义速度均不会在几乎处处同时退化，即
+
+\begin{equation}
+\label{eq:galerkin-2-63}
+\dot{\mathbf{q}} \neq \mathbf{0}\quad \Rightarrow \quad T_{h}^{(2)}\left( \mathbf{q},\dot{\mathbf{q}} \right) > 0,
+\end{equation}
+
+则
+
+\begin{equation}
+\label{eq:galerkin-2-64}
+\mathbf{y}^{T}\mathbf{M}\left( \mathbf{q} \right)\mathbf{y} > 0,\quad\quad\forall\mathbf{y} \neq \mathbf{0}.
+\end{equation}
+
+因此 \(\mathbf{M}\left( \mathbf{q} \right)\) 为对称正定矩阵。这里需要排除的是冗余广义坐标或退化速度映射，而不是自由边界下的刚体模态；刚体模态会导致刚度矩阵存在零特征值，但正常刚体运动仍具有正动能。
+
+\subsection{联合 Galerkin 投影}\label{sec:galerkin-2-5}
+
+\subsubsection{惯性项}\label{sec:galerkin-2-5-1}
+
+将有限维近似代入\Cref{sec:rod-model}的总惯性虚功，有
+
+\begin{equation}
+\label{eq:galerkin-2-65}
+\delta W_{in,h} = \delta\mathbf{q}^{T}\left\lbrack \frac{d}{dt}\left( \frac{\partial T_{h}}{\partial\dot{\mathbf{q}}} \right) - \frac{\partial T_{h}}{\partial\mathbf{q}} \right\rbrack.
+\end{equation}
+
+对于静止流场，或在明确将规定流场交叉项的完整 Euler--Lagrange 作用划入 \(\mathbf{Q}_{flow}\) 后选取的自治保守惯性骨架，
+
+\begin{equation}
+\label{eq:galerkin-2-66}
+T_{h} = \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}},
+\end{equation}
+
+惯性广义力可整理为
+
+\begin{equation}
+\label{eq:galerkin-2-67}
+\mathbf{M}\left( \mathbf{q} \right)\ddot{\mathbf{q}} + \mathbf{g}_{M}\left( \mathbf{q},\dot{\mathbf{q}} \right).
+\end{equation}
+
+一般规定流场下，\(T_{h}\) 还包含 \(- {\dot{\mathbf{q}}}^{T}\mathbf{b}_{A} + c_{A}\)，对应附加项记为 \(\mathbf{g}_{f}\left( \mathbf{q},\dot{\mathbf{q}},t \right)\)。因此统一写成
+
+\begin{equation}
+\label{eq:galerkin-2-68}
+\boxed{\mathbf{M}\left( \mathbf{q} \right)\ddot{\mathbf{q}} + \mathbf{g}_{T}\left( \mathbf{q},\dot{\mathbf{q}},t \right),\quad\quad\mathbf{g}_{T} = \mathbf{g}_{M} + \mathbf{g}_{f}.}
+\end{equation}
+
+各项将在\Cref{sec:galerkin-2-6}严格给出。
+
+\subsubsection{内力项}\label{sec:galerkin-2-5-2}
+
+离散内部虚功为
+
+\begin{equation}
+\label{eq:galerkin-2-69}
+\delta W_{int,h} = \delta\mathbf{q}^{T}\int_{0}^{L}\left\lbrack \mathbf{B}_{\nu}^{T}\mathbf{n}_{b} + \mathbf{B}_{\kappa}^{T}\mathbf{m}_{b} \right\rbrack dS.
+\end{equation}
+
+因此
+
+\begin{equation}
+\label{eq:galerkin-2-70}
+\mathbf{f}_{int}\left( \mathbf{q} \right) = \int_{0}^{L}\left\lbrack \mathbf{B}_{\nu}^{T}\mathbf{n}_{b} + \mathbf{B}_{\kappa}^{T}\mathbf{m}_{b} \right\rbrack dS = \nabla_{\mathbf{q}}V_{int,h}\left( \mathbf{q} \right).
+\end{equation}
+
+\subsubsection{分布力和分布力矩的联合投影}\label{sec:galerkin-2-5-3}
+
+首先将仍位于外力端口中的分布载荷作排他分解
+
+\begin{equation}
+\label{eq:galerkin-2-71}
+\mathbf{f}_{ext,rem} = \mathbf{f}_{cons} + \mathbf{f}_{nc},\quad\quad\mathbf{l}_{ext} = \mathbf{l}_{cons} + \mathbf{l}_{nc}.
+\end{equation}
+
+其中保守部分在\Cref{sec:galerkin-2-5-5}通过外势能处理，只有非保守部分直接投影到右端。空间分布力矩先转换为材料坐标 \(\mathbf{l}_{nc}^{b} = \mathbf{R}_{h}^{T}\mathbf{l}_{nc}\)，从而非保守分布广义力为
+
+\begin{equation}
+\label{eq:galerkin-2-72}
+\boxed{\mathbf{Q}_{nc,dist}\left( \mathbf{q},\dot{\mathbf{q}},t \right) = \int_{0}^{L}\begin{bmatrix}
+\mathbf{N}^{T}\mathbf{f}_{nc} \\
+\mathbf{B}_{\omega}^{T}\mathbf{R}_{h}^{T}\mathbf{l}_{nc}
+\end{bmatrix}dS.}
+\end{equation}
+
+该式使磁力矩、接触力矩和流体力矩在属于非保守端口时直接进入转动广义坐标；若某一载荷已由势能表示，则不得再次包含在 \(\mathbf{Q}_{nc,dist}\) 中。
+
+对只作用于中心线平移速度的法向二次拖曳，定义联合速度矩阵
+
+\begin{equation}
+\label{eq:galerkin-2-73}
+\boxed{\mathbf{N}_{q} = \left\lbrack \,\mathbf{N}\ \ \mathbf{0}\, \right\rbrack \in \mathbb{R}^{3 \times n},\quad\quad{\dot{\mathbf{r}}}_{h} = \mathbf{N}_{q}\dot{\mathbf{q}}.}
+\end{equation}
+
+其一致广义力投影为
+
+\begin{equation}
+\label{eq:galerkin-2-74}
+\mathbf{Q}_{drag} = \int_{0}^{L}d_{f}\mathbf{N}_{q}^{T}\mathbf{P}_{\bot}\left( \mathbf{v}_{f} - \mathbf{N}_{q}\dot{\mathbf{q}} \right)\, dS = - \mathbf{D}_{drag}\left( \mathbf{q},\dot{\mathbf{q}},t \right)\dot{\mathbf{q}} + \mathbf{Q}_{drag,flow}\left( \mathbf{q},\dot{\mathbf{q}},t \right),
+\end{equation}
+
+其中
+
+\begin{equation}
+\label{eq:galerkin-2-75}
+\boxed{\mathbf{D}_{drag} = \int_{0}^{L}d_{f}\mathbf{N}_{q}^{T}\mathbf{P}_{\bot}\mathbf{N}_{q}\, dS,\quad\quad\mathbf{Q}_{drag,flow} = \int_{0}^{L}d_{f}\mathbf{N}_{q}^{T}\mathbf{P}_{\bot}\mathbf{v}_{f}\, dS.}
+\end{equation}
+
+对任意 \(\mathbf{y} \in \mathbb{R}^{n}\)，有
+
+\begin{equation}
+\label{eq:galerkin-2-76}
+\mathbf{y}^{T}\mathbf{D}_{drag}\mathbf{y} = \int_{0}^{L}d_{f} \parallel \mathbf{P}_{\bot}\mathbf{N}_{q}\mathbf{y} \parallel^{2}\, dS \geq 0,
+\end{equation}
+
+故 \(\mathbf{D}_{drag} = \mathbf{D}_{drag}^{T} \succcurlyeq 0\)。这里必须使用 \(\mathbf{N}_{q}^{T}\) 而不是 \(\mathbf{N}^{T}\)，从而 \(\mathbf{Q}_{drag} \in \mathbb{R}^{n}\)、\(\mathbf{D}_{drag} \in \mathbb{R}^{n \times n}\)。由于 \(\mathbf{N}_{q} = \left\lbrack \mathbf{N}\ \mathbf{0} \right\rbrack\)，中心线拖曳对应的 \(ab\)、\(ba\) 与 \(bb\) 块为零；偏心流体力矩和截面自转阻尼仍通过独立分布力矩投影进入姿态通道。\(d_{f}\) 依赖相对速度，因此 \(\mathbf{D}_{drag}\) 是逐状态半正定的非线性矩阵。
+
+\subsubsection{边界广义力}\label{sec:galerkin-2-5-4}
+
+\Cref{sec:rod-model}的边界虚功为
+
+\begin{equation}
+\label{eq:galerkin-2-77}
+\left\lbrack \mathbf{n} \cdot \delta\mathbf{r} + \mathbf{m}_{b} \cdot \bm{\eta} \right\rbrack_{0}^{L}.
+\end{equation}
+
+代入有限维虚变量，得到
+
+\begin{equation}
+\label{eq:galerkin-2-78}
+\boxed{\mathbf{Q}_{\partial}\left( \mathbf{q},t \right) = \begin{bmatrix}
+\mathbf{N}^{T}\overline{\mathbf{n}} \\
+\mathbf{B}_{\omega}^{T}\left( \mathbf{q} \right){\overline{\mathbf{m}}}_{b}
+\end{bmatrix}_{0}^{L}.}
+\end{equation}
+
+边界广义力一般依赖构形，因为转动试验矩阵 \(\mathbf{B}_{\omega}\) 以及空间力矩到材料力矩的变换均可能随姿态变化。若端点为本质边界，对应试验函数为零，边界项自动消失；若端点为自然边界，则必须保留给定端力和端力矩。
+
+\subsubsection{保守与非保守外载荷}\label{sec:galerkin-2-5-5}
+
+若保守分布载荷和保守边界载荷存在离散外势能 \(V_{ext,h}\left( \mathbf{q},t \right)\)，则其总保守广义力为
+
+\begin{equation}
+\label{eq:galerkin-2-79}
+\mathbf{Q}_{cons} = - \nabla_{\mathbf{q}}V_{ext,h},
+\end{equation}
+
+并定义
+
+\begin{equation}
+\label{eq:galerkin-2-80}
+V_{h}\left( \mathbf{q},t \right) = V_{int,h}\left( \mathbf{q} \right) + V_{ext,h}\left( \mathbf{q},t \right).
+\end{equation}
+
+非保守广义力统一记为
+
+\begin{equation}
+\label{eq:galerkin-2-81}
+\mathbf{Q}_{nc} = \mathbf{Q}_{nc,dist} + \mathbf{Q}_{control} + \mathbf{Q}_{disturbance} + \mathbf{Q}_{other,nc}.
+\end{equation}
+
+最终方程只在左端使用 \(\nabla_{\mathbf{q}}V_{h}\)，并在右端使用 \(\mathbf{Q}_{nc}\)；不得再把含保守部分的原始载荷投影整体加入右端。若时变磁作用已经包含在 \(V_{ext,h}\left( \mathbf{q},t \right)\) 中，其显式时间功率只由 \(\partial V_{ext,h}/\partial t\) 表示。
+
+\subsection{广义动量与几何惯性项的严格推导}\label{sec:galerkin-2-6}
+
+\subsubsection{一般广义动量}\label{sec:galerkin-2-6-1}
+
+对\Cref{sec:galerkin-2-4-6}的速度型惯性泛函
+
+\begin{equation}
+\label{eq:galerkin-2-82}
+T_{h} = \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - {\dot{\mathbf{q}}}^{T}\mathbf{b}_{A}\left( \mathbf{q},t \right) + c_{A}\left( \mathbf{q},t \right),
+\end{equation}
+
+定义广义动量
+
+\begin{equation}
+\label{eq:galerkin-2-83}
+\boxed{\mathbf{p} = \frac{\partial T_{h}}{\partial\dot{\mathbf{q}}} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - \mathbf{b}_{A}\left( \mathbf{q},t \right).}
+\end{equation}
+
+因此，一般规定流场下不能无条件写成 \(\mathbf{p} = \mathbf{M}\dot{\mathbf{q}}\)。只有在静止流场中，或在人为选取的自治保守骨架中将 \(\mathbf{b}_{A}\) 的完整作用移入 \(\mathbf{Q}_{flow}\) 后，才定义骨架动量
+
+\begin{equation}
+\label{eq:galerkin-2-84}
+\mathbf{p}_{0} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}}.
+\end{equation}
+
+\subsubsection{质量度量产生的几何惯性}\label{sec:galerkin-2-6-2}
+
+对纯二次速度部分求 Euler---Lagrange 导数，得到
+
+\begin{equation}
+\label{eq:galerkin-2-85}
+\mathbf{M}\left( \mathbf{q} \right)\ddot{\mathbf{q}} + \mathbf{g}_{M}\left( \mathbf{q},\dot{\mathbf{q}} \right),
+\end{equation}
+
+其中
+
+\begin{equation}
+\label{eq:galerkin-2-86}
+\boxed{\mathbf{g}_{M} = \dot{\mathbf{M}}\dot{\mathbf{q}} - \frac{1}{2}\nabla_{\mathbf{q}}\left( {\dot{\mathbf{q}}}^{T}\mathbf{M}\dot{\mathbf{q}} \right).}
+\end{equation}
+
+定义
+
+\begin{equation}
+\label{eq:galerkin-2-87}
+\Gamma_{ijk} = \frac{1}{2}\left( \frac{\partial M_{ij}}{\partial q_{k}} + \frac{\partial M_{ik}}{\partial q_{j}} - \frac{\partial M_{jk}}{\partial q_{i}} \right),
+\end{equation}
+
+则
+
+\begin{equation}
+\label{eq:galerkin-2-88}
+g_{M,i} = \sum_{j,k = 1}^{n}\Gamma_{ijk}{\dot{q}}_{j}{\dot{q}}_{k}.
+\end{equation}
+
+令 \(C_{ij} = \sum_{k}^{}\Gamma_{ijk}{\dot{q}}_{k}\)，有 \(\mathbf{g}_{M} = \mathbf{C}\dot{\mathbf{q}}\)，且 \(\dot{\mathbf{M}} - 2\mathbf{C}\) 为反对称矩阵，从而保证动能功率恒等式成立。
+
+\subsubsection{规定流场交叉项产生的附加作用}\label{sec:galerkin-2-6-3}
+
+由 \(- {\dot{\mathbf{q}}}^{T}\mathbf{b}_{A} + c_{A}\) 得到
+
+\begin{equation}
+\label{eq:galerkin-2-89}
+\boxed{\mathbf{g}_{f} = - {\dot{\mathbf{b}}}_{A} + \left( \nabla_{\mathbf{q}}\mathbf{b}_{A} \right)^{T}\dot{\mathbf{q}} - \nabla_{\mathbf{q}}c_{A}.}
+\end{equation}
+
+这里 \({\dot{\mathbf{b}}}_{A}\) 为沿轨道的全导数。于是总惯性作用为
+
+\begin{equation}
+\label{eq:galerkin-2-90}
+\boxed{\frac{d}{dt}\frac{\partial T_{h}}{\partial\dot{\mathbf{q}}} - \frac{\partial T_{h}}{\partial\mathbf{q}} = \mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{M} + \mathbf{g}_{f}.}
+\end{equation}
+
+也可以将 \(\mathbf{g}_{f}\) 移到右端并记为流场输入 \(\mathbf{Q}_{flow}\)，但必须整体移动，不能仅保留其中一部分。
+
+\subsubsection{常质量矩阵特例}\label{sec:galerkin-2-6-4}
+
+若在特定小转角、无偏心、冻结法向投影和固定附加质量近似下有
+
+\begin{equation}
+\label{eq:galerkin-2-91}
+\frac{\partial\mathbf{M}}{\partial q_{i}} = \mathbf{0},\quad\quad i = 1,\ldots,n,
+\end{equation}
+
+则 \(\mathbf{g}_{M} = \mathbf{0}\)。若同时 \(\mathbf{b}_{A} = \mathbf{0}\)，则全部几何惯性项消失。该结论只适用于相应局部近似，不应反向用于否定完整模型中的构形相关惯性。
+
+\subsection{Kirchhoff 无剪切约束的离散处理}\label{sec:galerkin-2-7}
+
+\subsubsection{离散约束}\label{sec:galerkin-2-7-1}
+
+严格 Kirchhoff 模型要求\cite{MarsdenRatiu1999MechanicsSymmetry,HairerLubichWanner2006GNI}
+
+\begin{equation}
+\label{eq:galerkin-2-92}
+\nu_{h1}\left( \mathbf{q} \right) = 0,\quad\quad\nu_{h2}\left( \mathbf{q} \right) = 0.
+\end{equation}
+
+将所有离散约束写成
+
+\begin{equation}
+\label{eq:galerkin-2-93}
+\mathbf{c}\left( \mathbf{q} \right) = \mathbf{0}.
+\end{equation}
+
+定义约束 Jacobian
+
+\begin{equation}
+\label{eq:galerkin-2-94}
+\mathbf{G}\left( \mathbf{q} \right) = \frac{\partial\mathbf{c}}{\partial\mathbf{q}}.
+\end{equation}
+
+\subsubsection{拉格朗日乘子形式}\label{sec:galerkin-2-7-2}
+
+引入拉格朗日乘子 \(\bm{\lambda}_{c}\)，约束反力对应的广义力为
+
+\begin{equation}
+\label{eq:galerkin-2-95}
+\mathbf{Q}_{c} = \mathbf{G}^{T}\left( \mathbf{q} \right)\bm{\lambda}_{c}.
+\end{equation}
+
+完整受约束离散系统写为
+
+\begin{equation}
+\label{eq:galerkin-2-96}
+\left\{ \begin{matrix}
+ & \mathbf{M}\left( \mathbf{q} \right)\ddot{\mathbf{q}} + \mathbf{g}\left( \mathbf{q},\dot{\mathbf{q}} \right) + \nabla_{\mathbf{q}}V_{h}\left( \mathbf{q},t \right) + \mathbf{G}^{T}\left( \mathbf{q} \right)\bm{\lambda}_{c} = \mathbf{Q}_{nc}\left( \mathbf{q},\dot{\mathbf{q}},t \right), \\
+ & \mathbf{c}\left( \mathbf{q} \right) = \mathbf{0}.
+\end{matrix} \right.\ \ \ \
+\end{equation}
+
+这是一组非线性微分---代数方程。约束只消除剪切变形，不删除转动广义坐标或扭转模态。
+
+\subsubsection{有限剪切刚度形式}\label{sec:galerkin-2-7-3}
+
+若采用完整可剪切 Cosserat 杆，或以大有限剪切刚度近似 Kirchhoff 约束，则无需引入拉格朗日乘子，剪切能已包含在 \(V_{int,h}\) 中。此时系统为普通二阶非线性常微分方程。两种处理方式具有不同的数值性质，但共享同一完整平移---转动离散结构。
+
+\subsection{全局有限维动力学方程}\label{sec:galerkin-2-8}
+
+\subsubsection{无显式约束形式}\label{sec:galerkin-2-8-1}
+
+将惯性项、内部保守力、保守外势、非保守分布载荷和边界载荷组装，得到
+
+\begin{equation}
+\label{eq:galerkin-2-97}
+\boxed{\mathbf{M}\left( \mathbf{q} \right)\ddot{\mathbf{q}} + \mathbf{g}_{T}\left( \mathbf{q},\dot{\mathbf{q}},t \right) + \nabla_{\mathbf{q}}V_{h}\left( \mathbf{q},t \right) = \mathbf{Q}_{nc}\left( \mathbf{q},\dot{\mathbf{q}},t \right) + \mathbf{Q}_{\partial}\left( \mathbf{q},t \right).}
+\end{equation}
+
+其中，\(\mathbf{q}\) 同时包含平移和转动广义坐标；\(\mathbf{M}\) 来自基础杆体、偏心部件和能量一致附加质量的速度二次项；\(\mathbf{g}_{T} = \mathbf{g}_{M} + \mathbf{g}_{f}\)；\(V_{h}\) 同时包含拉伸、剪切、弯曲、扭转以及满足势函数条件的外部势能。
+
+若把规定流场交叉项整体移至输入端口，并将耗散与控制输入分开，可写为
+
+\begin{equation}
+\label{eq:galerkin-2-98}
+\mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{M} + \nabla_{\mathbf{q}}V_{h} = \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial}.
+\end{equation}
+
+经过排他拆分的拖曳被动核、固定壁条件下的接触法向阻尼与摩擦以及所保留的自转阻尼组成 \(\mathbf{Q}_{diss}\)，并满足 \({\dot{\mathbf{q}}}^{T}\mathbf{Q}_{diss} \leq 0\)。背景流拖曳项 \(\mathbf{Q}_{drag,flow}\) 必须归入 \(\mathbf{Q}_{flow}\)，其功率一般不定号；因此不能对完整相对拖曳作整体耗散断言。\(\mathbf{Q}_{diss}\) 也不应被强制写成常阻尼矩阵乘以速度，因为二次拖曳的 \(\mathbf{D}_{drag}\left( \mathbf{q},\dot{\mathbf{q}},t \right)\) 本身依赖状态与相对速度。同一流体作用在任一选定表示中只能计入一次。
+
+\subsubsection{受约束形式}\label{sec:galerkin-2-8-2}
+
+严格 Kirchhoff 无剪切模型最终写为
+
+\begin{equation}
+\label{eq:galerkin-2-99}
+\mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{T} + \nabla_{\mathbf{q}}V_{h} + \mathbf{G}^{T}\left( \mathbf{q} \right)\bm{\lambda}_{c} = \mathbf{Q}_{nc} + \mathbf{Q}_{\partial},
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-100}
+\mathbf{c}\left( \mathbf{q} \right) = \mathbf{0}.
+\end{equation}
+
+该系统保留完整弯曲---扭转、截面姿态和转动惯性，同时严格实施无剪切条件。
+
+\subsection{离散能量与功率恒等式}\label{sec:galerkin-2-9}
+
+\subsubsection{保守惯性骨架的离散机械能}\label{sec:galerkin-2-9-1}
+
+在静止流场 \(\mathbf{b}_{A} = \mathbf{0}\) 且 \(c_{A} = 0\)，或已将规定流场交叉项完整移入 \(\mathbf{Q}_{flow}\) 后选取的自治保守骨架中，定义
+
+\begin{equation}
+\label{eq:galerkin-2-101}
+E_{h}\left( \mathbf{q},\dot{\mathbf{q}},t \right) = \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} + V_{h}\left( \mathbf{q},t \right).
+\end{equation}
+
+由于 \(\mathbf{g}_{M}\) 由完整二次动能的 Euler---Lagrange 导数产生，有
+
+\begin{equation}
+\label{eq:galerkin-2-102}
+{\dot{\mathbf{q}}}^{T}\left\lbrack \mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{M} \right\rbrack = \frac{d}{dt}\left( \frac{1}{2}{\dot{\mathbf{q}}}^{T}\mathbf{M}\dot{\mathbf{q}} \right).
+\end{equation}
+
+\subsubsection{一般端口功率平衡}\label{sec:galerkin-2-9-2}
+
+对全局方程左乘 \({\dot{\mathbf{q}}}^{T}\)，得到
+
+\begin{equation}
+\label{eq:galerkin-2-103}
+\frac{dE_{h}}{dt} = {\dot{\mathbf{q}}}^{T}\left( \mathbf{Q}_{nc} + \mathbf{Q}_{\partial} - \mathbf{g}_{f} \right) + \frac{\partial V_{h}}{\partial t}.
+\end{equation}
+
+若将规定流场交叉作用的完整 Euler--Lagrange 贡献定义为流场输入的一部分，则
+
+\begin{equation}
+\label{eq:galerkin-2-104}
+\boxed{\frac{dE_{h}}{dt} = {\dot{\mathbf{q}}}^{T}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} \right) + \frac{\partial V_{h}}{\partial t}.}
+\end{equation}
+
+这里 \(\mathbf{Q}_{diss}\) 只含拆分后的被动耗散核，满足 \({\dot{\mathbf{q}}}^{T}\mathbf{Q}_{diss} \leq 0\)；\(\mathbf{Q}_{flow}\) 同时收纳 \(\mathbf{Q}_{drag,flow}\)、Froude--Krylov 输入以及由所选表示决定的反应性流场贡献，其功率不预设符号。相对运动恒等式用于校验拖曳定律的物理被动性，而 CHNN 的耗散结构约束应作用于前述 \(\mathbf{Q}_{diss}\)，二者不得混用。对于理想约束，
+
+\begin{equation}
+\label{eq:galerkin-2-105}
+\mathbf{G}\left( \mathbf{q} \right)\dot{\mathbf{q}} = \mathbf{0},
+\end{equation}
+
+因此
+
+\begin{equation}
+\label{eq:galerkin-2-106}
+{\dot{\mathbf{q}}}^{T}\mathbf{G}^{T}\bm{\lambda}_{c} = 0.
+\end{equation}
+
+只有在无非保守载荷、无流场输入、无边界功输入且势能不显含时间时，才有 \(dE_{h}/dt = 0\)。
+
+\subsubsection{一致切线矩阵}\label{sec:galerkin-2-9-3}
+
+在非线性求解或局部线性化中，内部一致切线矩阵定义为
+
+\begin{equation}
+\label{eq:galerkin-2-107}
+\mathbf{K}_{T}\left( \mathbf{q} \right) = \frac{\partial\mathbf{f}_{int}}{\partial\mathbf{q}} = \nabla_{\mathbf{q}}^{2}V_{int,h}\left( \mathbf{q} \right).
+\end{equation}
+
+该矩阵同时包含材料刚度和由姿态、伸长及曲率变化产生的几何刚度。它不等于将某一状态相关标量刚度直接乘以固定基函数积分得到的割线矩阵。
+
+\subsection{局部线性化与工程约化}\label{sec:galerkin-2-10}
+
+\subsubsection{平衡构形附近的局部线性化}\label{sec:galerkin-2-10-1}
+
+采用耗散---输入分解
+
+\begin{equation}
+\label{eq:galerkin-2-108}
+\mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{M} + \nabla V_{h} + \mathbf{G}^{T}\bm{\lambda}_{c} = \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial}.
+\end{equation}
+
+设 \(\mathbf{q}_{e}\) 为静态平衡构形，\({\dot{\mathbf{q}}}_{e} = \mathbf{0}\)，则
+
+这里的``静态平衡构形''要求系统在 \(t = t_{e}\) 处已冻结显式时间输入、控制参数和规定流场，或本身为自治系统。若磁场或流场为周期驱动，应围绕周期轨道采用 Floquet 线性化，而不能直接使用静态平衡矩阵。
+
+\begin{equation}
+\label{eq:galerkin-2-109}
+\nabla V_{h}\left( \mathbf{q}_{e} \right) + \mathbf{G}^{T}\left( \mathbf{q}_{e} \right)\bm{\lambda}_{ce} = \mathbf{Q}_{diss}\left( \mathbf{q}_{e},\mathbf{0} \right) + \mathbf{Q}_{in,e} + \mathbf{Q}_{flow,e} + \mathbf{Q}_{\partial,e}.
+\end{equation}
+
+通常 \(\mathbf{Q}_{diss}\left( \mathbf{q},\mathbf{0} \right) = \mathbf{0}\)。令 \(\mathbf{q} = \mathbf{q}_{e} + \bm{\eta}\)，忽略二阶及以上扰动项。对无约束系统有
+
+\begin{equation}
+\label{eq:galerkin-2-110}
+\mathbf{M}_{e}\ddot{\bm{\eta}} + \mathbf{C}_{e}\dot{\bm{\eta}} + \mathbf{K}_{e}\bm{\eta} = \delta\mathbf{Q}(t),
+\end{equation}
+
+其中
+
+\begin{equation}
+\label{eq:galerkin-2-111}
+\mathbf{M}_{e} = \mathbf{M}\left( \mathbf{q}_{e} \right),
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-112}
+\mathbf{C}_{e} = - \left. \ \ \ \frac{\partial\mathbf{Q}_{diss}}{\partial\dot{\mathbf{q}}} \right|_{e},
+\end{equation}
+
+\begin{equation}
+\label{eq:galerkin-2-113}
+\boxed{\mathbf{K}_{e} = \left. \ \ \ \left\lbrack \nabla_{\mathbf{q}}^{2}V_{h} - \frac{\partial\mathbf{Q}_{diss}}{\partial\mathbf{q}} - \frac{\partial\left( \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} \right)}{\partial\mathbf{q}} \right\rbrack \right|_{e}.}
+\end{equation}
+
+这里 \(\delta\mathbf{Q}(t)\) 收集未被状态 Jacobian 吸收的显式时间输入扰动。按上述实际耗散力约定，被动耗散在平衡点附近给出 \(\mathbf{C}_{e} \succcurlyeq \mathbf{0}\)；若载荷 Jacobian 含非对称随形项，\(\mathbf{K}_{e}\) 一般不必对称。
+
+当平衡点附近存在接触时，上述 Jacobian 与一致切线默认接触活动集固定；若平衡点位于接触开闭切换面，应采用光滑接触正则化、半光滑 Newton 方法或分段线性化，不能直接把 \(\max\) 函数当作处处可微。
+
+在纯保守、无边界随形载荷的情形下，直接化为
+
+\begin{equation}
+\label{eq:galerkin-2-114}
+\boxed{\mathbf{K}_{e} = \nabla_{\mathbf{q}}^{2}V_{h}\left( \mathbf{q}_{e} \right),}
+\end{equation}
+
+不再重复减去已经包含在 \(V_{h}\) 中的保守广义力导数。若存在严格约束，应在约束切空间中投影，或先引入满足 \(\mathbf{c}\left( \mathbf{q} \right) = 0\) 的独立局部坐标；约束平衡点的切线刚度还应包含约束拉格朗日函数的二阶项。常矩阵线性系统只是完整非线性联合模型在给定平衡构形附近的局部近似。\cite{MarsdenRatiu1999MechanicsSymmetry,HairerLubichWanner2006GNI}
+
+\subsubsection{工程约化的适用范围}\label{sec:galerkin-2-10-2}
+
+小转角、常质量、冻结法向投影和低阶模态截断仅用于数值校核、参数辨识或消融实验。Euler--Bernoulli 分支则具有双重角色：在理论层面，它是几何精确母模型的 Kirchhoff 无剪切约化；在 COMSOL 层面，它是主训练数据的 Kirchhoff 一致工程实现。只有在细长比、剪切能占比以及与 Timoshenko／实体模型的对照误差满足预设容差时，才允许将其作为主训练分支。COMSOL 的共旋 Beam 几何非线性允许大转动但假定单元局部小应变，因此网格必须使相邻节点间转角增量足够小\cite{COMSOLBeamInterface2025,COMSOLGeometricNonlinearity2025}。
+
+\subsubsection{模态截断与主计算阶数的确定}\label{sec:galerkin-2-10-3}
+
+CHNN 和 KAM 分析必须基于固定维数的有限维系统，不能长期停留在抽象模态数 \(n\)。对候选截断阶数 \(n = 1,2,\ldots,n_{max}\)，至少计算：前若干固有频率、末端位移、结构能量、扭转响应和主要端口功率。定义相邻阶数的收敛指标
+
+\begin{equation}
+\label{eq:galerkin-2-115}
+e_{n}^{freq} = \max_{1 \leq j \leq m}\frac{\left| \omega_{j}^{(n + 1)} - \omega_{j}^{(n)} \right|}{\left| \omega_{j}^{(n + 1)} \right|},\quad\quad e_{n}^{traj} = \frac{\parallel \mathbf{q}^{(n + 1)} - \Pi_{n + 1 \rightarrow n}\mathbf{q}^{(n + 1)} \parallel}{\parallel \mathbf{q}^{(n + 1)} \parallel},
+\end{equation}
+
+并以能量和扭转量定义同类指标。主计算阶数 \(n_{*}\) 取为所有指定指标首次同时低于容差的位置。正文在尚未完成该计算时只能保留 \(n_{*}\) 为待确定参数，不能把某一经验阶数写成已经证明充分。
+
+本文采用固定的 \(N=2\) 基检验 canonical 数据映射。该基取自 mesh-80 的近频簇，经有限元一致质量度量正交归一，并固定符号、归一化和自由度行序；它定义 P1 系列及后续数据一致性分析所用的 paired-coordinate contract。完整 bridge 同时保留前 12 个生产模态及 mesh-40/80 交叉比较，因此 \(N=2\) 不替代上文 \(n_{*}\) 的收敛判据，也不构成高保真充分性结论。
+
+\subsection{数值实现与有限维模型输出}\label{sec:galerkin-2-11}
+
+\subsubsection{COMSOL 模型层级、投影与验证}\label{sec:galerkin-2-11-1}
+
+COMSOL 数据采用``主训练---严格复现---高保真对照''三级体系。
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Kirchhoff 一致主训练模型。} 采用三维 Beam 接口的 Euler--Bernoulli 公式、Time Dependent 动力学和几何非线性，保留轴向变形、两向弯曲、三维截面转角及扭转。COMSOL 的三维 Euler--Bernoulli 截面刚度包含轴力、扭矩和两个弯矩，因此无剪切并不等于无扭转\cite{COMSOLBeamInterface2025,COMSOLSectionStiffness2025}。该模型生成与严格 Kirchhoff 主分支同假设的数据。
+\item
+  \textbf{严格弱形式复现模型。} 当需要逐项验证本文平移---姿态联合弱形式、非标准约束或自定义分布力矩时，使用 Weak Form PDE 或 Weak Contribution 输入试验函数、边界项和辅助变量\cite{COMSOLWeakFormPDE2025,COMSOLWeakContribution2025}。该分支用于核查内置 Beam 与本文方程的差异，而非默认全部工况均采用。
+\item
+  \textbf{高保真对照模型。} Timoshenko Beam 用于量化横向剪切和转动惯性修正；三维 Solid Mechanics 用于检查局部截面应力、接触区和附加部件效应。它们输出 \(X_{HF}\)，与 Kirchhoff 一致模型 \(X_{K}\) 的差异用于验证和模型偏差学习，而不直接替换 KAM 主分支。
+\end{enumerate}
+
+所有模型应输出中心线位置 \(\mathbf{r}_{C}(S,t)\)、截面姿态 \(\mathbf{R}_{C}(S,t)\) 或等价转角、中心线速度、截面角速度、截面合力与合力矩，以及结构动能和应变能。主训练分支还应输出磁、流体、接触和边界作用的分项功率。
+
+定义平移 Gram 矩阵
+
+\begin{equation}
+\label{eq:galerkin-2-116}
+\mathbf{G}_{a} = \int_{0}^{L}\mathbf{N}^{T}\mathbf{W}_{a}\mathbf{N}\, dS,
+\end{equation}
+
+则 COMSOL 中心线场投影为
+
+\begin{equation}
+\label{eq:galerkin-2-117}
+\mathbf{a}(t) = \mathbf{G}_{a}^{- 1}\int_{0}^{L}\mathbf{N}^{T}\mathbf{W}_{a}\left\lbrack \mathbf{r}_{C}(S,t) - \mathbf{r}_{0}(S) \right\rbrack dS.
+\end{equation}
+
+姿态不能直接对 Euler 角分量线性投影。应先计算相对旋转的对数坐标
+
+\begin{equation}
+\label{eq:galerkin-2-118}
+\bm{\theta}_{C}(S,t) = \log\left( \mathbf{R}_{0}^{T}(S)\mathbf{R}_{C}(S,t) \right)^{\vee},
+\end{equation}
+
+再令
+
+\begin{equation}
+\label{eq:galerkin-2-119}
+\mathbf{G}_{b} = \int_{0}^{L}\bm{\Psi}^{T}\mathbf{W}_{b}\bm{\Psi}\, dS,\quad\quad\mathbf{b}(t) = \mathbf{G}_{b}^{- 1}\int_{0}^{L}\bm{\Psi}^{T}\mathbf{W}_{b}\bm{\theta}_{C}(S,t)\, dS.
+\end{equation}
+
+由此得到 \(\mathbf{q} = \left( \mathbf{a}^{T},\mathbf{b}^{T} \right)^{T}\)。角速度应通过 \(\bm{\omega}_{h} = \mathbf{B}_{\omega}\left( \mathbf{q} \right)\dot{\mathbf{b}}\) 校核，而不是简单令 \(\bm{\omega} = \bm{\Psi}\dot{\mathbf{b}}\)。
+
+COMSOL--Galerkin bridge 比较 stationary energy/field 导出、mesh-40/80 模态现实性、前 12 阶频率簇和质量度量基。mesh 频率最大相对差为 \(4.15920\times10^{-5}\)，候选前缀质量 Gram 非对角元最大值不超过 \(1.32445\times10^{-15}\)。三条 \(1\,\mathrm{s}\) 轨迹总体不满足原 \(0.5\%\) 严格扰动能量判据，而在固定公共支持和锚点下均满足独立的 \(2\%\) force-v2 判据。严格能量判据、探索性 \(1\%\) 能量判据和 force-v2 判据对应不同物理问题与阈值，逐项数值见\Cref{sec:numerical-6-2}。
+
+流体载荷实现必须与理论分支一致：理论主线采用 \(T_{A}\)（或其离散等效质量与几何项）加纯 Froude--Krylov 项及拖曳项；工程 Morison 对照采用完整 \(C_{M}\mathbf{a}_{f} - C_{A}\ddot{\mathbf{r}}\) 形式，但不得同时启用 \(T_{A}\)。同一物理作用在任一数据样本中只能计入一次。
+
+\subsubsection{有限维状态、能量、端口与结构学习输出}\label{sec:galerkin-2-11-2}
+
+经联合 Galerkin 离散和\Cref{sec:hamiltonian-structure}的一致 Legendre 后处理后，数值实现应输出统一的有限维状态、能量、端口和表示标签：
+
+\begin{equation}
+\label{eq:galerkin-2-120}
+\mathcal{O}_{h} = \left( \mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}},\mathbf{p}_{rep},{\dot{\mathbf{p}}}_{rep},\mathbf{M}\left( \mathbf{q} \right),V_{h},E_{h},\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow},\mathbf{Q}_{\partial},\mathbf{c},\mathbf{G},representation \right).
+\end{equation}
+
+其中，\(\mathbf{p}_{rep}\) 和 \({\dot{\mathbf{p}}}_{rep}\) 必须与所选 Lagrangian 表示一致；\(representation\) 至少区分自治骨架表示、精确非自治表示和工程约化表示。严格 Kirchhoff 分支同时保存离散约束 \(\mathbf{c}\left( \mathbf{q} \right)\) 及其 Jacobian \(\mathbf{G}\left( \mathbf{q} \right)\)；无约束分支可将这两个分量标记为空。
+
+\Cref{sec:hamiltonian-structure}应据此构造两类不混用的数据对象。自治骨架数据为
+
+\begin{equation}
+\label{eq:galerkin-2-121}
+\mathcal{D}_{sk} = \left( \mathbf{z}_{0},{\dot{\mathbf{z}}}_{0},H_{cons},\nabla_{\mathbf{z}_{0}}H_{cons},\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{sk},\mathbf{Q}_{\partial} \right),\quad\quad\mathbf{z}_{0} = \left( \mathbf{q},\mathbf{p}_{0} \right),
+\end{equation}
+
+精确非自治数据为
+
+\begin{equation}
+\label{eq:galerkin-2-122}
+\mathcal{D}_{na} = \left( \mathbf{z},\dot{\mathbf{z}},t,H,\nabla_{\mathbf{z}}H,\partial_{t}H,\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{H},\mathbf{Q}_{\partial} \right),\quad\quad\mathbf{z} = \left( \mathbf{q},\mathbf{p} \right).
+\end{equation}
+
+若 \({\dot{\mathbf{p}}}_{rep}\) 或 \({\dot{\mathbf{z}}}_{rep}\) 由数值差分而非求解器残差、解析方程或自动微分得到，必须同时记录差分阶数、时间步长和导数误差估计。CHNN 的导数监督、能量平衡监督和后续 KAM 误差预算只能使用表示一致且误差可追踪的数据。
+
+\subsubsection{训练数据分层与模型标签}\label{sec:galerkin-2-11-3}
+
+每个样本必须同时保存
+
+\begin{equation}
+\label{eq:galerkin-2-123}
+model\_ level \in \{ K,WF,T,S\},\quad\quad representation \in \{ sk,na,red\},
+\end{equation}
+
+其中 \(K\) 为 Kirchhoff 一致 Beam 主训练模型，\(WF\) 为严格弱形式模型，\(T\) 为 Timoshenko 对照，\(S\) 为三维实体对照；\(sk\) 表示自治骨架，\(na\) 表示精确非自治变量，\(red\) 表示工程约化。
+
+用于保守 CHNN 与统计学习---KAM 的数据集限定为
+
+\begin{equation}
+\label{eq:galerkin-2-124}
+\mathcal{D}_{K}^{cons} = \{\left( \mathbf{z}_{0},{\dot{\mathbf{z}}}_{0},H_{cons},\nabla H_{cons} \right):model\_ level = K,\ representation = sk,\ \mathbf{Q}_{port} = 0\},
+\end{equation}
+
+开放端口训练集为
+
+\begin{equation}
+\label{eq:galerkin-2-125}
+\mathcal{D}_{K}^{port} = \{\left( \mathbf{z}_{rep},{\dot{\mathbf{z}}}_{rep},\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow},\mathbf{Q}_{\partial} \right):model\_ level = K\},
+\end{equation}
+
+高保真对照集为
+
+\begin{equation}
+\label{eq:galerkin-2-126}
+\mathcal{D}_{HF} = \{ X_{HF} - X_{K}:model\_ level \in \{ WF,T,S\}\}.
+\end{equation}
+
+\(\mathcal{D}_{HF}\) 只在闭合性、功率符号和正则性检验后分别进入保守修正、耗散修正或一般残差；不得把高保真差异整体解释为 Hamiltonian 扰动。不同 \(model\_ level\) 和 \(representation\) 的样本不得在无标签、无配对的情况下直接混合。
+
+\subsection{本章小结}\label{sec:galerkin-2-12}
+
+本章直接从完整平移---转动弱形式出发，采用中心线展开和截面姿态指数映射构造联合 Galerkin 近似。参考构形与参考应变的相容条件、初始条件、接触活动集以及保守---非保守载荷的排他记账均已明确；基础杆体、偏心附加部件和能量一致流体附加质量统一写入速度型惯性泛函，由其关于广义速度的 Hessian 得到
+
+\begin{equation}
+\label{eq:galerkin-2-127}
+\mathbf{M}\left( \mathbf{q} \right) = \mathbf{M}_{str}\left( \mathbf{q} \right) + \sum_{e}^{}\mathbf{M}_{e}\left( \mathbf{q} \right) + \mathbf{M}_{A}\left( \mathbf{q} \right).
+\end{equation}
+
+对于一般规定流场，广义动量严格为
+
+\begin{equation}
+\label{eq:galerkin-2-128}
+\mathbf{p} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - \mathbf{b}_{A}\left( \mathbf{q},t \right),
+\end{equation}
+
+几何惯性和流场交叉项均由完整 Euler---Lagrange 导数产生，而不是经验补项。内部恢复力由完整拉伸---剪切---弯曲---扭转势能梯度得到，磁力矩和其他分布力矩通过转动试验函数直接投影。局部线性化已消除保守外载荷的重复计算，并明确了边界随形载荷和约束切线项。
+
+最终得到无约束及 Kirchhoff 受约束的有限维非线性动力系统，并给出 COMSOL 全阶场到联合广义坐标的投影与统一输出规范。能量一致流体主线采用 \(T_{A} + \mathbf{f}_{FK} + \mathbf{f}_{drag}\)，其中拖曳在一般背景流下进一步拆为 \(\mathbf{f}_{drag,diss} + \mathbf{f}_{drag,flow}\)；工程 Morison 仅作互斥验证。小转角、常质量与冻结附加质量仅作为约化分支；Euler--Bernoulli 在满足细长和剪切误差容差后作为 COMSOL Kirchhoff 一致主训练分支。上述离散对象不仅用于\Cref{sec:hamiltonian-structure}的正则动量和 Hamiltonian 构造，还通过 \(\mathcal{D}_{K}^{cons}\)、\(\mathcal{D}_{K}^{port}\)、\(\mathcal{D}_{HF}\)、端口标签、模型层级标签和约束标签向\Cref{sec:chnn-model} CHNN 训练及\Cref{sec:symplectic-kam}结构保持与 KAM 核验提供唯一上游接口。

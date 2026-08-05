@@ -1,0 +1,896 @@
+% Migrated from the Word baseline; do not duplicate content in other section files.
+\section{Geometrically Exact Bending--Torsion Dynamics of a Flexible Catheter under Multiphysics Loading}\label{sec:rod-model}
+
+\subsection{Modeling framework}\label{sec:rod-1-1}
+
+Consider the three-dimensional large-deformation motion of a magnetically actuated flexible catheter in a space-station microgravity environment under the combined action of magnetic fields, fluid flow, and vessel-wall contact. To retain the complete mechanical information required for the subsequent finite-dimensional Hamiltonian structure, complex-representation Hamiltonian neural network, and KAM stability analysis, the centerline position and cross-sectional orientation are treated as independent primary fields. The model retains axial extension, transverse shear, bending about two directions, independent torsion, cross-sectional rotary inertia, and externally distributed couples.
+
+The continuous model is first formulated within a geometrically exact Cosserat-rod framework. For a slender catheter, a Kirchhoff shear-free constraint may subsequently be imposed; this constraint removes transverse shear strain but does not eliminate cross-sectional orientation, torsional degrees of freedom, angular velocity, or rotary inertia. The complete translational--rotational model is therefore not replaced by a centerline-only field equation.\cite{Simo1985FiniteStrainBeam,Antman2005Elasticity,MarsdenRatiu1999MechanicsSymmetry}
+
+Let the reference material coordinate be
+
+\begin{equation}
+\label{eq:rod-1-1}
+S \in \lbrack 0,L\rbrack,\quad\quad t \in \lbrack 0,T\rbrack,
+\end{equation}
+
+where \(L\) is the catheter length in the reference configuration. Unless otherwise stated, all cross-sectional parameters may vary with \(S\) to represent nonuniform geometry, spatially varying material properties, or localized magnetic components.
+
+Magnetic, fluid, and contact effects enter the rod equations as distributed forces and couples per unit reference length. A strictly coupled multiphysics PDE system would require simultaneous solution of the electromagnetic, fluid, and structural field equations. The formulation developed in this section is instead a geometrically exact rod-dynamics model driven by multiphysics load inputs.
+
+\subsubsection{Model hierarchy and computational branches}\label{sec:rod-1-1-1}
+
+The overall route is as follows: a continuous model is constructed from Kirchhoff/geometrically exact rod mechanics, Maxwell magnetic actuation, Morison-type fluid loading, and catheter--vessel-wall contact; Galerkin discretization yields finite-dimensional dynamics; and the resulting system supports a Hamiltonian backbone, a complex-representation-enhanced structured Hamiltonian neural network, and KAM/structure-preserving stability analysis. To avoid conflating the continuous parent model, the COMSOL training model, the learned structured model, and the KAM analysis object, the following four-level hierarchy is used throughout.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Geometrically exact physical parent model.} The coupled translational--cross-sectional-orientation Cosserat rod, independent torsion, rotary inertia, distributed forces, and distributed couples are retained. This level preserves the complete mechanical information and provides the common energy and virtual-work basis for all reduced branches\cite{Simo1985FiniteStrainBeam,Antman2005Elasticity}.
+\item
+  \textbf{Strict Kirchhoff theoretical branch.} For slender, low-shear catheters, the shear-free constraint is imposed without removing cross-sectional orientation, torsion, angular velocity, or rotary inertia. Before CHNN or KAM analysis, the constrained finite-dimensional system must be expressed in independent local coordinates on the constraint manifold or approximated by a regularized model whose convergence to the constrained system has been verified. A differential--algebraic system with Lagrange multipliers must not be treated directly as a canonical Hamiltonian system on the full coordinate space.
+\item
+  \textbf{COMSOL Kirchhoff-consistent training branch.} The primary training data preferentially use the three-dimensional Euler--Bernoulli Beam interface with geometric nonlinearity, dynamic inertia, and torsional degrees of freedom, which is the closest built-in COMSOL realization of the Kirchhoff shear-free assumptions. Because this interface permits large displacements and rotations while retaining a small-strain, element-local linearization, it is referred to as a ``Kirchhoff-consistent engineering model rather than being identified unconditionally with the geometrically exact parent model\cite{COMSOLBeamInterface2025,COMSOLGeometricNonlinearity2025,COMSOLSectionStiffness2025}. When term-by-term reproduction of the coupled weak form is required, custom Weak Form PDE or Weak Contribution equations are used\cite{COMSOLWeakFormPDE2025,COMSOLWeakContribution2025}.
+\item
+  \textbf{High-fidelity validation and open-port branch.} Timoshenko beams, three-dimensional Solid Mechanics, or a custom Cosserat weak form are used to assess shear effects, local cross-sectional effects, and model discrepancy. Magnetic control, background-flow input, passive drag, contact dissipation, friction, and boundary actuation enter the finite-dimensional model through mutually exclusive power ports. High-fidelity data are used for external validation and model-discrepancy learning and are not mixed with conservative Kirchhoff samples without explicit labels. The complete open system is used for structured CHNN identification and safe-domain computation; only the autonomous conservative backbone obtained by closing the ports, or an independently proven exact symplectic extension, is a direct object of classical KAM theory.
+\end{enumerate}
+
+Accordingly, in addition to the continuous equations and Galerkin system, the first two sections provide \Cref{sec:hamiltonian-structure,sec:chnn-model,sec:symplectic-kam} with mutually consistent conservative energies, constraint-reduced states, port decompositions, model-level labels, and numerical-representation labels. All subsequent engineering reductions are performed within this common physical--mathematical framework.
+
+\subsection{Geometry and kinematics}\label{sec:rod-1-2}
+
+\subsubsection{Centerline and cross-sectional frame}\label{sec:rod-1-2-1}
+
+Let the catheter centerline be described by the position vector
+
+\begin{equation}
+\label{eq:rod-1-2}
+\mathbf{r} = \mathbf{r}(S,t) \in \mathbb{R}^{3}.
+\end{equation}
+
+Introduce a right-handed orthonormal frame on each cross section,
+
+\begin{equation}
+\label{eq:rod-1-3}
+\{\mathbf{d}_{1}(S,t),\mathbf{d}_{2}(S,t),\mathbf{d}_{3}(S,t)\},
+\end{equation}
+
+and define the rotation matrix
+
+\begin{equation}
+\label{eq:rod-1-4}
+\mathbf{R}(S,t) = \left\lbrack \mathbf{d}_{1}\ \mathbf{d}_{2}\ \mathbf{d}_{3} \right\rbrack \in SO(3),
+\end{equation}
+
+which satisfies
+
+\begin{equation}
+\label{eq:rod-1-5}
+\mathbf{R}^{T}\mathbf{R} = \mathbf{I},\quad\quad\det\mathbf{R} = 1.
+\end{equation}
+
+The full model does not impose \(\mathbf{d}_{3}\) to be parallel to the centerline tangent; transverse shear is therefore admissible. The centerline stretch and unit tangent are defined, respectively, by
+
+\begin{equation}
+\label{eq:rod-1-6}
+\lambda(S,t) = \parallel \mathbf{r}_{,S} \parallel ,\quad\quad\mathbf{t}(S,t) = \frac{\mathbf{r}_{,S}}{\lambda}.
+\end{equation}
+
+\subsubsection{Skew-symmetric operator}\label{sec:rod-1-2-2}
+
+For any \(\mathbf{a} \in \mathbb{R}^{3}\), define the skew-symmetric matrix \(\widehat{\mathbf{a}} \in \mathfrak{so}(3)\) such that\cite{Sola2018MicroLie,MarsdenRatiu1999MechanicsSymmetry}
+
+\begin{equation}
+\label{eq:rod-1-7}
+\widehat{\mathbf{a}}\,\mathbf{b} = \mathbf{a} \times \mathbf{b},\quad\quad\forall\mathbf{b} \in \mathbb{R}^{3}.
+\end{equation}
+
+Its inverse mapping is denoted by \(( \cdot )^{\vee}\). Hence, both spatial and temporal derivatives of the rotation matrix can be represented by three-dimensional vectors.
+
+\subsubsection{Shear--extension strain}\label{sec:rod-1-2-3}
+
+Define the shear--extension strain vector in the material frame as
+
+\begin{equation}
+\label{eq:rod-1-8}
+\bm{\nu}(S,t) = \mathbf{R}^{T}\mathbf{r}_{,S} = \begin{bmatrix}
+\nu_{1} \\
+\nu_{2} \\
+\nu_{3}
+\end{bmatrix}.
+\end{equation}
+
+where \(\nu_{1}\) and \(\nu_{2}\) are the two transverse shear-strain components and \(\nu_{3}\) is the axial extension component along the third director. The reference strain is denoted by
+
+\begin{equation}
+\label{eq:rod-1-9}
+\bm{\nu}_{0}(S) = \begin{bmatrix}
+\nu_{01} \\
+\nu_{02} \\
+\nu_{03}
+\end{bmatrix}.
+\end{equation}
+
+For a straight rod with no initial shear and no reference-length extension, one may take
+
+\begin{equation}
+\label{eq:rod-1-10}
+\bm{\nu}_{0} = (0,0,1)^{T}.
+\end{equation}
+
+In the fully shearable Cosserat parent model, the axial material-strain component along the third director must be distinguished from the centerline stretch strain. The former is defined by
+
+\begin{equation}
+\label{eq:rod-1-11}
+\varepsilon_{3} = \nu_{3} - \nu_{03}.
+\end{equation}
+
+On the other hand, \(\mathbf{r}_{,S} = \mathbf{R}\bm{\nu}\) together with \(\mathbf{R}^{T}\mathbf{R} = \mathbf{I}\) gives \(\lambda = \parallel \mathbf{r}_{,S} \parallel = \parallel \bm{\nu} \parallel\). The centerline extension strain is therefore defined as
+
+\begin{equation}
+\label{eq:rod-1-12}
+\varepsilon_{\lambda} = \lambda - \lambda_{0} = \parallel \bm{\nu} \parallel - \parallel \bm{\nu}_{0} \parallel .
+\end{equation}
+
+Under the Kirchhoff shear-free condition \(\nu_{1} = \nu_{2} = 0\), if the reference configuration also satisfies \(\nu_{03} = \lambda_{0}\), then \(\varepsilon_{3} = \varepsilon_{\lambda}\). The constitutive matrices used below remain formulated in terms of the material strain \(\bm{\nu} - \bm{\nu}_{0}\).
+
+\subsubsection{Curvature--torsion kinematics}\label{sec:rod-1-2-4}
+
+Define the curvature--torsion vector in the material frame by
+
+\begin{equation}
+\label{eq:rod-1-13}
+\widehat{\bm{\kappa}} = \mathbf{R}^{T}\mathbf{R}_{,S},\quad\quad\bm{\kappa} = \begin{bmatrix}
+\kappa_{1} \\
+\kappa_{2} \\
+\kappa_{3}
+\end{bmatrix}.
+\end{equation}
+
+where \(\kappa_{1}\) and \(\kappa_{2}\) are the bending curvatures about the two principal directions and \(\kappa_{3}\) is the independent twist rate. The variation of the local frame along the reference coordinate satisfies
+
+\begin{equation}
+\label{eq:rod-1-14}
+\mathbf{d}_{i,S} = \left( \mathbf{R}\bm{\kappa} \right) \times \mathbf{d}_{i},\quad\quad i = 1,2,3.
+\end{equation}
+
+The reference curvature--torsion vector is denoted by
+
+\begin{equation}
+\label{eq:rod-1-15}
+\bm{\kappa}_{0}(S) = \left( \kappa_{01},\kappa_{02},\kappa_{03} \right)^{T}.
+\end{equation}
+
+\subsubsection{Cross-sectional angular velocity and compatibility}\label{sec:rod-1-2-5}
+
+Define the cross-sectional angular velocity in the material frame by
+
+\begin{equation}
+\label{eq:rod-1-16}
+\widehat{\bm{\omega}} = \mathbf{R}^{T}\mathbf{R}_{,t}.
+\end{equation}
+
+The corresponding angular velocity in the spatial frame is
+
+\begin{equation}
+\label{eq:rod-1-17}
+\bm{\omega}_{s} = \mathbf{R}\bm{\omega}.
+\end{equation}
+
+The identities \(\mathbf{r}_{,St} = \mathbf{r}_{,tS}\) and \(\mathbf{R}_{,St} = \mathbf{R}_{,tS}\) yield the kinematic compatibility relations\cite{Simo1985FiniteStrainBeam,Antman2005Elasticity,Sola2018MicroLie}
+
+\begin{equation}
+\label{eq:rod-1-18}
+\dot{\bm{\nu}} = \mathbf{R}^{T}{\dot{\mathbf{r}}}_{,S} - \bm{\omega} \times \bm{\nu},
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-19}
+\dot{\bm{\kappa}} = \bm{\omega}_{,S} + \bm{\kappa} \times \bm{\omega}.
+\end{equation}
+
+The second relation enforces compatibility between the spatial and temporal evolution of the cross-sectional orientation and is indispensable to the complete bending--torsion dynamics.
+
+\subsubsection{Motion of material points within a cross section}\label{sec:rod-1-2-6}
+
+Let the in-plane material coordinate be
+
+\begin{equation}
+\label{eq:rod-1-20}
+\bm{\xi} = \xi_{1}\mathbf{e}_{1} + \xi_{2}\mathbf{e}_{2},
+\end{equation}
+
+The spatial position of a material point in the rod is then
+
+\begin{equation}
+\label{eq:rod-1-21}
+\mathbf{x}\left( S,\bm{\xi},t \right) = \mathbf{r}(S,t) + \mathbf{R}(S,t)\bm{\xi}.
+\end{equation}
+
+and its velocity is
+
+\begin{equation}
+\label{eq:rod-1-22}
+\dot{\mathbf{x}} = \dot{\mathbf{r}} + \mathbf{R}\left( \bm{\omega} \times \bm{\xi} \right) = \dot{\mathbf{r}} - \mathbf{R}\widehat{\bm{\xi}}\bm{\omega}.
+\end{equation}
+
+This expression contains both centerline translation and cross-sectional rotational velocity and is the starting point for the complete kinetic energy and the configuration-dependent mass matrix.
+
+\subsection{Complete kinetic energy, elastic potential, and constitutive relations}\label{sec:rod-1-3}
+
+\subsubsection{Cross-sectional mass parameters and the mass-centerline convention}\label{sec:rod-1-3-1}
+
+Let the material density be \(\rho\left( S,\bm{\xi} \right)\). Define the mass per unit reference length as
+
+\begin{equation}
+\label{eq:rod-1-23}
+\mu(S) = \int_{A(S)}^{}\rho\, dA,
+\end{equation}
+
+Define the first mass moment of the cross section by
+
+\begin{equation}
+\label{eq:rod-1-24}
+\mathbf{c}_{\rho}(S) = \int_{A(S)}^{}\rho\bm{\xi}\, dA,
+\end{equation}
+
+and the mass-inertia tensor per unit reference length in the material frame by
+
+\begin{equation}
+\label{eq:rod-1-25}
+\mathbf{J}_{c}(S) = \int_{A(S)}^{}\rho\left( \parallel \bm{\xi} \parallel^{2}\mathbf{I} - \bm{\xi}\bm{\xi}^{T} \right)dA.
+\end{equation}
+
+The preceding definitions retain a general cross-sectional mass distribution. To ensure that the subsequent momentum balance, weak form, and discrete mass matrix use a common inertial reference, the centerline \(\mathbf{r}(S,t)\) is taken, from \Cref{sec:rod-1-4} onward, to pass through the mass center of each cross section. The distributed rod therefore satisfies
+
+\begin{equation}
+\label{eq:rod-1-26}
+\boxed{\mathbf{c}_{\rho}(S) = \mathbf{0}.}
+\end{equation}
+
+This convention removes neither cross-sectional rotational degrees of freedom nor rotary inertia. A magnetic tip, sensor, or other localized component whose center of mass is offset from the centerline is not absorbed into \(\mathbf{c}_{\rho}\); it is introduced as an attached rigid body with its own coupled translational--rotational kinetic energy. This treatment preserves both closure of the base-rod equations and the physical inertial coupling of eccentric attachments.
+
+If the principal cross-sectional axes coincide with \(\mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\), then
+
+\begin{equation}
+\label{eq:rod-1-27}
+\mathbf{J}_{c} = diag\left( \rho I_{1},\rho I_{2},\rho I_{3} \right),
+\end{equation}
+
+where \(I_{1},I_{2}\) are the area moments of inertia about the two principal directions and \(I_{3} = I_{1} + I_{2}\) is the polar moment. For a nonuniform density distribution, the area-integral definitions must be used directly; the density cannot in general be factored out of the integrals.
+
+\subsubsection{Complete structural kinetic energy}\label{sec:rod-1-3-2}
+
+The three-dimensional kinetic energy of the base rod follows from the material-point velocity as
+
+\begin{equation}
+\label{eq:rod-1-28}
+T_{str} = \frac{1}{2}\int_{0}^{L}{\int_{A(S)}^{}\rho}\left| \dot{\mathbf{r}} + \mathbf{R}\left( \bm{\omega} \times \bm{\xi} \right) \right|^{2}dA\, dS.
+\end{equation}
+
+After integration over the cross section, the general form becomes
+
+\begin{equation}
+\label{eq:rod-1-29}
+T_{str} = \frac{1}{2}\int_{0}^{L}\left\lbrack \mu\left| \dot{\mathbf{r}} \right|^{2} + 2{\dot{\mathbf{r}}}^{T}\mathbf{R}\left( \bm{\omega} \times \mathbf{c}_{\rho} \right) + \bm{\omega}^{T}\mathbf{J}_{c}\bm{\omega} \right\rbrack dS.
+\end{equation}
+
+Under the mass-centerline convention of \Cref{sec:rod-1-3-1}, \(\mathbf{c}_{\rho} = \mathbf{0}\), and the kinetic energy of the base rod reduces to
+
+\begin{equation}
+\label{eq:rod-1-30}
+\boxed{T_{str} = \frac{1}{2}\int_{0}^{L}\left\lbrack \mu\left| \dot{\mathbf{r}} \right|^{2} + \bm{\omega}^{T}\mathbf{J}_{c}\bm{\omega} \right\rbrack dS.}
+\end{equation}
+
+If eccentric attached components are present, their kinetic energy \(T_{e}\) is added separately and generally reintroduces translational--rotational cross terms. Regardless of whether the base rod uses a mass-centerline convention, the kinetic energy retains rotary inertia about both transverse axes and torsional inertia about the tangent direction. The model must not subsequently be reduced to a centerline-only field by deleting the rotational terms.
+
+\subsubsection{Elastic strain-energy density}\label{sec:rod-1-3-3}
+
+Let the shear--extension and bending--torsion stiffness matrices be, respectively,
+
+\begin{equation}
+\label{eq:rod-1-31}
+\mathbf{K}_{\nu}(S) = diag\left( k_{1}GA,k_{2}GA,EA \right),
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-32}
+\mathbf{K}_{\kappa}(S) = diag\left( EI_{1},EI_{2},GJ \right),
+\end{equation}
+
+where \(E\) is Young's modulus, \(G\) is the shear modulus, \(k_{1},k_{2}\) are shear correction factors, and \(J\) is the cross-sectional torsional constant. For asymmetric materials or cross sections, \(\mathbf{K}_{\nu}\) and \(\mathbf{K}_{\kappa}\) may be general symmetric positive-definite matrices so that directional coupling is retained.
+
+The elastic strain-energy density per unit reference length is defined by
+
+\begin{equation}
+\label{eq:rod-1-33}
+W\left( \bm{\nu},\bm{\kappa};S \right) = \frac{1}{2}\left( \bm{\nu} - \bm{\nu}_{0} \right)^{T}\mathbf{K}_{\nu}\left( \bm{\nu} - \bm{\nu}_{0} \right) + \frac{1}{2}\left( \bm{\kappa} - \bm{\kappa}_{0} \right)^{T}\mathbf{K}_{\kappa}\left( \bm{\kappa} - \bm{\kappa}_{0} \right).
+\end{equation}
+
+The internal elastic potential energy is
+
+\begin{equation}
+\label{eq:rod-1-34}
+V_{int} = \int_{0}^{L}W\, dS.
+\end{equation}
+
+\subsubsection{Constitutive laws for internal force and couple}\label{sec:rod-1-3-4}
+
+The resultant internal force and couple in the material frame are obtained from the gradient of the strain-energy density:
+
+\begin{equation}
+\label{eq:rod-1-35}
+\mathbf{n}_{b} = \frac{\partial W}{\partial\bm{\nu}} = \mathbf{K}_{\nu}\left( \bm{\nu} - \bm{\nu}_{0} \right),
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-36}
+\mathbf{m}_{b} = \frac{\partial W}{\partial\bm{\kappa}} = \mathbf{K}_{\kappa}\left( \bm{\kappa} - \bm{\kappa}_{0} \right).
+\end{equation}
+
+Their counterparts in the spatial frame are
+
+\begin{equation}
+\label{eq:rod-1-37}
+\mathbf{n} = \mathbf{R}\mathbf{n}_{b},\quad\quad\mathbf{m} = \mathbf{R}\mathbf{m}_{b}.
+\end{equation}
+
+These constitutive equations retain extension, shear in both transverse directions, bending about two axes, and independent torsion. For a general nonlinear hyperelastic material, the quadratic form \(W\) may be replaced by the corresponding objective strain-energy density, with the constitutive resultants still obtained from its derivatives.
+
+\subsection{Momentum balance and multiphysics loading}\label{sec:rod-1-4}
+
+\subsubsection{Translational balance}\label{sec:rod-1-4-1}
+
+The continuous balance laws below use the mass centerline specified in \Cref{sec:rod-1-3-1} as the centerline of the base catheter. The linear-momentum balance per unit reference length is
+
+\begin{equation}
+\label{eq:rod-1-38}
+\mu\ddot{\mathbf{r}} = \mathbf{n}_{,S} + \mathbf{f}_{ext},
+\end{equation}
+
+where
+
+\begin{equation}
+\label{eq:rod-1-39}
+\mathbf{f}_{ext} = \mathbf{f}_{mag} + \mathbf{f}_{hydro} + \mathbf{f}_{cont} + \mathbf{f}_{g}.
+\end{equation}
+
+All terms represent spatially distributed forces per unit reference length. The inertia of eccentric attachments is not contained implicitly in \(\mu\ddot{\mathbf{r}}\); it is introduced consistently at the discrete level through their independent kinetic energy. Under the energy-consistent fluid formulation of \Cref{sec:rod-1-4-4}, the added-inertia operator is placed on the left-hand side, while the fluid-acceleration input on the right-hand side contains only the pure Froude--Krylov term and drag. The complete engineering Morison branch and this theoretical branch must not be activated simultaneously.
+
+\subsubsection{Rotational balance}\label{sec:rod-1-4-2}
+
+The angular-momentum balance about the centerline is written as
+
+\begin{equation}
+\label{eq:rod-1-40}
+\mathbf{m}_{,S} + \mathbf{r}_{,S} \times \mathbf{n} + \mathbf{l}_{ext} = \frac{\partial}{\partial t}\left( \mathbf{R}\mathbf{J}_{c}\bm{\omega} \right),
+\end{equation}
+
+where
+
+\begin{equation}
+\label{eq:rod-1-41}
+\mathbf{l}_{ext} = \mathbf{l}_{mag} + \mathbf{l}_{hydro} + \mathbf{l}_{cont}.
+\end{equation}
+
+Using \(\dot{\mathbf{R}} = \mathbf{R}\widehat{\bm{\omega}}\), the expanded form is
+
+\begin{equation}
+\label{eq:rod-1-42}
+\mathbf{m}_{,S} + \mathbf{r}_{,S} \times \mathbf{n} + \mathbf{l}_{ext} = \mathbf{R}\left\lbrack \mathbf{J}_{c}\dot{\bm{\omega}} + \bm{\omega} \times \left( \mathbf{J}_{c}\bm{\omega} \right) \right\rbrack.
+\end{equation}
+
+where \(\bm{\omega} \times \left( \mathbf{J}_{c}\bm{\omega} \right)\) is the gyroscopic inertia term. It follows from the exact time derivative of angular momentum and is not an empirical correction that may be added or removed arbitrarily.
+
+\subsubsection{Magnetic force and couple from the Maxwell stress tensor}\label{sec:rod-1-4-3}
+
+In the air or vacuum region surrounding an infinitesimal magnetic catheter segment, the Maxwell stress tensor is\cite{Jackson1998Electrodynamics,Abbott2020MagneticRobotics}
+
+\begin{equation}
+\label{eq:rod-1-43}
+\mathbf{T}_{M} = \frac{1}{\mu_{0}}\left( \mathbf{B} \otimes \mathbf{B} - \frac{1}{2}\left| \mathbf{B} \right|^{2}\mathbf{I} \right),
+\end{equation}
+
+where \(\mathbf{B}\) is the magnetic flux density and \(\mu_{0}\) is the permeability of free space. For a segment of reference length \(\Delta S\), the magnetic force per unit reference length and the magnetic couple about the centerline are defined by
+
+\begin{equation}
+\label{eq:rod-1-44}
+\mathbf{f}_{mag} = \lim_{\Delta S \rightarrow 0}\frac{1}{\Delta S}\int_{\partial\Omega_{\Delta S}}^{}\mathbf{T}_{M}\mathbf{n}_{A}\, dA,
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-45}
+\mathbf{l}_{mag} = \lim_{\Delta S \rightarrow 0}\frac{1}{\Delta S}\int_{\partial\Omega_{\Delta S}}^{}\left( \mathbf{x} - \mathbf{r} \right) \times \left( \mathbf{T}_{M}\mathbf{n}_{A} \right)\, dA,
+\end{equation}
+
+where \(\mathbf{n}_{A}\) is the outward unit normal to the closed integration surface.
+
+When a magnetic segment can be represented by a dipole approximation, let \(\bm{\mu}_{0}^{b}(S)\) be the magnetic moment per unit reference length in the material frame. The corresponding spatial magnetic moment is\cite{Jackson1998Electrodynamics,Abbott2020MagneticRobotics}
+
+\begin{equation}
+\label{eq:rod-1-46}
+\bm{\mu}(S,t) = \mathbf{R}(S,t)\bm{\mu}_{0}^{b}(S).
+\end{equation}
+
+For a prescribed external magnetic field \(\mathbf{B}\left( \mathbf{r},t \right)\), the magnetic potential energy is
+
+\begin{equation}
+\label{eq:rod-1-47}
+V_{mag} = - \int_{0}^{L}\bm{\mu} \cdot \mathbf{B}\left( \mathbf{r},t \right)\, dS.
+\end{equation}
+
+The associated magnetic force and couple are
+
+\begin{equation}
+\label{eq:rod-1-48}
+\mathbf{f}_{mag} = \nabla_{\mathbf{r}}\left( \bm{\mu} \cdot \mathbf{B} \right),\quad\quad\mathbf{l}_{mag} = \bm{\mu} \times \mathbf{B}.
+\end{equation}
+
+The Maxwell-stress integral and the magnetic-dipole potential are two scale-dependent representations of the same magnetic action. One should be selected as the primary load model according to the required fidelity; they must not be superposed and counted twice.
+
+\subsubsection{Modified Morison loading and energy-consistent added mass}\label{sec:rod-1-4-4}
+
+Let the fluid velocity be \(\mathbf{v}_{f}\left( \mathbf{r},t \right)\), with material acceleration
+
+\begin{equation}
+\label{eq:rod-1-49}
+\mathbf{a}_{f} = \frac{\partial\mathbf{v}_{f}}{\partial t} + \left( \mathbf{v}_{f} \cdot \nabla \right)\mathbf{v}_{f}.
+\end{equation}
+
+Define the fluid velocity relative to the catheter by
+
+\begin{equation}
+\label{eq:rod-1-50}
+\mathbf{u}_{r} = \mathbf{v}_{f} - \dot{\mathbf{r}}.
+\end{equation}
+
+If only the component normal to the current centerline is retained, define
+
+\begin{equation}
+\label{eq:rod-1-51}
+\mathbf{P}_{\bot} = \mathbf{I} - \mathbf{t} \otimes \mathbf{t},\quad\quad\mathbf{u}_{r\bot} = \mathbf{P}_{\bot}\mathbf{u}_{r}.
+\end{equation}
+
+An engineering Morison validation branch may be written as\cite{Morison1950,Newman1977MarineHydrodynamics,Faltinsen1990SeaLoads}
+
+\begin{equation}
+\label{eq:rod-1-52}
+\mathbf{f}_{hydro}^{M} = \mathbf{f}_{in}^{M} + \mathbf{f}_{add}^{M} + \mathbf{f}_{drag},
+\end{equation}
+
+where
+
+\begin{equation}
+\label{eq:rod-1-53}
+\mathbf{f}_{in}^{M} = \rho_{f}C_{M}A_{d}\mathbf{P}_{\bot}\mathbf{a}_{f},
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-54}
+\mathbf{f}_{add}^{M} = - \rho_{f}C_{A}A_{d}\mathbf{P}_{\bot}\ddot{\mathbf{r}},
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-55}
+\mathbf{f}_{drag} = \frac{1}{2}\rho_{f}C_{D}D \parallel \mathbf{u}_{r\bot} \parallel \mathbf{u}_{r\bot}.
+\end{equation}
+
+Here, \(\rho_{f}\) is the fluid density, \(A_{d}\) is the characteristic displaced-fluid area per unit length, \(D\) is the catheter outer diameter, and \(C_{A},C_{M},C_{D}\) are the added-mass, inertia, and drag coefficients, respectively; under a common convention, \(C_{M} = 1 + C_{A}\). This empirical branch must be used as a complete formulation and must not be combined with the functional \(T_{A}\) introduced below.
+
+To incorporate configuration-dependent added mass into the full inertial structure, the theoretical branch is instead defined through a velocity-dependent added-fluid inertia functional. Let\cite{Newman1977MarineHydrodynamics,Faltinsen1990SeaLoads}
+
+\begin{equation}
+\label{eq:rod-1-56}
+m_{A}(S) = \rho_{f}C_{A}A_{d},\quad\quad\mathbf{w}_{\bot} = \mathbf{P}_{\bot}\left( \dot{\mathbf{r}} - \mathbf{v}_{f} \right),
+\end{equation}
+
+and take
+
+\begin{equation}
+\label{eq:rod-1-57}
+T_{A}\left\lbrack \mathbf{r},\dot{\mathbf{r}};t \right\rbrack = \frac{1}{2}\int_{0}^{L}m_{A}\,\mathbf{w}_{\bot}^{T}\mathbf{w}_{\bot}\, dS.
+\end{equation}
+
+The corresponding inertial action is generated consistently by the functional Euler--Lagrange derivative
+
+\begin{equation}
+\label{eq:rod-1-58}
+\mathbf{I}_{A} = \frac{d}{dt}\frac{\delta T_{A}}{\delta\dot{\mathbf{r}}} - \frac{\delta T_{A}}{\delta\mathbf{r}}
+\end{equation}
+
+When \(\mathbf{P}_{\bot}\) is frozen, the leading term is
+
+\begin{equation}
+\label{eq:rod-1-59}
+\mathbf{I}_{A} = \rho_{f}C_{A}A_{d}\mathbf{P}_{\bot}\left( \ddot{\mathbf{r}} - \mathbf{a}_{f} \right),
+\end{equation}
+
+Variations of \(\mathbf{P}_{\bot}\) with configuration and spatial variations of the prescribed flow generate additional geometric terms. When the theoretical branch based on \(T_{A}\) is used, the explicit fluid-acceleration input on the right-hand side retains only the pure Froude--Krylov term
+
+\begin{equation}
+\label{eq:rod-1-60}
+\boxed{\mathbf{f}_{FK} = \rho_{f}A_{d}\mathbf{P}_{\bot}\mathbf{a}_{f}},
+\end{equation}
+
+with
+
+\begin{equation}
+\label{eq:rod-1-61}
+\mathbf{f}_{hydro,rem} = \mathbf{f}_{FK} + \mathbf{f}_{drag}.
+\end{equation}
+
+In this formulation, \(T_{A}\) already supplies the complete added-mass action associated with \(C_{A}\left( \mathbf{a}_{f} - \ddot{\mathbf{r}} \right)\). Together with the Froude--Krylov term having coefficient \(1\), it recovers \(C_{M} = 1 + C_{A}\); consequently, \(\mathbf{f}_{in}^{M}\) must no longer retain its \(C_{A}\mathbf{a}_{f}\) term, and no additional \(\mathbf{f}_{add}^{M}\) may be included. When \(\mathbf{v}_{f} = \mathbf{0}\) and \(m_{A}\) is time independent, \(T_{A}\) reduces to an added kinetic energy that can be included in the conservative inertial backbone. For a general prescribed flow, its cross terms and explicit time dependence are treated collectively as a flow port.
+
+For quadratic drag, define the nonnegative instantaneous state-dependent coefficient
+
+\begin{equation}
+\label{eq:rod-1-62}
+d_{f} = \frac{1}{2}\rho_{f}C_{D}D\, \parallel \mathbf{u}_{r\bot} \parallel \geq 0.
+\end{equation}
+
+The drag force must then be decomposed exclusively into a passive dissipative kernel and a background-flow input:
+
+\begin{equation}
+\label{eq:rod-1-63}
+\boxed{\mathbf{f}_{drag} = d_{f}\mathbf{P}_{\bot}\left( \mathbf{v}_{f} - \dot{\mathbf{r}} \right) = \underset{\mathbf{f}_{drag,diss}}{\underbrace{- d_{f}\mathbf{P}_{\bot}\dot{\mathbf{r}}}} + \underset{\mathbf{f}_{drag,flow}}{\underbrace{d_{f}\mathbf{P}_{\bot}\mathbf{v}_{f}}}.}
+\end{equation}
+
+Only the passive kernel has a definite dissipative sign with respect to the catheter mechanical energy:
+
+\begin{equation}
+\label{eq:rod-1-64}
+{\dot{\mathbf{r}}}^{T}\mathbf{f}_{drag,diss} = - d_{f} \parallel \mathbf{P}_{\bot}\dot{\mathbf{r}} \parallel^{2} \leq 0,
+\end{equation}
+
+The term \({\dot{\mathbf{r}}}^{T}\mathbf{f}_{drag,flow}\) is generally sign-indefinite and is therefore assigned to the flow-input port. The complete drag force also satisfies the relative-motion passivity identity
+
+\begin{equation}
+\label{eq:rod-1-65}
+\left( \dot{\mathbf{r}} - \mathbf{v}_{f} \right)^{T}\mathbf{f}_{drag} = - d_{f} \parallel \mathbf{P}_{\bot}\left( \dot{\mathbf{r}} - \mathbf{v}_{f} \right) \parallel^{2} \leq 0,
+\end{equation}
+
+This identity, however, does not replace the port accounting in the structural mechanical-energy balance. Thus, when \(\mathbf{v}_{f} \neq \mathbf{0}\), the complete quadratic drag must not be assigned entirely to \(\mathbf{Q}_{diss}\). Because \(d_{f}\) depends on the relative velocity, the passive kernel is a statewise positive-semidefinite nonlinear operator rather than a constant damping matrix.
+
+If damping of cross-sectional spin by the fluid is relevant, an additional fluid couple per unit reference length may be introduced, for example,
+
+\begin{equation}
+\label{eq:rod-1-66}
+\mathbf{l}_{hydro} = - c_{\omega}(S)\left| \omega_{3} - \omega_{f3} \right|\left( \omega_{3} - \omega_{f3} \right)\mathbf{d}_{3},
+\end{equation}
+
+where \(\omega_{f3}\) is the effective fluid angular velocity about the catheter tangent. If this effect is negligible compared with the magnetic and structural torsional moments, one may set \(\mathbf{l}_{hydro} = \mathbf{0}\) for the operating condition under consideration, while retaining the cross-sectional rotational degree of freedom.
+
+The baseline computational route assumes a stationary vessel wall and Morison loading associated with normal cross-flow, neglecting axial tangential skin friction; the effective fluid spin about the catheter tangent is set to \(\omega_{f3} = 0\). These are medium-fidelity reductions of the environmental loads and do not remove the structural variables describing cross-sectional orientation, independent torsion, angular velocity, or rotary inertia. Moving walls, tangential friction, or fluid spin can be incorporated later through additional ports following the same input--dissipation accounting.
+
+\subsubsection{Catheter--vessel-wall contact force and couple}\label{sec:rod-1-4-5}
+
+Let \(g(S,t)\) be the gap function between the catheter surface and the vessel wall, and let \(g_{0}\) be the contact-detection threshold. Define the penetration measure
+
+\begin{equation}
+\label{eq:rod-1-67}
+\delta_{c} = \max\left( g_{0} - g,0 \right).
+\end{equation}
+
+To represent Hertzian elasticity, normal-impact dissipation, and regularized friction simultaneously, let \({\dot{\delta}}_{c}\) denote the material time derivative of the penetration at the contact point. When contact is active, \(\delta_{c} > 0\), the normal force is taken as\cite{Johnson1985ContactMechanics,HuntCrossley1975Restitution,BrownMcPhee2016Friction}
+
+\begin{equation}
+\label{eq:rod-1-68}
+f_{n} = k_{c}\delta_{c}^{\alpha} + c_{n}{\dot{\delta}}_{c},\quad\quad\delta_{c} > 0.
+\end{equation}
+
+If the preceding expression is negative or if \(\delta_{c} = 0\), set \(f_{n} = 0\). This nonnegative truncation prevents nonphysical tensile contact forces during separation or noncontact. The tangential friction force and total contact force are, respectively,
+
+\begin{equation}
+\label{eq:rod-1-69}
+\mathbf{f}_{t} = - \mu_{c}f_{n}\frac{\mathbf{v}_{t}}{\sqrt{\mathbf{v}_{t} \cdot \mathbf{v}_{t} + v_{0}^{2}}},
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-70}
+\mathbf{f}_{cont} = f_{n}\mathbf{n}_{w} + \mathbf{f}_{t}.
+\end{equation}
+
+Here, \(k_{c}\) is the contact stiffness, \(c_{n}\) is the normal contact-damping coefficient, \(\alpha\) is the contact exponent, and Hertzian contact commonly uses \(\alpha = 3/2\). The vector \(\mathbf{n}_{w}\) is the unit normal directed away from the wall, \(\mathbf{v}_{t}\) is the tangential velocity of the contact point relative to the wall, \(\mu_{c}\) is the friction coefficient, and \(v_{0}\) is a regularization parameter. For automatic differentiation or a consistent Newton iteration, the contact activation and nonnegative truncation may be replaced by smooth regularizations. For conservative contact, one may set \(c_{n} = \mu_{c} = 0\), in which case the elastic contact term is derivable from a potential.
+
+If the contact force acts at an offset vector \(\bm{\rho}_{c}\) from the centerline, the contact couple is
+
+\begin{equation}
+\label{eq:rod-1-71}
+\mathbf{l}_{cont} = \bm{\rho}_{c} \times \mathbf{f}_{cont} + \mathbf{l}_{spin},
+\end{equation}
+
+where \(\mathbf{l}_{spin}\) may represent additional damping or frictional torque associated with cross-sectional spin in the contact region. Normal damping, tangential friction, and \(\mathbf{l}_{spin}\) are all included in the nonconservative power.
+
+\subsubsection{Microgravity term}\label{sec:rod-1-4-6}
+
+If a residual acceleration \(\mathbf{g}_{res}(t)\) is present in the space station, the residual gravitational force per unit reference length is
+
+\begin{equation}
+\label{eq:rod-1-72}
+\mathbf{f}_{g} = \mu\mathbf{g}_{res}.
+\end{equation}
+
+Under the ideal microgravity approximation, set
+
+\begin{equation}
+\label{eq:rod-1-73}
+\mathbf{g}_{res} = \mathbf{0}.
+\end{equation}
+
+\subsubsection{Complete strong-form system}\label{sec:rod-1-4-7}
+
+Collecting the kinematics, balance laws, and constitutive equations gives the geometrically exact system for the base rod:
+
+\begin{equation}
+\label{eq:rod-1-74}
+\left\{ \begin{matrix}
+ & \mathbf{r}_{,S} = \mathbf{R}\bm{\nu}, \\
+ & \mathbf{R}_{,S} = \mathbf{R}\widehat{\bm{\kappa}}, \\
+ & \mathbf{R}_{,t} = \mathbf{R}\widehat{\bm{\omega}}, \\
+ & \mu\ddot{\mathbf{r}} = \mathbf{n}_{,S} + \mathbf{f}_{ext}, \\
+ & \mathbf{m}_{,S} + \mathbf{r}_{,S} \times \mathbf{n} + \mathbf{l}_{ext} = \mathbf{R}\left\lbrack \mathbf{J}_{c}\dot{\bm{\omega}} + \bm{\omega} \times \left( \mathbf{J}_{c}\bm{\omega} \right) \right\rbrack, \\
+ & \mathbf{n} = \mathbf{R}\mathbf{K}_{\nu}\left( \bm{\nu} - \bm{\nu}_{0} \right), \\
+ & \mathbf{m} = \mathbf{R}\mathbf{K}_{\kappa}\left( \bm{\kappa} - \bm{\kappa}_{0} \right).
+\end{matrix} \right.\ \ \ \
+\end{equation}
+
+with the compatibility relations
+
+\begin{equation}
+\label{eq:rod-1-75}
+\dot{\bm{\nu}} = \mathbf{R}^{T}{\dot{\mathbf{r}}}_{,S} - \bm{\omega} \times \bm{\nu},\quad\quad\dot{\bm{\kappa}} = \bm{\omega}_{,S} + \bm{\kappa} \times \bm{\omega}.
+\end{equation}
+
+Under the energy-consistent added-mass formulation, \(\mathbf{I}_{A}\) is placed on the left-hand side together with the structural inertia, and only \(\mathbf{f}_{FK}\), drag, and the remaining fluid ports are retained on the right-hand side. Under the engineering Morison validation branch, the complete combination \(\mathbf{f}_{in}^{M} + \mathbf{f}_{add}^{M}\) is retained and \(T_{A}\) is omitted. Exactly one of these two representations must be used.
+
+The primary unknowns are \(\mathbf{r},\mathbf{R},\bm{\nu},\bm{\kappa},\bm{\omega},\mathbf{n},\mathbf{m}\). The system is a geometrically nonlinear mixed partial differential--algebraic system with Lie-group-valued orientation variables.
+
+\subsection{Variational formulation and complete weak form}\label{sec:rod-1-5}
+
+\subsubsection{Virtual displacement and virtual rotation}\label{sec:rod-1-5-1}
+
+Let \(\delta\mathbf{r}\) be the virtual centerline displacement and represent the orientation variation by the material virtual rotation \(\bm{\eta}\):
+
+\begin{equation}
+\label{eq:rod-1-76}
+\delta\mathbf{R} = \mathbf{R}\widehat{\bm{\eta}}.
+\end{equation}
+
+The corresponding spatial virtual rotation is
+
+\begin{equation}
+\label{eq:rod-1-77}
+\bm{\eta}_{s} = \mathbf{R}\bm{\eta}.
+\end{equation}
+
+The strain definitions give
+
+\begin{equation}
+\label{eq:rod-1-78}
+\delta\bm{\nu} = \mathbf{R}^{T}\delta\mathbf{r}_{,S} - \bm{\eta} \times \bm{\nu},
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-79}
+\delta\bm{\kappa} = \bm{\eta}_{,S} + \bm{\kappa} \times \bm{\eta}.
+\end{equation}
+
+\subsubsection{Internal virtual work}\label{sec:rod-1-5-2}
+
+The internal virtual work is
+
+\begin{equation}
+\label{eq:rod-1-80}
+\delta W_{int} = \int_{0}^{L}\left( \mathbf{n}_{b} \cdot \delta\bm{\nu} + \mathbf{m}_{b} \cdot \delta\bm{\kappa} \right)dS.
+\end{equation}
+
+Substituting the strain variations and integrating the spatial derivatives by parts gives
+
+\begin{equation}
+\label{eq:rod-1-81}
+\delta W_{int} = \left\lbrack \mathbf{n} \cdot \delta\mathbf{r} + \mathbf{m}_{b} \cdot \bm{\eta} \right\rbrack_{0}^{L} - I_{r} - I_{R},
+\end{equation}
+
+where
+
+\begin{equation}
+\label{eq:rod-1-82}
+I_{r} = \int_{0}^{L}\mathbf{n}_{,S} \cdot \delta\mathbf{r}\, dS,
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-83}
+I_{R} = \int_{0}^{L}\left( \mathbf{m}_{b,S} + \bm{\kappa} \times \mathbf{m}_{b} + \bm{\nu} \times \mathbf{n}_{b} \right) \cdot \bm{\eta}\, dS.
+\end{equation}
+
+The material-form rotational balance term satisfies
+
+\begin{equation}
+\label{eq:rod-1-84}
+\mathbf{m}_{b,S} + \bm{\kappa} \times \mathbf{m}_{b} + \bm{\nu} \times \mathbf{n}_{b} + \mathbf{l}_{b} = \mathbf{J}_{c}\dot{\bm{\omega}} + \bm{\omega} \times \left( \mathbf{J}_{c}\bm{\omega} \right),
+\end{equation}
+
+and \(\mathbf{l}_{b} = \mathbf{R}^{T}\mathbf{l}_{ext}\).
+
+\subsubsection{Inertial and external virtual work}\label{sec:rod-1-5-3}
+
+The inertial virtual work of the base rod is
+
+\begin{equation}
+\label{eq:rod-1-85}
+\delta W_{in,str} = \int_{0}^{L}\left\lbrack \mu\ddot{\mathbf{r}} \cdot \delta\mathbf{r} + \left( \mathbf{J}_{c}\dot{\bm{\omega}} + \bm{\omega} \times \left( \mathbf{J}_{c}\bm{\omega} \right) \right) \cdot \bm{\eta} \right\rbrack dS.
+\end{equation}
+
+If the energy-consistent added-mass formulation of \Cref{sec:rod-1-4-4} is used, the added-inertia virtual work is
+
+\begin{equation}
+\label{eq:rod-1-86}
+\delta W_{in,A} = \left\langle \frac{d}{dt}\frac{\delta T_{A}}{\delta\dot{\mathbf{r}}} - \frac{\delta T_{A}}{\delta\mathbf{r}},\,\delta\mathbf{r} \right\rangle,
+\end{equation}
+
+where \(\langle \cdot , \cdot \rangle\) denotes the duality pairing along the rod. If eccentric attachments are present, their inertial virtual work is generated by the Euler--Lagrange derivative of the corresponding rigid-body kinetic energy \(T_{e}\). The total inertial virtual work is therefore
+
+\begin{equation}
+\label{eq:rod-1-87}
+\delta W_{in} = \delta W_{in,str} + \delta W_{in,A} + \delta W_{in,e}.
+\end{equation}
+
+The virtual work of distributed external loads is
+
+\begin{equation}
+\label{eq:rod-1-88}
+\delta W_{ext} = \int_{0}^{L}\left( \mathbf{f}_{ext,rem} \cdot \delta\mathbf{r} + \mathbf{l}_{ext} \cdot \bm{\eta}_{s} \right)dS + \delta W_{\partial},
+\end{equation}
+
+where \(\mathbf{f}_{ext,rem}\) no longer contains the added inertia already represented by \(T_{A}\). In the energy-consistent fluid branch, the fluid contribution contains only \(\mathbf{f}_{FK}\), drag, and other inputs not represented by \(T_{A}\). Because \(\bm{\eta}_{s} = \mathbf{R}\bm{\eta}\), it may equivalently be written as
+
+\begin{equation}
+\label{eq:rod-1-89}
+\mathbf{l}_{ext} \cdot \bm{\eta}_{s} = \mathbf{l}_{b} \cdot \bm{\eta}.
+\end{equation}
+
+\subsubsection{Coupled weak form}\label{sec:rod-1-5-4}
+
+By D'Alembert's principle, every admissible pair \(\delta\mathbf{r}\) and \(\bm{\eta}\) satisfying the essential boundary conditions obeys
+
+\begin{equation}
+\label{eq:rod-1-90}
+\delta W_{in} + \delta W_{int} - \delta W_{ext} = 0.
+\end{equation}
+
+Expansion yields the complete coupled translational--rotational weak form:
+
+\begin{equation}
+\label{eq:rod-1-91}
+\begin{matrix}
+ & \int_{0}^{L}\mu\ddot{\mathbf{r}} \cdot \delta\mathbf{r}\, dS + \int_{0}^{L}\left\lbrack \mathbf{J}_{c}\dot{\bm{\omega}} + \bm{\omega} \times \left( \mathbf{J}_{c}\bm{\omega} \right) \right\rbrack \cdot \bm{\eta}\, dS \\
+ & + \,\delta W_{in,A} + \delta W_{in,e} + \int_{0}^{L}\left( \mathbf{n}_{b} \cdot \delta\bm{\nu} + \mathbf{m}_{b} \cdot \delta\bm{\kappa} \right)dS \\
+ & - \int_{0}^{L}\left( \mathbf{f}_{ext,rem} \cdot \delta\mathbf{r} + \mathbf{l}_{b} \cdot \bm{\eta} \right)dS - \delta W_{\partial} = 0.
+\end{matrix}
+\end{equation}
+
+If neither the added-fluid inertia functional nor eccentric attachments are included, setting \(\delta W_{in,A} = \delta W_{in,e} = 0\) recovers the base-rod weak form. Because the weak form contains only first spatial derivatives of the centerline and orientation fields, \(C^{0}\)-continuous approximation spaces for both fields are sufficient; no fourth-order centerline equation need be constructed by eliminating the rotational equation.
+
+In functional terms, the centerline and orientation may be viewed as mappings in \(\mathbf{r} \in H^{1}\left( 0,L;\mathbb{R}^{3} \right)\) and \(\mathbf{R} \in H^{1}\left( 0,L;SO(3) \right)\), respectively. The virtual displacement \(\delta\mathbf{r}\) and material virtual rotation \(\bm{\eta}\) belong to the corresponding \(H^{1}\) test spaces satisfying homogeneous essential boundary conditions. Thus, the coupled weak form requires only first-order spatial regularity.
+
+\subsubsection{Boundary terms and boundary conditions}\label{sec:rod-1-5-5}
+
+Integration by parts produces the natural boundary term
+
+\begin{equation}
+\label{eq:rod-1-92}
+\left\lbrack \mathbf{n} \cdot \delta\mathbf{r} + \mathbf{m} \cdot \bm{\eta}_{s} \right\rbrack_{0}^{L}.
+\end{equation}
+
+At an endpoint \(S = S_{e}\), one of the following two classes of boundary conditions may be prescribed:
+
+\begin{equation}
+\label{eq:rod-1-93}
+\mathbf{r}\left( S_{e},t \right) = \overline{\mathbf{r}}(t)\quad\text{or}\quad\mathbf{n}\left( S_{e},t \right) = \overline{\mathbf{n}}(t),
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-94}
+\mathbf{R}\left( S_{e},t \right) = \overline{\mathbf{R}}(t)\quad\text{or}\quad\mathbf{m}\left( S_{e},t \right) = \overline{\mathbf{m}}(t).
+\end{equation}
+
+At a clamped end, \(\delta\mathbf{r} = \mathbf{0}\) and \(\bm{\eta} = \mathbf{0}\); at a free end without applied terminal loads, the natural boundary conditions are \(\mathbf{n} = \mathbf{0}\) and \(\mathbf{m} = \mathbf{0}\). Boundary forces and moments must remain in the weak form unless the boundary conditions have been specified explicitly.
+
+The complete initial--boundary-value problem also requires the initial conditions
+
+\begin{equation}
+\label{eq:rod-1-95}
+\mathbf{r}(S,0) = \mathbf{r}^{0}(S),\quad\quad\dot{\mathbf{r}}(S,0) = \mathbf{v}^{0}(S),
+\end{equation}
+
+\begin{equation}
+\label{eq:rod-1-96}
+\mathbf{R}(S,0) = \mathbf{R}^{0}(S) \in SO(3),\quad\quad\bm{\omega}(S,0) = \bm{\omega}^{0}(S).
+\end{equation}
+
+The initial fields must satisfy the geometric compatibility relations \(\bm{\nu}^{0} = \left( \mathbf{R}^{0} \right)^{T}\mathbf{r}_{,S}^{0}\) and \({\widehat{\bm{\kappa}}}^{0} = \left( \mathbf{R}^{0} \right)^{T}\mathbf{R}_{,S}^{0}\), and they must be consistent with the essential boundary conditions. The strict Kirchhoff branch additionally requires the initial position constraint and its velocity-level compatibility condition.
+
+\subsection{Kirchhoff shear-free constraint}\label{sec:rod-1-6}
+
+For a slender catheter, impose the extensible Kirchhoff shear-free constraint
+
+\begin{equation}
+\label{eq:rod-1-97}
+\nu_{1} = 0,\quad\quad\nu_{2} = 0,\quad\quad\nu_{3} = \lambda.
+\end{equation}
+
+which gives
+
+\begin{equation}
+\label{eq:rod-1-98}
+\mathbf{r}_{,S} = \lambda\mathbf{d}_{3},\quad\quad\mathbf{d}_{3} = \mathbf{t}.
+\end{equation}
+
+This condition aligns the third director with the centerline tangent but does not determine the rotation of \(\mathbf{d}_{1},\mathbf{d}_{2}\) about \(\mathbf{d}_{3}\). Consequently, \(\kappa_{3}\), \(\omega_{3}\), \(GJ\), the polar rotary inertia, and the magnetic couple must all be retained.
+
+In the strong form, the transverse shear force is the reaction enforcing the shear-free constraint and does not vanish merely because \(\nu_{1} = \nu_{2} = 0\). The constraint may be imposed exactly with Lagrange multipliers or regularized by retaining a large but finite shear stiffness. In either case, the cross-sectional orientation field must remain in the model.\cite{MarsdenRatiu1999MechanicsSymmetry,HairerLubichWanner2006GNI}
+
+\subsection{Continuous energy balance}\label{sec:rod-1-7}
+
+\subsubsection{Structural energy and extended inertial energy}\label{sec:rod-1-7-1}
+
+The mechanical energy of the base rod is defined as
+
+\begin{equation}
+\label{eq:rod-1-99}
+E_{str} = T_{str} + V_{int}.
+\end{equation}
+
+If eccentric attachments are present, add their kinetic energy \(T_{e}\). In the energy-consistent added-mass branch with a stationary flow \(\mathbf{v}_{f} = \mathbf{0}\) and time-independent \(m_{A}\), define the total kinetic energy as
+
+\begin{equation}
+\label{eq:rod-1-100}
+T_{tot} = T_{str} + T_{A} + T_{e}.
+\end{equation}
+
+If magnetic loading, frictionless contact, or residual gravity is derivable from potentials, define
+
+\begin{equation}
+\label{eq:rod-1-101}
+V = V_{int} + V_{mag} + V_{cont} + V_{g},
+\end{equation}
+
+and the extended mechanical energy
+
+\begin{equation}
+\label{eq:rod-1-102}
+\boxed{E = T_{tot} + V.}
+\end{equation}
+
+For a general prescribed flow, \(T_{A}\) may depend explicitly on time and contain cross terms involving relative velocity. It is then a velocity-dependent added-fluid inertia functional in the Lagrangian rather than the ordinary mechanical kinetic energy of a closed system. Its contribution must remain explicit as an independent flow port in the power balance; it does not imply conservation of the mechanical energy of the combined structure--prescribed-flow system.
+
+\subsubsection{Power balance}\label{sec:rod-1-7-2}
+
+Taking the inner product of the translational equation with \(\dot{\mathbf{r}}\), the rotational equation with the spatial angular velocity \(\bm{\omega}_{s}\), and integrating along the rod gives
+
+\begin{equation}
+\label{eq:rod-1-103}
+\frac{d}{dt}\left( T_{tot} + V_{int} \right) = P_{\partial} + P_{mag} + P_{flow} + P_{cont} + P_{g},
+\end{equation}
+
+where the boundary power is
+
+\begin{equation}
+\label{eq:rod-1-104}
+P_{\partial} = \left\lbrack \mathbf{n} \cdot \dot{\mathbf{r}} + \mathbf{m} \cdot \bm{\omega}_{s} \right\rbrack_{0}^{L}.
+\end{equation}
+
+After all conservative external loads have been incorporated into \(V\), one obtains
+
+\begin{equation}
+\label{eq:rod-1-105}
+\boxed{\frac{dE}{dt} = P_{\partial} + P_{diss} + P_{in} + P_{flow} + \frac{\partial V_{ext}}{\partial t}.}
+\end{equation}
+
+Here, \(P_{diss}\) contains only the passive components obtained after the input--dissipation split, including \(P_{drag,diss}\), normal contact damping and friction for a fixed wall, and any retained spin damping, and it satisfies \(P_{diss} \leq 0\). The term \(P_{flow}\) collects the background-flow drag power \(P_{drag,flow}\), the Froude--Krylov input, and reactive-flow power assigned to the port under the selected representation; it is generally sign-indefinite. The term \(P_{in}\) contains only nonfluid nonconservative body inputs and control inputs. Terminal actuation contributes only through \(P_{\partial}\). If a nonautonomous magnetic action has already been represented by \(V_{mag}\left( \mathbf{r},\mathbf{R},t \right)\), its explicit-time power appears only through \(\partial V_{ext}/\partial t\) and must not be counted again in \(P_{in}\). The extended mechanical energy is conserved only when \(P_{diss} = P_{in} = P_{flow} = P_{\partial} = 0\) and the potential is time independent.
+
+\subsection{Section summary}\label{sec:rod-1-8}
+
+With the centerline \(\mathbf{r}\) and cross-sectional orientation \(\mathbf{R}\) as independent primary fields, this section established a geometrically exact rod-dynamics model retaining extension, shear, bending about two axes, independent torsion, cross-sectional rotary inertia, magnetic couples, fluid loading, and contact couples. The base catheter uses a mass-centerline convention, whereas eccentric magnetic tips and sensors retain translational--rotational coupling through independent rigid-body kinetic energies. In the energy-consistent fluid representation, \(T_{A}\) generates the added inertia and the pure Froude--Krylov term supplies the remaining fluid-acceleration input; this branch is mutually exclusive with the engineering Morison representation, thereby avoiding double counting of \(C_{A}\mathbf{a}_{f}\).
+
+The complete weak form retains translational and rotational test functions as well as terminal force and moment terms. The passive kernel of quadratic drag, normal contact damping, and friction are assigned to dissipative power, while background-flow drag input and prescribed-flow inertia are assigned to an independent flow port. The Kirchhoff shear-free condition is enforced as a constraint rather than by deleting cross-sectional orientation, independent torsion, or rotary inertia. This coupled weak form provides the theoretical basis for the joint translational--rotational Galerkin discretization in \Cref{sec:galerkin-discretization}.

@@ -1,0 +1,9 @@
+use Cwd qw(getcwd);
+$project_dir = getcwd();
+
+$pdf_mode = 5;
+$xelatex = 'xelatex -interaction=nonstopmode -halt-on-error -file-line-error -synctex=1 %O %S';
+$xdvipdfmx = 'xdvipdfmx -E -V 7 %O -o %D %S';
+$bibtex = qq{python "$project_dir/tools/bibtex_wrapper.py" %O %B};
+$bibtex_use = 1;
+$clean_ext = 'bbl blg fdb_latexmk fls synctex.gz run.xml nav snm vrb';

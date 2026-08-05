@@ -1,0 +1,656 @@
+% Migrated from the Word baseline; do not duplicate content in other section files.
+\section{Structured Hamiltonian Neural Networks with Complex-Valued Representations}\label{sec:chnn-model}
+
+\subsection{Learning Object and Upstream Interfaces}\label{sec:chnn-4-1}
+
+This section constructs a Hamiltonian neural network with complex-valued representations on the reduced canonical finite-dimensional system and connects it to KAM stability analysis. To keep the physical objects unambiguous, a single complex-valued scalar is not used to generate conservative, dissipative, and driven dynamics simultaneously. \Cref{sec:hamiltonian-structure} has already provided the independent canonical variables after local reduction of the strict Kirchhoff constraint, canonical nondimensionalization, the physical Hamiltonian baseline, and mutually exclusive port accounting. The CHNN is defined only on these objects.
+
+Let the reduced nondimensional canonical state be
+
+\begin{equation}
+\label{eq:chnn-4-1}
+\mathbf{Z} = \begin{bmatrix}
+\mathbf{Q} \\
+\mathbf{P}
+\end{bmatrix} \in \mathbb{R}^{2d},\quad\quad\mathbf{J} = \begin{bmatrix}
+\mathbf{0} & \mathbf{I} \\
+ - \mathbf{I} & \mathbf{0}
+\end{bmatrix},
+\end{equation}
+
+and define the complex coordinate
+
+\begin{equation}
+\label{eq:chnn-4-2}
+\boxed{\bm{\xi} = \frac{\mathbf{Q} + i\mathbf{P}}{\sqrt{2}},\quad\quad\overline{\bm{\xi}} = \frac{\mathbf{Q} - i\mathbf{P}}{\sqrt{2}}.}
+\end{equation}
+
+Here, \(\mathbf{Q}\) and \(\mathbf{P}\) have undergone a canonical scaling satisfying \(\mathbf{S}_{q}^{T}\mathbf{S}_{p}=E_{ref}t_{ref}\mathbf{I}\), so they may be combined as the real and imaginary parts of a complex variable. The dimensional variables \(\mathbf{q}\) and \(\mathbf{p}\) are not added directly before canonical nondimensionalization.
+
+The COMSOL data also carry
+
+\begin{equation}
+\label{eq:chnn-4-3}
+model\_ level \in \{ K,WF,T,S\},\quad\quad representation \in \{ sk,na,red\},
+\end{equation}
+
+which identify, respectively, the Kirchhoff-consistent Beam model, strict weak-form model, Timoshenko model, and solid model, together with the autonomous-backbone, exact nonautonomous, and engineering-reduction representations. Data with different labels are not mixed without a documented compatibility analysis.
+
+\subsection{Conservative Hamiltonian Head and Complex-Valued Internal Representation}\label{sec:chnn-4-2}
+
+\subsubsection{Real-Valued Physical Hamiltonian}\label{sec:chnn-4-2-1}
+
+A standard HNN generates the conservative vector field from the gradient of a real-valued scalar Hamiltonian.\cite{Greydanus2019HNN} We use
+
+\begin{equation}
+\label{eq:chnn-4-4}
+\boxed{{\widehat{H}}_{\lambda}\left( \mathbf{Z} \right) = {\widehat{H}}_{phys}\left( \mathbf{Z} \right) + \Delta{\widehat{H}}_{\lambda}\left( \mathbf{Z} \right) \in \mathbb{R},}
+\end{equation}
+
+where \({\widehat{H}}_{phys}\) is supplied by the mass matrix, Cosserat/Kirchhoff strain energy, identified conservative magnetic potential, and elastic contact potential for a fixed active set from \Cref{sec:hamiltonian-structure}. The network learns only material-parameter discrepancies, conservative corrections caused by Galerkin truncation, and other conservatively closed model discrepancies. To remove the additive gauge freedom, impose
+
+\begin{equation}
+\label{eq:chnn-4-5}
+{\widehat{H}}_{\lambda}\left( \mathbf{Z}_{ref} \right) = 0
+\end{equation}
+
+or require zero mean over the training domain.
+
+\subsubsection{Complex-Valued Backbone and Real-Valued Readout}\label{sec:chnn-4-2-2}
+
+Let
+
+\begin{equation}
+\label{eq:chnn-4-6}
+\mathbf{h}_{\theta} = \mathcal{N}_{\theta}^{\mathbb{C}}\left( \bm{\xi},\overline{\bm{\xi}} \right),\quad\quad\Delta{\widehat{H}}_{\lambda} = \mathcal{R}_{H,\lambda}\left( \mathbf{h}_{\theta} \right) \in \mathbb{R}.
+\end{equation}
+
+A complex linear layer represents amplitude scaling and phase rotation simultaneously through its real--imaginary block structure. For noncircular phase-space data, both \(\bm{\xi}\) and \(\overline{\bm{\xi}}\) are retained as inputs, or an equivalent augmented representation is used. A practical CVNN may be treated as a real-differentiable mapping \(\mathbb{R}^{2d}\rightarrow\mathbb{R}\); global holomorphy of the network is not required.\cite{Trabelsi2018DeepComplex,Hirose2012CVNN} A nonconstant real-valued Hamiltonian generally cannot be a purely holomorphic function on a connected open set, so the physical readout may depend on both \(\bm{\xi}\) and \(\overline{\bm{\xi}}\).
+
+The primary theoretical branch uses activation functions sufficiently smooth in the real and imaginary parts, for example
+
+\begin{equation}
+\label{eq:chnn-4-7}
+\phi_{split}(z) = \tanh(Rez) + i\tanh(Imz).
+\end{equation}
+
+modReLU, CReLU, and zReLU may be included in engineering ablations, but their piecewise smoothness or nondifferentiability at boundaries prevents their direct use in statistical-learning--KAM theorems requiring higher-order smoothness. Complex weights use complex Glorot or semi-unitary initialization; the Hamiltonian backbone does not use BatchNorm based on batch statistics by default.\cite{Trabelsi2018DeepComplex,Hirose2012CVNN}
+
+\subsubsection{Widely Linear Complex Layers and Real-Affine Completeness}\label{sec:chnn-4-2-3}
+
+To retain an amplitude--phase inductive bias while preserving expressive compatibility with general real networks, the complex backbone uses a widely linear layer. Let
+
+\begin{equation}
+\label{eq:chnn-4-8}
+\mathbf{z}_{out} = \mathbf{W}\mathbf{z} + \mathbf{V}\overline{\mathbf{z}} + \mathbf{b}
+\end{equation}
+
+where \(\mathbf{z}=\mathbf{x}+i\mathbf{y}\), \(\mathbf{W}=\mathbf{A}+i\mathbf{B}\), \(\mathbf{V}=\mathbf{C}+i\mathbf{D}\), and \(\mathbf{b}=\mathbf{b}_{R}+i\mathbf{b}_{I}\). Then
+
+\begin{equation}
+\label{eq:chnn-4-9}
+\mathbf{x}_{out} = \left( \mathbf{A} + \mathbf{C} \right)\mathbf{x} + \left( - \mathbf{B} + \mathbf{D} \right)\mathbf{y} + \mathbf{b}_{R}
+\end{equation}
+
+\begin{equation}
+\label{eq:chnn-4-10}
+\mathbf{y}_{out} = \left( \mathbf{B} + \mathbf{D} \right)\mathbf{x} + \left( \mathbf{A} - \mathbf{C} \right)\mathbf{y} + \mathbf{b}_{I}
+\end{equation}
+
+\begin{proposition}[Real-affine completeness]\label{prop:real-affine-completeness}
+For any real affine mapping
+
+\begin{equation}
+\label{eq:chnn-4-11}
+\mathbf{x}_{out} = \mathbf{M}_{11}\mathbf{x} + \mathbf{M}_{12}\mathbf{y} + \mathbf{c}_{1}
+\end{equation}
+
+\begin{equation}
+\label{eq:chnn-4-12}
+\mathbf{y}_{out} = \mathbf{M}_{21}\mathbf{x} + \mathbf{M}_{22}\mathbf{y} + \mathbf{c}_{2}
+\end{equation}
+
+there exist unique \(\mathbf{W},\mathbf{V},\mathbf{b}\) for which the widely linear complex layer is exactly equivalent, with the explicit construction
+
+\begin{equation}
+\label{eq:chnn-4-13}
+\mathbf{A} = \frac{\mathbf{M}_{11} + \mathbf{M}_{22}}{2},\quad\quad\mathbf{C} = \frac{\mathbf{M}_{11} - \mathbf{M}_{22}}{2}
+\end{equation}
+
+\begin{equation}
+\label{eq:chnn-4-14}
+\mathbf{B} = \frac{\mathbf{M}_{21} - \mathbf{M}_{12}}{2},\quad\quad\mathbf{D} = \frac{\mathbf{M}_{21} + \mathbf{M}_{12}}{2}
+\end{equation}
+
+\begin{equation}
+\label{eq:chnn-4-15}
+\mathbf{b} = \mathbf{c}_{1} + i\mathbf{c}_{2}
+\end{equation}
+\end{proposition}
+
+\begin{proof} Substituting the stated construction into the real and imaginary equations recovers the four blocks \(\mathbf{M}_{11},\mathbf{M}_{12},\mathbf{M}_{21},\mathbf{M}_{22}\). Conversely, solving the four linear block equations gives uniqueness.\end{proof}
+
+When \(\mathbf{V}=\mathbf{0}\), the real block matrix associated with a standard complex-linear layer must commute with the standard complex structure and is therefore a proper subclass of general real linear mappings. We use standard complex-linear layers as a stronger amplitude--phase structural bias and widely linear layers as the default theoretical model when general real-affine expressivity must be retained. This result establishes only a function-class inclusion and does not by itself imply fewer parameters or higher sample efficiency for the complex-valued model.
+
+\subsubsection{Embedding of Real MLPs and Conditional Inheritance of Sobolev Approximation}\label{sec:chnn-4-2-4}
+
+\begin{theorem}[Layerwise embedding of the real MLP class]\label{thm:real-mlp-embedding}
+Let a real-valued multilayer perceptron take \(\left(\mathbf{Q},\mathbf{P}\right)\) as input and use a smooth hidden-layer activation satisfying \(\sigma(0)=0\). Then there exists a complex network taking \(\bm{\xi}=\left(\mathbf{Q}+i\mathbf{P}\right)/\sqrt{2}\) and \(\overline{\bm{\xi}}\) as inputs and using widely linear layers and split activations, whose real-valued output is identical to that of the real MLP.
+\end{theorem}
+
+\begin{proof} The first layer treats \(\left(Re\bm{\xi},Im\bm{\xi}\right)\) as the realified input and uses \Cref{prop:real-affine-completeness} to realize the target real affine mapping while setting the target imaginary preactivation to zero. Since \(\sigma(0)=0\), the imaginary channel remains zero after the split activation. Starting from the second layer, the block-diagonal special case of \Cref{prop:real-affine-completeness} realizes each affine layer of the original real network. The final real-valued readout is therefore identical to that of the original MLP.\end{proof}
+
+\begin{corollary}[Conditional inheritance of Sobolev approximation]\label{cor:sobolev-inheritance}
+Let \(\Omega\subset\mathbb{R}^{2d}\) be a bounded Lipschitz domain, \(s\in\mathbb{N}\), and \(1 \leq r < \infty\). If the class of real MLPs with the chosen activation is dense in \(W^{s,r}(\Omega)\), then the class of real-valued readouts of the preceding widely linear complex networks is also dense in \(W^{s,r}(\Omega)\).
+\end{corollary}
+
+This corollary transfers an existing real-network density result and does not remove the original assumptions on the activation, domain, network width, or derivative approximation.\cite{Hornik1990DerivativeApproximation} The standard complex-linear subclass is constrained by its block structure and does not automatically inherit the same Sobolev-density conclusion.
+
+The theoretical advantages established by Zhang et al. for complex-reaction networks depend on their specific complex reaction structure, activation, and problem setting.\cite{Zhang2022ComplexReaction} They cannot be generalized directly into the claim that an arbitrary complex-valued CHNN must outperform a real-valued HNN. Here, that work motivates only the possibility of a task-relevant inductive bias from complex structure; actual sample-efficiency and error advantages are evaluated through parameter-matched ablation studies.
+
+\subsubsection{Physical Limits of the Complex Representation}\label{sec:chnn-4-2-5}
+
+Consider the complex scalar representation
+
+\begin{equation}
+\label{eq:chnn-4-16}
+\widetilde{\mathcal{H}} = H + iG
+\end{equation}
+
+This is retained only as a special representation layer. A residual vector field may be represented by a real auxiliary potential \(G\) only if the corresponding one-form is closed and locally integrable. General quadratic drag, contact friction, magnetic control input, and background-flow effects do not satisfy this condition. The imaginary part is not interpreted directly as physical dissipation; physical energy is always given by the real-valued \({\widehat{H}}_{\lambda}\).
+
+\subsection{Open-Port Dynamics and Branch Networks}\label{sec:chnn-4-3}
+
+The metriplectic framework of Coquinot--Morrison requires a Poisson bracket, a symmetric positive-semidefinite metric bracket, energy and entropy variables, and the corresponding degeneracy conditions and entropy-production relation.\cite{Coquinot2020Metriplectic} The current catheter model does not establish an independent thermodynamic entropy field or these degeneracy structures. Therefore, the open-port model is not formulated metriplectically; that framework instead delineates the conditions required by future thermo-viscoelastic extensions and a rigorous entropy-production mechanism.
+
+The complete structured model on the autonomous backbone is
+
+\begin{equation}
+\label{eq:chnn-4-17}
+\boxed{\dot{\mathbf{Z}} = \mathbf{J}\nabla{\widehat{H}}_{\lambda}\left( \mathbf{Z} \right) + \mathbf{B}\left( {\widehat{\mathbf{Q}}}_{diss,\mu} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + {\widehat{\mathbf{Q}}}_{\partial} + {\widehat{\mathbf{r}}}_{\eta} \right),}
+\end{equation}
+
+where
+
+\begin{equation}
+\label{eq:chnn-4-18}
+\mathbf{B} = \begin{bmatrix}
+\mathbf{0} \\
+\mathbf{I}
+\end{bmatrix}.
+\end{equation}
+
+The branches have distinct physical meanings.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \({\widehat{\mathbf{Q}}}_{diss,\mu}\) represents only the passive component whose power with respect to the structural mechanical energy is nonpositive. For the equivalent-viscous subclass, one may take
+\end{enumerate}
+
+\begin{equation}
+\label{eq:chnn-4-19}
+{\widehat{\mathbf{Q}}}_{diss,\mu} = - \mathbf{D}_{\mu}\left( \mathbf{Z} \right)\nabla_{\mathbf{P}}{\widehat{H}}_{\lambda},\quad\quad\mathbf{D}_{\mu} = \mathbf{L}_{\mu}\mathbf{L}_{\mu}^{T} \succcurlyeq 0,
+\end{equation}
+
+\begin{itemize}
+\tightlist
+\item
+  so that \(\nabla_{\mathbf{P}}{\widehat{H}}_{\lambda}^{T}{\widehat{\mathbf{Q}}}_{diss,\mu} \leq 0\). Contact switching, Coulomb friction, and impact may remain separate ports rather than being forced into one smooth matrix representation.\cite{Zhong2020Dissipative}
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  \({\widehat{\mathbf{Q}}}_{in,\nu}\) represents magnetic control and other nonfluid inputs not included in the potential. Magnetic actions derivable from a potential at fixed magnetic parameters enter \({\widehat{H}}_{phys}\). A time-dependent conservative magnetic potential may either enter the nonautonomous Hamiltonian or enter the input port once as \(-\nabla V_{drv}\); the two representations are mutually exclusive.
+\item
+  \({\widehat{\mathbf{Q}}}_{flow,\kappa}\) represents the Froude--Krylov input, background-flow drag input, and reactive effects induced by the prescribed flow. The background-flow power is generally sign-indefinite and cannot be absorbed wholesale into a dissipation matrix.
+\item
+  \({\widehat{\mathbf{Q}}}_{\partial}\) is supplied by the known terminal force, terminal moment, and boundary actuation and is not relearned by the network in principle.
+\item
+  \({\widehat{\mathbf{r}}}_{\eta}\) represents only the residual remaining after the known physical backbone and all known ports have been removed.
+\end{enumerate}
+
+This decomposition follows the separation of Hamiltonian, dissipation, and control in Dissipative SymODEN and the treatment of explicit time-dependent forcing and identifiability in port-Hamiltonian neural networks.\cite{Zhong2020Dissipative,Desai2021PHNN}
+
+Numerical studies of pHNNs show that simultaneously identifying the Hamiltonian, time-dependent forcing, and damping from state trajectories alone can cause information leakage among branches, demonstrating that identifiability is not guaranteed by the architecture.\cite{Desai2021PHNN} We therefore fix the physical Hamiltonian and known ports established in \Cref{sec:rod-model,sec:galerkin-discretization,sec:hamiltonian-structure}; the network is allowed to learn only conservative corrections, sign-constrained dissipative corrections, and the residual after known terms have been removed. Staged training, port-power supervision, and sparsity or magnitude regularization reduce mutual compensation among branches. These measures are structural constraints designed to mitigate leakage, but uniqueness and stability must still be tested through paired operating conditions and ablation experiments.
+
+\subsection{COMSOL Data Hierarchy and Training Objects}\label{sec:chnn-4-4}
+
+\subsubsection{Kirchhoff-Consistent Primary Training Set}\label{sec:chnn-4-4-1}
+
+The primary COMSOL training model uses the three-dimensional Euler--Bernoulli Beam interface with geometric nonlinearity, dynamic inertia, and torsional degrees of freedom. In COMSOL 6.3, the Beam interface applies the Euler--Bernoulli formulation to slender beams and neglects transverse shear while retaining three-dimensional displacement, cross-sectional rotation, and torque; geometric nonlinearity is represented in a corotational large-rotation, small-strain form.\cite{COMSOLBeamInterface2025,COMSOLGeometricNonlinearity2025,COMSOLSectionStiffness2025} The model is therefore consistent with the strict Kirchhoff branch in the shear-free assumption but is not unconditionally identical to the geometrically exact Cosserat equations.
+
+The conservative training set is restricted to
+
+\begin{equation}
+\label{eq:chnn-4-20}
+\mathcal{D}_{K}^{cons} = \left\{ \left( \mathbf{Z}_{i},{\dot{\mathbf{Z}}}_{i},{\widehat{H}}_{phys,i} \right):model\_ level = K,\ representation = sk,\ \mathbf{Q}_{port} = 0 \right\}.
+\end{equation}
+
+The open-port training set is
+
+\begin{equation}
+\label{eq:chnn-4-21}
+\mathcal{D}_{K}^{port} = \left\{ \left( \mathbf{Z}_{i},{\dot{\mathbf{Z}}}_{i},\mathbf{Q}_{diss,i},\mathbf{Q}_{in,i},\mathbf{Q}_{flow,i},\mathbf{Q}_{\partial,i} \right) \right\}.
+\end{equation}
+
+Samples used for probabilistic transfer to KAM theory may only come from \(\mathcal{D}_{K}^{cons}\). The total training loss of the open-port model cannot be interpreted as a Hamiltonian perturbation.
+
+The P1-series pilots use only three small trajectories---mode1, mode2, and mixed12---in the fixed \(N=2\) basis, with leave-one-whole-trajectory-out partitioning rather than random point splitting across a trajectory. P1 contains \(3\) folds\(\times4\) models\(\times5\) seeds, or \(60\) derivative-training runs; P1.5 contains \(45\) residual and \(15\) physics-only runs; and P1.6 contains \(30\) constrained and \(30\) unconstrained runs. The five seeds are algorithmic repetitions on the same physical trajectories and quantify optimization variability; they are not five independent physical samples. These pilots compare structural assumptions and expose failure modes but do not replace the planned 96-trajectory data set or full-scale P2 training.
+
+\subsubsection{Strict Weak-Form and High-Fidelity References}\label{sec:chnn-4-4-2}
+
+When a term-by-term reproduction of the coupled weak form is required, Weak Form PDE or Weak Contribution is used to enter test functions, boundary contributions, and auxiliary variables.\cite{COMSOLWeakFormPDE2025,COMSOLWeakContribution2025} Timoshenko Beam and three-dimensional Solid Mechanics models are used to assess shear, local contact, and cross-sectional effects. For paired operating conditions, define
+
+\begin{equation}
+\label{eq:chnn-4-22}
+\Delta X_{HF} = X_{HF} - X_{K}.
+\end{equation}
+
+Only the component that passes the closure test enters the conservative correction \(\mathbf{J}\nabla\Delta H_{HF}\); a component with nonpositive power enters the dissipative correction; and all remaining components remain general residuals. The complete \(\Delta X_{HF}\) must not be interpreted as a Hamiltonian perturbation or as \(H_{1}\) in KAM theory.
+
+\subsection{Loss Functions and Staged Training}\label{sec:chnn-4-5}
+
+\subsubsection{Conservative Derivative Supervision}\label{sec:chnn-4-5-1}
+
+For \(\mathcal{D}_{K}^{cons}\), define
+
+\begin{equation}
+\label{eq:chnn-4-23}
+\mathcal{L}_{H} = \frac{1}{N_{c}}\sum_{i = 1}^{N_{c}}\left. \  \parallel {\dot{\mathbf{Z}}}_{i} - \mathbf{J}\nabla{\widehat{H}}_{\lambda}\left( \mathbf{Z}_{i} \right) \right.\  \parallel_{2}^{2}.
+\end{equation}
+
+If the physical Hamiltonian is known, add supervision of the energy correction
+
+\begin{equation}
+\label{eq:chnn-4-24}
+\mathcal{L}_{\Delta H} = \frac{1}{N_{c}}\sum_{i = 1}^{N_{c}}\left| \Delta{\widehat{H}}_{\lambda}\left( \mathbf{Z}_{i} \right) - \Delta{\widehat{H}}_{ref,i} \right|^{2}.
+\end{equation}
+
+\subsubsection{Port and Energy-Balance Supervision}\label{sec:chnn-4-5-2}
+
+Define the port residual
+
+\begin{equation}
+\label{eq:chnn-4-25}
+\mathcal{L}_{port} = \frac{1}{N}\sum_{i = 1}^{N}\left. \  \parallel {\dot{\mathbf{Z}}}_{i} - \mathbf{J}\nabla{\widehat{H}}_{\lambda} - \mathbf{B}\left( {\widehat{\mathbf{Q}}}_{diss,\mu} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + \mathbf{Q}_{\partial} + {\widehat{\mathbf{r}}}_{\eta} \right) \right.\  \parallel_{2}^{2}.
+\end{equation}
+
+The energy-balance loss is
+
+\begin{equation}
+\label{eq:chnn-4-26}
+\mathcal{L}_{E} = \frac{1}{N}\sum_{i = 1}^{N}\left| \frac{d{\widehat{H}}_{\lambda}}{d\tau} - \nabla_{\mathbf{P}}{\widehat{H}}_{\lambda}^{T}\left( {\widehat{\mathbf{Q}}}_{diss,\mu} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + \mathbf{Q}_{\partial} + {\widehat{\mathbf{r}}}_{\eta} \right) - \partial_{\tau}{\widehat{H}}_{\lambda} \right|^{2}.
+\end{equation}
+
+The dissipation-sign constraint is imposed only on \({\widehat{\mathbf{Q}}}_{diss,\mu}\):
+
+\begin{equation}
+\label{eq:chnn-4-27}
+\mathcal{L}_{pass} = \frac{1}{N}\sum_{i = 1}^{N}\left\lbrack \max\left\{ 0,\nabla_{\mathbf{P}}{\widehat{H}}_{\lambda}^{T}{\widehat{\mathbf{Q}}}_{diss,\mu} \right\} \right\rbrack^{2}.
+\end{equation}
+
+\subsubsection{Trajectory, Gauge, and Symplectic-Structure Losses}\label{sec:chnn-4-5-3}
+
+The trajectory loss is
+
+\begin{equation}
+\label{eq:chnn-4-28}
+\mathcal{L}_{traj} = \frac{1}{N}\sum_{i = 1}^{N}\left. \  \parallel \mathbf{Z}_{i,n + 1} - Integrate\left( X_{\theta},\mathbf{Z}_{i,n},\Delta\tau \right) \right.\  \parallel_{2}^{2}.
+\end{equation}
+
+The additive-gauge loss is
+
+\begin{equation}
+\label{eq:chnn-4-29}
+\mathcal{L}_{gauge} = \left| {\widehat{H}}_{\lambda}\left( \mathbf{Z}_{ref} \right) \right|^{2}.
+\end{equation}
+
+The symplectic-structure loss is applied only to the conservative submap \(F_{h,\lambda}^{cons}\):
+
+\begin{equation}
+\label{eq:chnn-4-30}
+\mathcal{L}_{symp} = \frac{1}{N}\sum_{i = 1}^{N}\left. \  \parallel \left( DF_{h,\lambda}^{cons} \right)^{T}\mathbf{J}DF_{h,\lambda}^{cons} - \mathbf{J} \right.\  \parallel_{F}^{2}.
+\end{equation}
+
+The complete dissipative map is generally not symplectic. The loss must therefore not be imposed on the complete open map and then interpreted as evidence of a strictly symplectic flow.
+
+Training proceeds in three stages: first fit \({\widehat{H}}_{\lambda}\); then identify the ports while fixing or only weakly updating the Hamiltonian head; and finally perform joint fine-tuning. The statistical-learning--KAM analysis reads only the conservative derivative error associated with \(\mathcal{L}_{H}\) and its function-space generalization bound.
+
+The P1/P1.5/P1.6 runs instantiate only the conservative derivative-only pilot and structural ablations of this workflow. P1.5 tests the conditional benefit and computational cost of physics-only, Real-HNN residual, and CHNN residual variants; P1.6 imposes \(f(0)=0\) and the zero-point Jacobian structure as a hard-constraint ablation. Their results are reported in \Cref{sec:numerical-6-3}, whereas open-port joint fine-tuning, high-order function-space certificates, and transfer to KAM remain to be examined in the full-scale P2 study.
+
+\subsubsection{CHNN Implementation and Structural Validation}\label{sec:chnn-4-5-4}
+
+To implement the preceding mathematical structure, we developed an independent CHNN software system aligned with the unified interfaces. Rather than directly assembling existing HNN, CVNN, and KAM--HNN reproduction projects, the implementation retains unit-tested complex-valued operators and reorganizes them according to the canonical state, gray-box Hamiltonian, and mutually exclusive port interfaces used here. The primary software model is
+
+\begin{equation}
+\label{eq:chnn-4-31}
+H_{\theta}\left( \mathbf{x},\bm{\mu} \right) = H_{phys}\left( \mathbf{x},\bm{\mu} \right) + \Delta H_{\theta}\left( \mathbf{x},\bm{\mu} \right),
+\end{equation}
+
+\begin{equation}
+\label{eq:chnn-4-32}
+\dot{\mathbf{x}} = \mathbf{J}\nabla_{\mathbf{x}}H_{\theta} + \mathbf{B}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} + \mathbf{Q}_{contact} + \mathbf{r}_{\eta} \right),\quad\quad\mathbf{B} = \begin{bmatrix}
+\mathbf{0} \\
+\mathbf{I}
+\end{bmatrix}.
+\end{equation}
+
+The passive dissipation head uses
+
+\begin{equation}
+\label{eq:chnn-4-33}
+\mathbf{Q}_{diss} = - \mathbf{D}_{\theta}\nabla_{\mathbf{p}}H_{\theta},\quad\quad\mathbf{D}_{\theta} = \mathbf{L}_{\theta}\mathbf{L}_{\theta}^{T} \succcurlyeq \mathbf{0},
+\end{equation}
+
+which guarantees at the code-structure level that
+
+\begin{equation}
+\label{eq:chnn-4-34}
+\left( \nabla_{\mathbf{p}}H_{\theta} \right)^{T}\mathbf{Q}_{diss} \leq 0.
+\end{equation}
+
+The implementation corresponds to the theory as follows. The canonical-scaling module first transforms the dimensional pair \(\left(\mathbf{q},\mathbf{p}\right)\) into the nondimensional canonical pair \(\left(\mathbf{Q},\mathbf{P}\right)\) and then constructs the complex coordinates. The complex backbone provides both standard complex-linear layers and widely linear layers of the form \(\mathbf{W}\bm{\xi}+\mathbf{V}\overline{\bm{\xi}}+\mathbf{b}\). The Hamiltonian head outputs only a real scalar and uses the gray-box structure \(H_{phys}+\Delta H_{\theta}\). Dissipation, magnetic input, flow, boundary, contact, and residual error are represented by independent generalized-force heads and enter only the momentum equation through \(\mathbf{B}\). The data interface uses \texttt{representation} to distinguish \(\mathbf{p}_{0} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}}\) from \(\mathbf{p} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - \mathbf{b}_{A}\), uses \texttt{model\_level} to distinguish the Kirchhoff Beam, strict weak-form, and high-fidelity reference models, and uses \texttt{conservative\_mask} to isolate conservative samples accessible to the statistical-learning--KAM analysis. The training pipeline implements the three stages ``conservative Hamiltonian--ports--joint fine-tuning'' and provides a real-valued HNN and a black-box vector-field network as comparison baselines.
+
+The software passed the following structural-consistency tests:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  equivalent implementation of an arbitrary real block-linear mapping by the widely linear layer;
+\item
+  round-trip consistency of canonical scaling and recovery of the Galerkin basis subspace for prescribed basis functions;
+\item
+  the total Hamiltonian satisfies \(H_{\theta}=H_{phys}+\Delta H_{\theta}\);
+\item
+  the continuous conservative field satisfies \(\nabla H_{\theta}^{T}\mathbf{J}\nabla H_{\theta}=0\);
+\item
+  passive dissipative power is nonpositive;
+\item
+  every external port has zero direct leakage into the \(\dot{\mathbf{q}}\) channel;
+\item
+  inconsistent momentum-representation labels, model-level labels, or projected-data formats are rejected, and automatic-differentiation backpropagation succeeds for every loss term.
+\end{enumerate}
+
+In a unified software environment, Python source compilation, editable installation, and 13 component and interface tests all passed, and the three-stage training pipeline executed end to end on synthetic data. These results verify consistency between the implementation and the stated structural identities; their evidential scope is limited to implementation correctness. They do not replace identification accuracy on catheter COMSOL data, function-class complexity constants, higher-order error certificates, or KAM invariant-torus certification. The physical baseline Hamiltonian \({\widehat{H}}_{phys}\), configuration-dependent mass--inertia matrix, exact nonautonomous terms, and COMSOL--Galerkin projection for a specific catheter will be instantiated from the actual model and data in the numerical experiments.
+
+\subsection{From CHNN Learning Error to the KAM Smallness Condition}\label{sec:chnn-4-6}
+
+\subsubsection{The Integrable Reference System Is Not an Automatic Consequence of the Network Real Part}\label{sec:chnn-4-6-1}
+
+\Cref{sec:hamiltonian-structure} constructs, through a stable equilibrium, modal canonicalization, and a Hamiltonian Birkhoff normal form,
+
+\begin{equation}
+\label{eq:chnn-4-35}
+H_{cons} = H_{0} + \varepsilon H_{1}.
+\end{equation}
+
+The Hamiltonian \(H_{0}\) must be verified to be integrable and nondegenerate. A real-valued \(H_{\lambda}\) is not integrable merely because it is real. The linear harmonic oscillator satisfies \(\partial_{\mathbf{I}}^{2}H_{2}=0\), so nondegeneracy must arise from higher-order conservative terms.
+
+\subsubsection{Conservative Training Data, Function Class, and Additive Gauge}\label{sec:chnn-4-6-2}
+
+The following statistical-learning statements apply only to the conservative training set \(\mathcal{D}_{K}^{cons}\). Let \(\Omega\subset\mathbb{R}^{2d}\) be a bounded connected Lipschitz domain, let the true conservative Hamiltonian be \(H_{\star}\), and let the samples \(\mathbf{Z}_{1},\ldots,\mathbf{Z}_{N}\) be independent and identically distributed according to a probability measure \(\mathbb{P}_{Z}\). Assume noiseless derivative labels satisfy
+
+\begin{equation}
+\label{eq:chnn-4-36}
+{\dot{\mathbf{Z}}}_{i} = \mathbf{J}\nabla H_{\star}\left( \mathbf{Z}_{i} \right).
+\end{equation}
+
+Realify all complex parameters of the Hamiltonian head as \(\bm{\vartheta}\in\Theta=\lbrack-B,B\rbrack^{P}\), and denote the learning error by
+
+\begin{equation}
+\label{eq:chnn-4-37}
+e_{\bm{\vartheta}} = {\widehat{H}}_{\bm{\vartheta}} - H_{\star}.
+\end{equation}
+
+State derivatives alone do not identify the absolute constant of the Hamiltonian. Therefore, impose on the theoretical domain
+
+\begin{equation}
+\label{eq:chnn-4-38}
+\int_{\Omega}^{}e_{\bm{\vartheta}}\left( \mathbf{Z} \right)\, d\mathbf{Z} = 0,
+\end{equation}
+
+or use a known energy anchor to select the same representative of the additive equivalence class. Choose a statistical exponent \(r>2d\) and define the scalar gradient loss
+
+\begin{equation}
+\label{eq:chnn-4-39}
+g_{\bm{\vartheta}}\left( \mathbf{Z} \right) = \left. \parallel\dot{\mathbf{Z}} - \mathbf{J}\nabla{\widehat{H}}_{\bm{\vartheta}}\left( \mathbf{Z} \right) \right.\parallel_{\ell^{r}}^{r} = \left. \parallel\nabla e_{\bm{\vartheta}}\left( \mathbf{Z} \right) \right.\parallel_{\ell^{r}}^{r}.
+\end{equation}
+
+To apply a uniform generalization bound for bounded losses, also assume \(0 \leq g_{\bm{\vartheta}} \leq c\). This boundedness is an independent regularity assumption and does not follow automatically from a small empirical loss.
+
+\subsubsection{Covering Numbers and Rademacher Complexity}\label{sec:chnn-4-6-3}
+
+For a sample \(S=\left(\mathbf{Z}_{1},\ldots,\mathbf{Z}_{N}\right)\), define the normalized empirical metric
+
+\begin{equation}
+\label{eq:chnn-4-40}
+d_{S}(g,g\prime) = \left( \frac{1}{N}\sum_{i = 1}^{N}\left| g\left( \mathbf{Z}_{i} \right) - g\prime\left( \mathbf{Z}_{i} \right) \right|^{2} \right)^{1/2}.
+\end{equation}
+
+\begin{assumption}[Samplewise Lipschitz continuity from parameters to loss]\label{ass:parametric-loss-lipschitz}
+For a given sample \(S\), there exists a finite constant \(L_{S}\) such that every \(\bm{\vartheta},\bm{\vartheta}\prime \in \Theta\) satisfies
+
+\begin{equation}
+\label{eq:chnn-4-41}
+d_{S}\left( g_{\bm{\vartheta}},g_{\bm{\vartheta}\prime} \right) \leq L_{S}\left. \parallel\bm{\vartheta} - \bm{\vartheta}\prime \right.\parallel_{2}.
+\end{equation}
+\end{assumption}
+
+When the input domain and parameter set are bounded, the network depth is finite, and the first and second derivatives of the activation are bounded on the relevant range, this assumption can hold on a compact parameter set. In general, \(L_{S}\) grows with depth, width, weight bounds, and derivative bounds.
+
+\begin{lemma}[Finite-parameter covering number]\label{lem:finite-parameter-cover}
+Under \Cref{ass:parametric-loss-lipschitz}, let \(\mathcal{G}=\{g_{\bm{\vartheta}}:\bm{\vartheta}\in\Theta\}\), and let \(\mathcal{G}_{S}\) denote the restriction of this function class to the sample \(S\). Then
+
+\begin{equation}
+\label{eq:chnn-4-42}
+\mathcal{N}\left( \varepsilon,\mathcal{G}_{S},d_{S} \right) \leq \left( 1 + \frac{2B\sqrt{P}\, L_{S}}{\varepsilon} \right)^{P}
+\end{equation}
+\end{lemma}
+
+\begin{proof} On the parameter cube \(\lbrack - B,B\rbrack^{P}\), place a grid of Euclidean radius \(\varepsilon/L_{S}\), and use \Cref{ass:parametric-loss-lipschitz} to push the parameter covering forward to a covering of the loss functions.\end{proof}
+
+Because the parameter set is compact and the loss is continuous in the parameters, the supremum is attained. Define the empirical Rademacher complexity by
+
+\begin{equation}
+\label{eq:chnn-4-43}
+{\widehat{\mathfrak{R}}}_{S}\left( \mathcal{G} \right) = \mathbb{E}_{\bm{\sigma}}\left\lbrack \max_{g \in \mathcal{G}}\frac{1}{N}\sum_{i = 1}^{N}\sigma_{i}g\left( \mathbf{Z}_{i} \right) \right\rbrack
+\end{equation}
+
+Let
+
+\begin{equation}
+\label{eq:chnn-4-44}
+R_{S} = \max_{g \in \mathcal{G}}d_{S}(g,0)
+\end{equation}
+
+Dudley's entropy integral gives\cite{Dudley1999UCLT}
+
+\begin{equation}
+\label{eq:chnn-4-45}
+{\widehat{\mathfrak{R}}}_{S}\left( \mathcal{G} \right) \leq \inf_{0 < \alpha < R_{S}}\left\lbrack 4\alpha + \frac{12}{\sqrt{N}}\int_{\alpha}^{R_{S}}\sqrt{\log\mathcal{N}\left( \varepsilon,\mathcal{G}_{S},d_{S} \right)}\, d\varepsilon \right\rbrack
+\end{equation}
+
+A purely complex-linear network is a structurally constrained subclass of the corresponding real network. A widely linear network must instead be counted using its actual number \(P\) of real parameters and its actual Lipschitz constant \(L_{S}\); ``one complex parameter'' must not be incorrectly counted as one real degree of freedom.
+
+\subsubsection{From Gradient Risk to Uniform Hamiltonian Error}\label{sec:chnn-4-6-4}
+
+Assume that the loss class is fixed before sampling. A standard uniform Rademacher generalization bound then implies that, with probability at least \(1-\delta\), simultaneously for every \(\bm{\vartheta}\in\Theta\),
+
+\begin{equation}
+\label{eq:chnn-4-46}
+\mathbb{E}_{\mathbb{P}_{Z}}g_{\bm{\vartheta}} \leq {\widehat{\mathcal{L}}}_{r}\left( \bm{\vartheta} \right) + 2{\widehat{\mathfrak{R}}}_{S}\left( \mathcal{G} \right) + 3c\sqrt{\frac{\log(2/\delta)}{2N}} = :B_{N,\delta}\left( \bm{\vartheta} \right).
+\end{equation}
+
+Assume further that \(\mathbb{P}_{Z}\) has a density \(f_{Z}\) with respect to Lebesgue measure and that throughout \(\Omega\),
+
+\begin{equation}
+\label{eq:chnn-4-47}
+f_{Z}\left( \mathbf{Z} \right) \geq m_{Z} > 0.
+\end{equation}
+
+Then, on the preceding uniform event,
+
+\begin{equation}
+\label{eq:chnn-4-48}
+\left. \parallel\nabla e_{\bm{\vartheta}} \right.\parallel_{L^{r}\left( \Omega;\ell^{r} \right)} \leq \left( \frac{B_{N,\delta}\left( \bm{\vartheta} \right)}{m_{Z}} \right)^{1/r}.
+\end{equation}
+
+Using the additive gauge, the Poincaré inequality, and the Morrey--Sobolev embedding for \(r>2d\),\cite{AdamsFournier2003SobolevSpaces} one obtains:
+
+\begin{theorem}[Uniform generalization bound for the Hamiltonian]\label{thm:hamiltonian-uniform-generalization}
+Under the preceding assumptions, with probability at least \(1-\delta\), simultaneously for every \(\bm{\vartheta}\in\Theta\),
+
+\begin{equation}
+\label{eq:chnn-4-49}
+\boxed{\left. \parallel{\widehat{H}}_{\bm{\vartheta}} - H_{\star} \right.\parallel_{L^{\infty}(\Omega)} \leq C_{\Omega,r}\left( 1 + C_{P} \right)\left( \frac{B_{N,\delta}\left( \bm{\vartheta} \right)}{m_{Z}} \right)^{1/r}.}
+\end{equation}
+\end{theorem}
+
+where \(C_{P}\) is the Poincaré constant. The overall \(1/r\) power arises from converting the \(r\)-th-power risk back to a gradient norm and cannot be absorbed into a constant independent of the training error and sample size.
+
+\subsubsection{Higher-Order Sobolev or Analytic Error Certificate}\label{sec:chnn-4-6-5}
+
+\Cref{thm:hamiltonian-uniform-generalization} provides only a \(C^{0}\)-level uniform error. A high-frequency, small-amplitude function may converge to zero in \(C^{0}\) while its higher derivatives diverge. Therefore, neither a first-derivative risk nor proximity of Hamiltonian values alone is sufficient to claim the KAM smallness condition.
+
+Assume that \Cref{sec:hamiltonian-structure} has constructed an integrable reference and coordinate transformation on the local action--angle domain
+
+\begin{equation}
+\label{eq:chnn-4-50}
+\mathcal{A} = \mathbb{T}^{M} \times U
+\end{equation}
+
+If the original training data are represented in physical canonical coordinates, the learning error must be pulled back to \(\mathcal{A}\), and bounds on the higher derivatives of the coordinate transformation and its inverse must be included in the constants. Choose integers \(s,\ell\) and a statistical exponent \(r\) satisfying
+
+\begin{equation}
+\label{eq:chnn-4-51}
+s > \ell + \frac{2M}{r}.
+\end{equation}
+
+Let the training algorithm output \(\widehat{\bm{\vartheta}}\). In addition to the first-order statistical certificate from \Cref{thm:hamiltonian-uniform-generalization}, require a higher-order certificate for this specific output: on an event of probability at least \(1-\eta\),
+
+\begin{equation}
+\label{eq:chnn-4-52}
+\sum_{2 \leq |\alpha| \leq s}^{}\left. \parallel D^{\alpha}\left( {\widehat{H}}_{\widehat{\bm{\vartheta}}} - H_{\star} \right) \right.\parallel_{L^{r}\left( \mathcal{A} \right)}^{r} \leq C_{s,\eta}\left( \widehat{\bm{\vartheta}} \right)^{r}.
+\end{equation}
+
+The certificate must control higher derivatives of the true learning error, not merely the magnitude of the network's own derivatives. Periodic Sobolev embedding then gives, on the intersection of the two events,
+
+\begin{equation}
+\label{eq:chnn-4-53}
+\left. \parallel{\widehat{H}}_{\widehat{\bm{\vartheta}}} - H_{\star} \right.\parallel_{C^{\ell}\left( \mathcal{A} \right)} \leq \mathfrak{C}_{N,\delta,\eta}\left( \widehat{\bm{\vartheta}} \right),
+\end{equation}
+
+where one may take
+
+\begin{equation}
+\label{eq:chnn-4-54}
+\mathfrak{C}_{N,\delta,\eta} = C_{s,r,\mathcal{A}}\left\lbrack \left( C_{P}^{r} + 1 \right)\frac{B_{N,\delta}\left( \widehat{\bm{\vartheta}} \right)}{m_{Z}} + C_{s,\eta}\left( \widehat{\bm{\vartheta}} \right)^{r} \right\rbrack^{1/r}.
+\end{equation}
+
+If the higher-order certificate is obtained by deterministic interval validation or interpolation with a rigorous remainder, set \(\eta=0\). If it is itself probabilistic, independence from the generalization event is not assumed, and the union bound yields only a joint probability of at least \(1-\delta-\eta\).
+
+If an analytic KAM theorem is selected, the preceding finitely smooth certificate is still insufficient; the analytic supremum norm of the learning error on a specified complex neighborhood must be controlled separately. Explicit dependence of a widely linear network on \(\bm{\xi}\) and \(\overline{\bm{\xi}}\) does not prevent the real-variable Hamiltonian from admitting a real-analytic extension, but smallness in a real-domain \(C^{\ell}\) norm does not automatically imply smallness in a complex-neighborhood analytic norm.
+
+\subsubsection{Accounting for the Integrable Reference, Pre-Existing Physical Perturbation, and Learning Error}\label{sec:chnn-4-6-6}
+
+Fix the integrable reference Hamiltonian \(h\left( \mathbf{I} \right)\) constructed and verified in \Cref{sec:hamiltonian-structure}. Write the true conservative system and the learned system as
+
+\begin{equation}
+\label{eq:chnn-4-55}
+H_{\star} = h + P_{0},\quad\quad{\widehat{H}}_{\widehat{\bm{\vartheta}}} = H_{\star} + e_{\widehat{\bm{\vartheta}}} = h + P_{\widehat{\bm{\vartheta}}},
+\end{equation}
+
+where
+
+\begin{equation}
+\label{eq:chnn-4-56}
+P_{\widehat{\bm{\vartheta}}} = P_{0} + e_{\widehat{\bm{\vartheta}}}.
+\end{equation}
+
+Therefore, in the common \(C^{\ell}\left( \mathcal{A} \right)\) norm,
+
+\begin{equation}
+\label{eq:chnn-4-57}
+\left. \parallel P_{\widehat{\bm{\vartheta}}} \right.\parallel_{C^{\ell}} \leq \left. \parallel P_{0} \right.\parallel_{C^{\ell}} + \mathfrak{C}_{N,\delta,\eta}\left( \widehat{\bm{\vartheta}} \right).
+\end{equation}
+
+If the true system is already only nearly integrable, \(P_{0}\) consumes part of the KAM perturbation budget; the entire threshold cannot be assigned to the learning error. Coordinate-transformation, Galerkin-truncation, parameter-identification, and model-closure errors may be added through the triangle inequality only after they have been controlled in the same function-space norm used by the KAM theorem. General dissipation, friction, background-flow input, and nonpotential magnetic control are not Hamiltonian perturbations here and remain in the open-port branches of \Cref{sec:chnn-model}.
+
+\subsubsection{Probabilistic Transfer from the Learning-Error Certificate to the KAM Condition}\label{sec:chnn-4-6-7}
+
+Select an external KAM theorem in advance. Let \(\mathsf{A}_{KAM}(h,P)\) denote all of its structural assumptions other than perturbation smallness, including the action--angle domain, regularity order, type of nondegeneracy, Diophantine condition, distance to the boundary, and admissible perturbation class. Let \(\varepsilon_{KAM}\) be its smallness threshold and let \(\mathcal{K}(h+P)\) denote the torus-persistence conclusion supplied by that theorem.
+
+\begin{proposition}[Probabilistic transfer]\label{prop:kam-probability-transfer}
+Under the preceding assumptions, with probability at least \(1-\delta-\eta\),
+
+\begin{equation}
+\label{eq:chnn-4-58}
+\boxed{\mathsf{A}_{KAM}\left( h,P_{\widehat{\bm{\vartheta}}} \right)\  \land \ \left( \left. \parallel P_{0} \right.\parallel_{C^{\ell}\left( \mathcal{A} \right)} + \mathfrak{C}_{N,\delta,\eta}\left( \widehat{\bm{\vartheta}} \right) < \varepsilon_{KAM} \right)\  \Rightarrow \ \mathcal{K}\left( {\widehat{H}}_{\widehat{\bm{\vartheta}}} \right).}
+\end{equation}
+\end{proposition}
+
+\begin{proof} On the intersection of the uniform-generalization event and the higher-order-certificate event, \Cref{sec:chnn-4-6-5} gives a \(C^{\ell}\) bound for the learning error. The triangle inequality in \Cref{sec:chnn-4-6-6} then makes the total Hamiltonian perturbation smaller than \(\varepsilon_{KAM}\). If all remaining conditions in \(\mathsf{A}_{KAM}\) also hold, the selected KAM theorem applies. By the union bound, the probability of the joint event is at least \(1-\delta-\eta\).\end{proof}
+
+This proposition establishes only the probabilistic transfer from a learning-error certificate to the small-perturbation condition of an external KAM theorem. The type, regularity, measure estimate, and frequency properties of the persistent tori are determined entirely by the selected external theorem and cannot be inferred from the training loss alone.
+
+\subsubsection{Continuous and Discrete Error Budgets}\label{sec:chnn-4-6-8}
+
+On a common analytic domain \(\mathcal{D}_{\rho}\), define
+
+\begin{equation}
+\label{eq:chnn-4-59}
+\varepsilon_{model} = \parallel X_{cons} - X_{0} \parallel_{\rho},\quad\quad\varepsilon_{learn} = \parallel X_{\lambda} - X_{cons} \parallel_{\rho}.
+\end{equation}
+
+Let \(\Phi_{h}^{0}\) be the exact map of \(X_{0}\) over a time step \(h\), and let \(\Psi_{h,\lambda}\) be an order-\(s_{a}\) symplectic algorithm applied to the learned Hamiltonian. If the vector fields and their first derivatives are uniformly bounded and the trajectories remain in a smaller analytic domain \(\mathcal{D}_{\rho\prime}\), then there exists a constant \(C_{\rho,\rho\prime}\) such that
+
+\begin{equation}
+\label{eq:chnn-4-60}
+\boxed{\parallel \Psi_{h,\lambda} - \Phi_{h}^{0} \parallel_{\rho\prime} \leq C_{\rho,\rho\prime}h\left( \varepsilon_{model} + \varepsilon_{learn} + h^{s_{a}} \right) = :\varepsilon_{map}.}
+\end{equation}
+
+Here, \(h^{s_{a}}\) arises from the local algorithmic error. This budget does not assume unconditionally that a globally exact ``discrete Hamiltonian'' exists. Only when
+
+\begin{equation}
+\label{eq:chnn-4-61}
+\varepsilon_{map}<\delta_{KAM}\left(\rho\prime,\gamma,\tau,\text{nondegeneracy margin},h\right)
+\end{equation}
+
+and the analyticity, Diophantine nonresonance, and step-size nonresonance conditions are satisfied may a specific symplectic-map KAM theorem be invoked.\cite{FengQin2010,Shang1999KAMAlgorithms,Shang2000KAMMappings,Poschel2001KAMLecture}
+
+\subsection{Three Discrete-Dynamics Branches}\label{sec:chnn-4-7}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Autonomous conservative branch.} Apply a generating-function method, implicit midpoint rule, or another algorithm proved to be symplectic to \(\dot{\mathbf{Z}} = \mathbf{J}\nabla{\widehat{H}}_{\lambda}\), yielding \(F_{h}^{cons}\). This map is used for Shang's KAM theory for symplectic algorithms and for validation by the Haro parameterization method.
+\item
+  \textbf{Exact nonautonomous Hamiltonian branch.} Apply the standard nonautonomous canonical equations to \(H\left( \mathbf{Z},\tau \right)\), or introduce the extended variables \(\left(\tau,p_{\tau}\right)\) and \(\mathcal{H}=H+p_{\tau}\) and use a symplectic algorithm in extended phase space. Explicit time dependence alone does not require a nonstandard \(K\left( \mathbf{z},t \right)\)-symplectic structure.
+\item
+  \textbf{Open-port branch.} Integrate the complete forced--dissipative system consistently while monitoring its energy balance. Its map is generally neither a standard symplectic map nor automatically a Birkhoff system. It enters the \(K\left( \mathbf{z},t \right)\)-symplectic branch of \Cref{sec:symplectic-kam} only if the residual vector field remaining after removal of the known backbone and ports passes the self-adjoint representation test.
+\end{enumerate}
+
+\subsection{Output Objects for Invariant-Torus Analysis}\label{sec:chnn-4-8}
+
+The objects required by the invariant-torus analysis in \Cref{sec:symplectic-kam} are therefore
+
+\begin{equation}
+\label{eq:chnn-4-62}
+\mathcal{O}_{4 \rightarrow 5}=\left(F_{h}^{cons},\varepsilon_{map},X_{res},\mathcal{D},\gamma,\tau,\text{nondegeneracy margin},model\_level,representation\right),
+\end{equation}
+
+where
+
+\begin{equation}
+\label{eq:chnn-4-63}
+\boxed{X_{res} = X_{data} - \mathbf{J}\nabla{\widehat{H}}_{\lambda} - \mathbf{B}\left( {\widehat{\mathbf{Q}}}_{diss,\mu} + {\widehat{\mathbf{Q}}}_{in,\nu} + {\widehat{\mathbf{Q}}}_{flow,\kappa} + \mathbf{Q}_{\partial} \right).}
+\end{equation}
+
+If any quantity has not yet been constructed or verified numerically, subsequent sections list it only as a condition to be tested rather than as an established conclusion.
