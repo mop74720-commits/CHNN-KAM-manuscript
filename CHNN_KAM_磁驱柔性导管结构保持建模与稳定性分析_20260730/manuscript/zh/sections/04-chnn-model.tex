@@ -331,7 +331,7 @@ P1/P1.5/P1.6 只实现上述流程中的保守 derivative-only pilot 和结构�
 
 \subsubsection{CHNN 的实现基础与结构检验}\label{sec:chnn-4-5-4}
 
-为实现上述数学结构，本文构建了与统一接口对应的独立 CHNN 软件系统。该实现不把既有 HNN、CVNN 和 KAM--HNN 复现工程直接拼接，而是保留经单元测试核验的复值算子，并按照本文的正则状态、灰箱 Hamiltonian 和排他端口接口重新组织。软件实现中的主模型为
+为实现上述数学结构，本文给出与统一接口对应的独立 CHNN 软件目标规格。当前 clean checkout 没有交付可审计的正式 CHNN 源码、配置、环境锁或训练日志，因此下式是理论接口和后续实现的验收对象，不是对正式软件已经存在或已经核验的声明。当前仓库中的 \texttt{verification\_skeleton.py} 只承担接口示例、回归测试骨架、数值流程演示和构建门测试对象的作用，不是正式 CHNN、COMSOL--Galerkin bridge、force-v2、P0/P1/P2 生产实验、控制器、自适应律或 KAM 数值证书。
 
 \begin{equation}
 \label{eq:chnn-4-31}
@@ -360,9 +360,9 @@ H_{\theta}\left( \mathbf{x},\bm{\mu} \right) = H_{phys}\left( \mathbf{x},\bm{\mu
 \left( \nabla_{\mathbf{p}}H_{\theta} \right)^{T}\mathbf{Q}_{diss}^{bulk} \leq 0.
 \end{equation}
 
-实现层与理论层的对应关系如下：正则尺度模块先把有量纲 \(\left( \mathbf{q},\mathbf{p} \right)\) 变换为无量纲正则对 \(\left( \mathbf{Q},\mathbf{P} \right)\)，再构造复坐标；复值主干同时提供标准复线性层和 \(\mathbf{W}\bm{\xi} + \mathbf{V}\overline{\bm{\xi}} + \mathbf{b}\) 型广义复线性层；Hamiltonian 头只输出实标量，并采用 \(H_{phys} + \Delta H_{\theta}\) 灰箱结构；耗散、磁输入、流场、边界、接触和剩余误差分别由独立广义力头表示，且只通过 \(\mathbf{B}_{port}\) 进入动量方程；数据接口用 \texttt{representation} 区分 \(\mathbf{p}_{0} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}}\) 与 \(\mathbf{p} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - \mathbf{b}_{A}\)，用 \texttt{model\_level} 区分 Kirchhoff Beam、严格弱形式和高保真对照模型，并以 \texttt{conservative\_mask} 隔离可供统计学习--KAM 分析读取的保守样本。训练流程实现``保守 Hamiltonian--端口--联合微调''三阶段，同时提供实值 HNN 和黑箱向量场网络作为比较基线。
+目标接口与理论层的对应关系如下：正则尺度模块应把有量纲 \(\left( \mathbf{q},\mathbf{p} \right)\) 变换为无量纲正则对 \(\left( \mathbf{Q},\mathbf{P} \right)\)，再构造复坐标；复值主干应提供标准复线性层和 \(\mathbf{W}\bm{\xi} + \mathbf{V}\overline{\bm{\xi}} + \mathbf{b}\) 型广义复线性层；Hamiltonian 头应只输出实标量，并采用 \(H_{phys} + \Delta H_{\theta}\) 灰箱结构；耗散、磁输入、流场、边界、接触和剩余误差应分别由独立广义力头表示，且只通过 \(\mathbf{B}_{port}\) 进入动量方程；数据接口应使用 \texttt{representation} 区分 \(\mathbf{p}_{0} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}}\) 与 \(\mathbf{p} = \mathbf{M}\left( \mathbf{q} \right)\dot{\mathbf{q}} - \mathbf{b}_{A}\)，使用 \texttt{model\_level} 区分 Kirchhoff Beam、严格弱形式和高保真对照模型，并以 \texttt{conservative\_mask} 隔离可供统计学习--KAM 分析读取的保守样本。完整训练流程和比较基线仍属于待交付正式实现。
 
-软件实现通过了以下结构一致性检验：
+正式实现应通过以下结构一致性检验；当前列表是回归验收清单，不是当前 skeleton 已经完成的正式实现证据：
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -383,7 +383,9 @@ H_{\theta}\left( \mathbf{x},\bm{\mu} \right) = H_{phys}\left( \mathbf{x},\bm{\mu
   动量表示标签、模型层级标签和投影数据格式不一致时拒绝混用，且各损失可完成自动微分反向传播。
 \end{enumerate}
 
-在统一软件环境中，Python 源文件编译、可编辑安装及 13 项组件与接口测试均通过，合成数据上的三阶段训练流程能够完整执行。该结果验证了软件实现与所列结构恒等式的一致性；其证据范围限于实现正确性，不替代导管 COMSOL 数据上的辨识精度、函数类复杂度常数、高阶误差证书或 KAM 不变环面认证。具体导管模型的物理基线 Hamiltonian \({\widehat{H}}_{phys}\)、构形相关质量---惯性矩阵、精确非自治项和 COMSOL--Galerkin 投影将在数值实验中由实际模型与数据实例化。
+\begin{sloppypar}
+当前可复核的代码材料仅包括 NumPy 版 \texttt{verification\_skeleton.py} 及其 \texttt{verification\_results.json}。它只运行低维解析振子、离散阶数、能量/功率平衡和有限差分结构敏感性检查；其 JSON 只能描述 skeleton 运行结果，不能作为正式 CHNN、COMSOL--Galerkin bridge、force-v2、P0/P1/P2 或控制器实验结果。解除这一实现边界至少需要正式源码、配置、环境锁、原始数组、manifest、clean-run 日志、自动生成的表格和图以及 provenance 一致性记录。具体导管模型的物理基线 Hamiltonian \({\widehat{H}}_{phys}\)、构形相关质量---惯性矩阵、精确非自治项和 COMSOL--Galerkin 投影仍需由这些正式材料实例化。
+\end{sloppypar}
 
 \subsection{从 CHNN 学习误差到 KAM 小量条件}\label{sec:chnn-4-6}
 

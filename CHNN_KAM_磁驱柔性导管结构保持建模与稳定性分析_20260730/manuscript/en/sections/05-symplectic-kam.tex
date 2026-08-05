@@ -135,21 +135,40 @@ If \(\delta_{Birk} = 0\), an exact representation is obtained. If \(\delta_{Birk
 
 \subsection{\texorpdfstring{A \(K\left( \mathbf{z},t \right)\)-symplectic discretization for Birkhoff systems}{A K-symplectic discretization for Birkhoff systems}}\label{sec:symplectic-kam-5-5}
 
-Under regularity, self-adjointness, analyticity, and nondegeneracy conditions, the Birkhoff phase flow admits a gradient map and a scalar generating function under an appropriate local projection. If the generating function is analytic in the step size, it can be expanded as
+Under regularity, self-adjointness, analyticity, and nondegeneracy conditions, the Birkhoff phase flow admits a gradient map and a scalar generating function under an appropriate local projection. To keep distinct orders separate, take the same local domain \(\mathcal{D}'\Subset\mathcal{D}\), let \(\Phi_h\) be the exact flow map, and let \(\Psi_h\) be the candidate discrete map. Define separately:
+
+\begin{itemize}
+\tightlist
+\item
+  The algebraic order \(r_{\rm alg}\) of the numerical method: if the required regularity and compatible norm give \(\|\Psi_h-\Phi_h\|_{C^{1}(\mathcal{D}')}\leq C_{\rm alg}h^{r_{\rm alg}+1}\), this is a local one-step map error; on a fixed time interval and under stability assumptions, the global trajectory error is typically \(O(h^{r_{\rm alg}})\).
+\item
+  The generating-function truncation order \(m_{\rm gen}\): this only records that the generating-function expansion is retained through \(h^{m_{\rm gen}}\). If \(S\) is analytic in \(h\),
+\end{itemize}
 
 \begin{equation}
 \label{eq:symplectic-kam-5-14}
 S\left( \mathbf{Z},h \right) = \sum_{r = 1}^{\infty}S_{r}\left( \mathbf{Z} \right)h^{r}.
 \end{equation}
 
-Truncation at order \(m\) gives an implicit order-\(m\) approximately \(K\left( \mathbf{z},t \right)\)-symplectic method satisfying
+and one may define \(S^{[m_{\rm gen}]}=\sum_{r=1}^{m_{\rm gen}}S_rh^r\) and \(R_S=S-S^{[m_{\rm gen}]}\). The remainder must be estimated in an explicitly stated \(C^{2}\) or analytic norm and domain; the generating-function truncation order is not automatically the algebraic order of the numerical method.
 
-\begin{equation}
-\label{eq:symplectic-kam-5-15}
-\left( D\Psi_{h} \right)^{T}\mathbf{K}\left( \Psi_{h}\left( \mathbf{z} \right),t + h \right)D\Psi_{h} = \mathbf{K}\left( \mathbf{z},t \right) + O\left( h^{m + 1} \right).
-\end{equation}
+\begin{itemize}
+\tightlist
+\item
+  Define the discrete structural defect by \(\Delta_K\):
+  \[
+  \Delta_{K}(\Psi_h;\mathcal{D}'):=\left\|D\Psi_h^{T}\mathbf{K}\left(\Psi_h(\mathbf{z}),t+h\right)D\Psi_h-\mathbf{K}(\mathbf{z},t)\right\|_{C^{0}(\mathcal{D}')}.
+  \]
+  This is not defined by \(r_{\rm alg}\) or \(m_{\rm gen}\) alone.
+\item
+  Only when \(\Omega_K\) is closed and nondegenerate, \(\Phi_h\) exactly preserves the structure, and compatible norm bounds for \(D(\Psi_h-\Phi_h)\) and \(R_S\) have been established, can \(\mathbf{K}\)'s \(C^{1}\) bounds yield an upper bound on \(\Delta_K\). For example, only if both map errors are bounded in \(C^{1}\) by \(O(h^{r_{\rm alg}+1})\) can a structural-defect bound of the same order be obtained conditionally; the algorithmic order must not be written directly as an \(O(h^{m+1})\) symplectic-structure defect without this derivation.
+\item
+  KAM smallness is not synonymous with any of these orders. It must be assembled in the selected analytic or finitely differentiable norm from model, learning, truncation, map, and structural errors, together with the analytic-domain, Diophantine, nondegeneracy, dimension, and step-size nonresonance conditions.
+\end{itemize}
 
-This result guarantees only approximate structure preservation and the stated order when its hypotheses hold; it is exactly \(K\)-symplectic only when the remainder vanishes on the domain of interest, and it does not by itself imply persistence of classical Hamiltonian KAM tori. If a nonstructured residual is superposed, the resulting structural defect must enter the error budget.
+The generating-function and structure-preserving algorithm basis is Feng--Qin's monograph on symplectic geometric algorithms and Hairer--Lubich--Wanner's monograph on geometric numerical integration; the KAM conditions for symplectic algorithms and maps correspond to Shang 1999 (Numerische Mathematik 83:477--496) and Shang 2000 (Journal of Dynamics and Differential Equations 12(2):357--383)\cite{FengQin2010,HairerLubichWanner2006GNI,Shang1999KAMAlgorithms,Shang2000KAMMappings}. These citations provide theoretical conditions and method sources; they do not mean that the present manuscript has completed the corresponding proof or numerical certificate.
+
+Accordingly, the text supports only the following conditional statement: when the hypotheses hold, the method has approximate \(K\)-symplectic structure preservation; when \(\Delta_K=0\) and the map assumptions hold, it is exactly \(K\)-symplectic. Approximate \(K\)-symplecticity is not numerical KAM certification. No complete numerical certificate is currently available for invariant tori, the frequency map, Diophantine conditions, or nondegeneracy constants; the current results support only a structure-preserving numerical framework, not an engineering safe-domain conclusion. If a nonstructured residual is superposed, the resulting structural defect must enter the error budget.
 
 \subsection{Invariant-torus computation by the parameterization method}\label{sec:symplectic-kam-5-6}
 

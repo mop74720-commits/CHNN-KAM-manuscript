@@ -1,4 +1,5 @@
 {
+  "artifact_type": "verification_skeleton_result",
   "complex_round_trip_error": 2.2887833992611187e-16,
   "conservative": {
     "max_quadratic_energy_drift": 3.1086244689504383e-15,
@@ -44,7 +45,21 @@
     "strang_exact_conformal_defect": 1.9270264446029797e-09
   },
   "environment": {
-    "date": "2026-08-05",
-    "scope": "V1--V3 NumPy verification skeleton"
-  }
+    "date": "2026-08-06",
+    "scope": "V1--V3 NumPy verification skeleton only"
+  },
+  "formal_experiment": false,
+  "formal_implementation": false,
+  "numerical_kam_certificate": false,
+  "required_formal_materials": [
+    "formal source code",
+    "configuration",
+    "environment lock",
+    "raw arrays",
+    "manifest",
+    "clean-run logs",
+    "automatically generated tables and figures",
+    "provenance-consistency records"
+  ],
+  "scope": "V1--V3 NumPy verification skeleton only"
 }

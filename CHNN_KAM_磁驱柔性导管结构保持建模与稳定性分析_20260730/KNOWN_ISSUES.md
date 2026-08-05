@@ -7,3 +7,9 @@
 5. `internal` profile 是 A4 单栏内部写作模板；出版社 adapter 仍为示例，尚未针对具体目标期刊验证。
 6. `Coquinot2020Metriplectic` 的基线记录未提供页码，尚待按原始来源核验。
 7. 正文保留较多 `\boxed` 核心公式；是否缩减应在目标期刊版式确定后决定。
+
+## A-17 验证边界
+
+当前仓库的 verification_skeleton.py 及 verification_results.json 只覆盖低维解析振子和 V1--V3 骨架检查。它们分别是接口示例、回归测试骨架、数值流程演示和构建门测试对象及其机器可读结果，不是正式 CHNN、COMSOL--Galerkin bridge、force-v2、P0/P1/P2 生产实验、控制器、自适应律或 KAM 数值证书。
+
+解除该边界需要正式源码、配置、环境锁、原始数组、manifest、clean-run 日志、自动生成的表格和图以及 provenance 一致性记录。上述材料仍未交付，A-17 继续为 PARTIAL。

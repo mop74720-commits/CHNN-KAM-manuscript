@@ -1,7 +1,11 @@
-"""Minimal verification suite for the CHNN--KAM full Chinese draft.
+"""Minimal verification skeleton for the CHNN--KAM manuscript.
 
-This file intentionally covers only the analytic V1--V3 tests.  It is not a
-replacement for the archived prototype or for the future COMSOL data pipeline.
+This file is an interface example, regression-test skeleton, numerical-workflow
+demonstration, and build-gate test object. It covers only the analytic V1--V3
+tests and is not formal CHNN training code, a formal COMSOL--Galerkin bridge,
+formal force-v2 code, a P0/P1/P2 production experiment, a controller or
+adaptive law, or a numerical KAM certificate. It is not a replacement for
+undelivered formal source, raw arrays, manifests, or clean-run logs.
 All variables are dimensionless unless explicitly stated otherwise.
 """
 
@@ -212,9 +216,24 @@ def run_all() -> dict[str, object]:
 
 if __name__ == "__main__":
     output = run_all()
+    output["artifact_type"] = "verification_skeleton_result"
+    output["scope"] = "V1--V3 NumPy verification skeleton only"
+    output["formal_implementation"] = False
+    output["formal_experiment"] = False
+    output["numerical_kam_certificate"] = False
+    output["required_formal_materials"] = [
+        "formal source code",
+        "configuration",
+        "environment lock",
+        "raw arrays",
+        "manifest",
+        "clean-run logs",
+        "automatically generated tables and figures",
+        "provenance-consistency records",
+    ]
     output["environment"] = {
         "date": date.today().isoformat(),
-        "scope": "V1--V3 NumPy verification skeleton",
+        "scope": "V1--V3 NumPy verification skeleton only",
     }
     result_path = Path(__file__).with_name("verification_results.json")
     temporary = result_path.with_suffix(".json.tmp")

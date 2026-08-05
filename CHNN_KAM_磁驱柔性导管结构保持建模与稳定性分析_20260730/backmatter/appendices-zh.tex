@@ -42,3 +42,5 @@ P1 和 P1.5 各包含 \(60/60\) 次完成的训练与评价运行，P1.6 包含 
 \subsection{后续数值实例化}
 
 多幅值统计、完整 96 轨迹数据集和 P2 模型比较将沿用整轨迹划分，并报告跨工况均值、方差和配对比较。开放端口研究还需给出功率平衡、耗散符号和端口泄漏指标；高保真研究需量化 Kirchhoff 模型相对 Timoshenko 梁和实体模型的偏差。数值 KAM 分析则需在统一范数下给出非退化裕度、Diophantine 裕度、高阶误差、辛映射缺陷和不变环面残差。实现代码和补充数据将在配套代码与补充材料中提供。
+
+当前 clean checkout 中的 \texttt{verification\_skeleton.py} 及 \texttt{verification\_results.json} 只描述低维 V1--V3 skeleton 运行。它们不是正式 CHNN、COMSOL--Galerkin bridge、force-v2、P0/P1/P2 生产实验、控制器、自适应律或 KAM 数值证书。解除该边界至少需要正式源码、配置、环境锁、原始数组、manifest、clean-run 日志、自动生成的表格和图以及 provenance 一致性记录；这些材料缺失时，A-17 保持 PARTIAL。
