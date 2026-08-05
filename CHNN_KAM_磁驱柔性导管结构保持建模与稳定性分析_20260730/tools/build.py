@@ -150,8 +150,18 @@ def check_assets_and_provenance(*, allow_mismatch: bool) -> None:
     source_issues: list[str] = []
     if PROVENANCE.exists():
         with PROVENANCE.open(encoding="utf-8", newline="") as handle:
-            for row in csv.DictReader(handle):
+            for row_number, row in enumerate(csv.DictReader(handle), start=2):
                 asset_path = row.get("asset_path", "")
+                source_paths = [item.strip() for item in row.get("formal_source_paths", "").split(";") if item.strip()]
+                source_hashes = [item.strip().upper() for item in row.get("formal_source_sha256", "").split(";") if item.strip()]
+                if len(source_paths) != len(source_hashes):
+                    raise RuntimeError(
+                        "Formal provenance manifest structure invalid at "
+                        f"{PROVENANCE} (row {row_number}, asset_path={asset_path or '<blank>'}): "
+                        "formal_source_paths count="
+                        f"{len(source_paths)}, formal_source_sha256 count={len(source_hashes)}; "
+                        "cannot establish one-to-one correspondence."
+                    )
                 expected = row.get("asset_sha256", "").strip().upper()
                 path = ROOT / asset_path
                 if not path.exists():
@@ -160,20 +170,17 @@ def check_assets_and_provenance(*, allow_mismatch: bool) -> None:
                 digest = hashlib.sha256(path.read_bytes()).hexdigest().upper()
                 if expected and digest != expected:
                     mismatches.append(f"{asset_path}: expected {expected}, got {digest}")
-                source_paths = [item.strip() for item in row.get("formal_source_paths", "").split(";") if item.strip()]
-                source_hashes = [item.strip().upper() for item in row.get("formal_source_sha256", "").split(";") if item.strip()]
                 for index, source_path in enumerate(source_paths):
                     source = ROOT / source_path
                     if not source.exists():
                         source_issues.append(f"{asset_path} source missing: {source_path}")
                         continue
-                    if index < len(source_hashes):
-                        source_digest = hashlib.sha256(source.read_bytes()).hexdigest().upper()
-                        if source_digest != source_hashes[index]:
-                            source_issues.append(
-                                f"{asset_path} source hash mismatch: {source_path}: "
-                                f"expected {source_hashes[index]}, got {source_digest}"
-                            )
+                    source_digest = hashlib.sha256(source.read_bytes()).hexdigest().upper()
+                    if source_digest != source_hashes[index]:
+                        source_issues.append(
+                            f"{asset_path} source hash mismatch: {source_path}: "
+                            f"expected {source_hashes[index]}, got {source_digest}"
+                        )
     else:
         mismatches.append("FIGURE_TABLE_PROVENANCE.csv is missing")
 

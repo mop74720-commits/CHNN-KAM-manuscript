@@ -101,3 +101,39 @@
 - 诊断 provenance 门：`python tools/build.py --language both --clean --diagnostic --allow-provenance-mismatch` exit 0；中文 PDF 57 页，英文 PDF 69 页，均位于 `build/diagnostic`；release 哈希不变。
 - 日志检查：无未解析 citation/reference、重复 label、缺失图片/表格、Overfull、缺字或致命错误；BibTeX 无警告；英文保留 3 处 Underfull `\\hbox`。
 - 骨架验证：`python code/verification_skeleton.py` exit 0；断言通过，并原子更新 `code/verification_results.json`。有限差分缺陷在过小步长受舍入放大，未作单调下降结论。
+
+## 9. 第三轮返工：A-13 数量一致性门
+
+### 9.1 基线与缺陷
+
+- 复审 head：`faea830574255284d798ae235e49b159814fa5a7`。
+- 缺陷位置：`tools/build.py` 中 `formal_source_paths` 与 `formal_source_sha256` 的解析和配对逻辑。
+- 原问题：旧逻辑仅在 `index < len(source_hashes)` 时校验 hash；两侧数量不一致时，缺失的 hash 会被静默跳过，无法建立 provenance source 的一一对应关系。
+
+### 9.2 本轮修改
+
+- 修改文件：`tools/build.py`；新增 `tests/test_build_provenance_structure.py`；本报告。
+- 在使用或配对 source 列表前，按 manifest 行检查两侧数量；错误信息包含 manifest 路径、行号、asset path、两侧数量以及“cannot establish one-to-one correspondence”原因。
+- 数量相等后才使用直接索引访问 `source_hashes[index]`，不使用截断式配对，不忽略多余 path 或 hash。
+- 该结构检查位于正式/诊断构建共用的 provenance 前置门中；未修改正式 provenance CSV、未刷新 hash，也不受诊断开关绕过。
+
+### 9.3 回归测试
+
+测试均使用临时 manifest 和临时 build 目录；正式 manifest 与 release 文件不作为写入目标。
+
+| 测试 | 命令 | 退出码 | 结果 |
+|---|---|---:|---|
+| T1：数量相等 | `python -m unittest tests.test_build_provenance_structure.FormalProvenanceStructureTests.test_t1_equal_lists_reach_existing_provenance_gate` | 0 | 数量门通过，随后由原有 asset hash 门拒绝 |
+| T2：paths 多 1 项 | `python -m unittest tests.test_build_provenance_structure.FormalProvenanceStructureTests.test_t2_extra_path_is_rejected` | 0 | 构建返回非零；报告 paths=2、sha256=1 和一一对应失败 |
+| T3：hashes 多 1 项 | `python -m unittest tests.test_build_provenance_structure.FormalProvenanceStructureTests.test_t3_extra_hash_is_rejected` | 0 | 构建返回非零；报告 paths=1、sha256=2 和一一对应失败 |
+| T4：一侧为空 | `python -m unittest tests.test_build_provenance_structure.FormalProvenanceStructureTests.test_t4_empty_path_list_with_hash_is_rejected` | 0 | 构建返回非零；报告 paths=0、sha256=1 和一一对应失败 |
+| T5：诊断模式不绕过 | `python -m unittest tests.test_build_provenance_structure.FormalProvenanceStructureTests.test_t5_diagnostic_mode_cannot_bypass_structure_gate` | 0 | 诊断构建同样返回非零；报告 paths=2、sha256=0 和一一对应失败 |
+
+测试套件命令 `python -m unittest discover -s tests -p 'test_*.py' -v` 共运行 5 项，exit 0。
+
+### 9.4 Release 与 provenance 记录
+
+- 正式 release 修改前 SHA-256：ZH `C3B2B3948FB67F12D91A7437147614E13F396AB68FA2DF67337858B63BC0F162`；EN `7F76C275B1937E74F91593AFD93829B7EB55E5698710D77E149312767B2BB1D5`。
+- T1--T5 及正式失败门之后 SHA-256：ZH `C3B2B3948FB67F12D91A7437147614E13F396AB68FA2DF67337858B63BC0F162`；EN `7F76C275B1937E74F91593AFD93829B7EB55E5698710D77E149312767B2BB1D5`。
+- 正式构建 `python tools/build.py --language both --clean` exit 4；现有 12 个 provenance 资产失配仍原样保留，未刷新、补齐或生成新的正式 hash。
+- 本轮只处理 A-13 数量一致性门，没有声称关闭其他 PARTIAL 或 BLOCKED 项。
