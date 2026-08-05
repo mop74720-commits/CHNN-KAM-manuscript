@@ -45,6 +45,29 @@ RERUN_PATTERNS = (
 )
 
 
+def parse_provenance_entries(
+    field_name: str,
+    raw_value: str,
+    manifest_location: str,
+) -> list[str]:
+    """Parse a semicolon-delimited provenance field without dropping empty entries."""
+    if raw_value == "":
+        return []
+
+    entries = raw_value.split(";")
+    parsed: list[str] = []
+    for index, raw_entry in enumerate(entries):
+        entry = raw_entry.strip()
+        if not entry:
+            raise RuntimeError(
+                "Formal provenance manifest structure invalid at "
+                f"{manifest_location}: {field_name} contains empty provenance entry "
+                f"at index {index}; cannot establish a valid one-to-one correspondence."
+            )
+        parsed.append(entry)
+    return parsed
+
+
 def run(cmd: list[str]) -> None:
     print("+", " ".join(cmd))
     subprocess.run(cmd, cwd=ROOT, check=True)
@@ -152,8 +175,23 @@ def check_assets_and_provenance(*, allow_mismatch: bool) -> None:
         with PROVENANCE.open(encoding="utf-8", newline="") as handle:
             for row_number, row in enumerate(csv.DictReader(handle), start=2):
                 asset_path = row.get("asset_path", "")
-                source_paths = [item.strip() for item in row.get("formal_source_paths", "").split(";") if item.strip()]
-                source_hashes = [item.strip().upper() for item in row.get("formal_source_sha256", "").split(";") if item.strip()]
+                manifest_location = (
+                    f"{PROVENANCE} (row {row_number}, "
+                    f"asset_path={asset_path or '<blank>'})"
+                )
+                source_paths = parse_provenance_entries(
+                    "formal_source_paths",
+                    row.get("formal_source_paths", ""),
+                    manifest_location,
+                )
+                source_hashes = [
+                    item.upper()
+                    for item in parse_provenance_entries(
+                        "formal_source_sha256",
+                        row.get("formal_source_sha256", ""),
+                        manifest_location,
+                    )
+                ]
                 if len(source_paths) != len(source_hashes):
                     raise RuntimeError(
                         "Formal provenance manifest structure invalid at "

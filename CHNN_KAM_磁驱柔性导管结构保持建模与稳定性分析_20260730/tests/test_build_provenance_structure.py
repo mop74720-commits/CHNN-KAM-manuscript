@@ -151,6 +151,82 @@ class FormalProvenanceStructureTests(unittest.TestCase):
         self.assertIn("formal_source_sha256 count=0", output)
         self.assertIn("one-to-one correspondence", output)
 
+    def test_t6_consecutive_empty_path_entry_is_rejected(self) -> None:
+        source = "review/first-review.md"
+        digest = sha256(PROJECT_ROOT / source)
+        code, output, _ = self.run_build_with_manifest(
+            [source, "", source], [digest, digest]
+        )
+        self.assertEqual(code, 4)
+        self.assertIn("formal_source_paths", output)
+        self.assertIn("empty provenance entry", output)
+        self.assertIn("index 1", output)
+
+    def test_t7_consecutive_empty_hash_entry_is_rejected(self) -> None:
+        source = "review/first-review.md"
+        digest = sha256(PROJECT_ROOT / source)
+        code, output, _ = self.run_build_with_manifest(
+            [source, source], [digest, "", digest]
+        )
+        self.assertEqual(code, 4)
+        self.assertIn("formal_source_sha256", output)
+        self.assertIn("empty provenance entry", output)
+        self.assertIn("index 1", output)
+
+    def test_t8_leading_empty_path_entry_is_rejected(self) -> None:
+        source = "review/first-review.md"
+        code, output, _ = self.run_build_with_manifest(
+            ["", source], [sha256(PROJECT_ROOT / source)]
+        )
+        self.assertEqual(code, 4)
+        self.assertIn("formal_source_paths", output)
+        self.assertIn("empty provenance entry", output)
+        self.assertIn("index 0", output)
+
+    def test_t9_trailing_empty_hash_entry_is_rejected(self) -> None:
+        source = "review/first-review.md"
+        digest = sha256(PROJECT_ROOT / source)
+        code, output, _ = self.run_build_with_manifest(
+            [source, source], [digest, ""]
+        )
+        self.assertEqual(code, 4)
+        self.assertIn("formal_source_sha256", output)
+        self.assertIn("empty provenance entry", output)
+        self.assertIn("index 1", output)
+
+    def test_t10_whitespace_only_entry_is_rejected(self) -> None:
+        source = "review/first-review.md"
+        digest = sha256(PROJECT_ROOT / source)
+        code, output, _ = self.run_build_with_manifest(
+            [source, "   ", source], [digest, digest]
+        )
+        self.assertEqual(code, 4)
+        self.assertIn("formal_source_paths", output)
+        self.assertIn("empty provenance entry", output)
+        self.assertIn("index 1", output)
+
+    def test_t11_formal_and_diagnostic_modes_reject_empty_entries(self) -> None:
+        source = "review/first-review.md"
+        digest = sha256(PROJECT_ROOT / source)
+        for diagnostic, allow_mismatch in ((False, False), (True, True)):
+            code, output, _ = self.run_build_with_manifest(
+                [source, "", source],
+                [digest, digest],
+                diagnostic=diagnostic,
+                allow_mismatch=allow_mismatch,
+            )
+            self.assertEqual(code, 4)
+            self.assertIn("formal_source_paths", output)
+            self.assertIn("empty provenance entry", output)
+            self.assertIn("index 1", output)
+
+    def test_t12_both_lists_empty_are_allowed_by_current_contract(self) -> None:
+        code, output, _ = self.run_build_with_manifest([], [])
+        self.assertEqual(code, 4)
+        self.assertIn("Provenance mismatch", output)
+        self.assertNotIn("empty provenance entry", output)
+        self.assertNotIn("one-to-one correspondence", output)
+
 
 if __name__ == "__main__":
     unittest.main()

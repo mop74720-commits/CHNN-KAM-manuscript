@@ -137,3 +137,58 @@
 - T1--T5 及正式失败门之后 SHA-256：ZH `C3B2B3948FB67F12D91A7437147614E13F396AB68FA2DF67337858B63BC0F162`；EN `7F76C275B1937E74F91593AFD93829B7EB55E5698710D77E149312767B2BB1D5`。
 - 正式构建 `python tools/build.py --language both --clean` exit 4；现有 12 个 provenance 资产失配仍原样保留，未刷新、补齐或生成新的正式 hash。
 - 本轮只处理 A-13 数量一致性门，没有声称关闭其他 PARTIAL 或 BLOCKED 项。
+
+## 10. 第四轮返工：A-13 空 provenance entry 与测试可发现性
+
+### 10.1 复审绑定与范围
+
+- 复审 head：`dd88904c7c52d1debef996e37f68cc625ee7a303`。
+- 剩余问题：`tests/__init__.py` 缺失使标准 unittest 模块命令不能直接运行；`formal_source_paths` 和 `formal_source_sha256` 的分隔字段使用 `if item.strip()` 静默丢弃空项。
+- 本轮修改文件：`tools/build.py`、`tests/__init__.py`、`tests/test_build_provenance_structure.py`、`review/modification-report.md`。
+- 未修改正文、release PDF、`FIGURE_TABLE_PROVENANCE.csv`、`review/first-review.md`、`review/issue-matrix.md` 或 `main`。
+
+### 10.2 新增检查逻辑与空字段合同
+
+- 新增 `parse_provenance_entries()`，对非空字段保留原始 `split(";")` 结果并逐项检查，不在结构校验前过滤空元素。
+- 前导分隔符、尾随分隔符、连续分隔符以及仅含空白的元素均立即失败；错误信息包含字段名、从 0 开始的空元素索引、manifest/config 路径和 `empty provenance entry`，并说明无法建立一一对应关系。
+- 整个字段为 `""` 时解析为空列表；因此当前正式合同允许 `formal_source_paths=""` 且 `formal_source_sha256=""` 的双空声明。该合同依据现有 manifest 解析语义：双空不触发结构错误，但随后仍由现有 asset/provenance 门决定构建结果。
+- 空项检查和数量检查位于 source hash 配对、staging 及 release promote 之前；正式和诊断构建共用，诊断开关不能绕过。
+- 数量相等时仍由原有 hash/provenance 门决定后续成功或失败；不使用截断式 `zip`，不忽略多余 path/hash，不生成、刷新或修改 provenance hash。
+
+### 10.3 回归测试
+
+以下每条命令均已从项目根目录实际执行，unittest 命令退出码均为 `0`；测试内部临时构建按预期返回 `4` 时由断言验证其失败原因。
+
+| 测试 | 实际命令 | unittest 退出码 | 结果 |
+|---|---|---:|---|
+| T1：paths/hashes 数量相等 | `python -m unittest tests.test_build_provenance_structure.FormalProvenanceStructureTests.test_t1_equal_lists_reach_existing_provenance_gate` | 0 | 数量合同通过；随后原有 provenance 门拒绝，构建返回 4 |
+| T2：paths 多 1 项 | `python -m unittest tests.test_build_provenance_structure.FormalProvenanceStructureTests.test_t2_extra_path_is_rejected` | 0 | 构建返回 4；报告 paths=2、sha256=1 和一一对应失败 |
+| T3：hashes 多 1 项 | `python -m unittest tests.test_build_provenance_structure.FormalProvenanceStructureTests.test_t3_extra_hash_is_rejected` | 0 | 构建返回 4；报告 paths=1、sha256=2 和一一对应失败 |
+| T4：paths 为空、hashes 非空 | `python -m unittest tests.test_build_provenance_structure.FormalProvenanceStructureTests.test_t4_empty_path_list_with_hash_is_rejected` | 0 | 构建返回 4；数量不一致被拒绝 |
+| T5：诊断模式不能绕过数量门 | `python -m unittest tests.test_build_provenance_structure.FormalProvenanceStructureTests.test_t5_diagnostic_mode_cannot_bypass_structure_gate` | 0 | 诊断构建返回 4；数量不一致仍被拒绝 |
+| T6：paths 连续分隔符 | `python -m unittest tests.test_build_provenance_structure.FormalProvenanceStructureTests.test_t6_consecutive_empty_path_entry_is_rejected` | 0 | 构建返回 4；报告 `formal_source_paths` 的空项 index 1 |
+| T7：hashes 连续分隔符 | `python -m unittest tests.test_build_provenance_structure.FormalProvenanceStructureTests.test_t7_consecutive_empty_hash_entry_is_rejected` | 0 | 构建返回 4；报告 `formal_source_sha256` 的空项 index 1 |
+| T8：paths 前导分隔符 | `python -m unittest tests.test_build_provenance_structure.FormalProvenanceStructureTests.test_t8_leading_empty_path_entry_is_rejected` | 0 | 构建返回 4；报告 `formal_source_paths` 的空项 index 0 |
+| T9：hashes 尾随分隔符 | `python -m unittest tests.test_build_provenance_structure.FormalProvenanceStructureTests.test_t9_trailing_empty_hash_entry_is_rejected` | 0 | 构建返回 4；报告 `formal_source_sha256` 的空项 index 1 |
+| T10：仅空白元素 | `python -m unittest tests.test_build_provenance_structure.FormalProvenanceStructureTests.test_t10_whitespace_only_entry_is_rejected` | 0 | 构建返回 4；报告 `formal_source_paths` 的空项 index 1 |
+| T11：正式/诊断均拒绝空项 | `python -m unittest tests.test_build_provenance_structure.FormalProvenanceStructureTests.test_t11_formal_and_diagnostic_modes_reject_empty_entries` | 0 | 两种模式均返回 4；诊断开关不能绕过 |
+| T12：双方同时为空 | `python -m unittest tests.test_build_provenance_structure.FormalProvenanceStructureTests.test_t12_both_lists_empty_are_allowed_by_current_contract` | 0 | 双空通过结构门；随后原有 provenance 门返回 4，未触发 empty entry 或数量错误 |
+
+标准模块和发现命令也均已从项目根目录实际执行并退出 `0`：
+
+```text
+python -m unittest tests.test_build_provenance_structure
+Ran 12 tests ... OK
+
+python -m unittest discover -s tests -p "test_build_provenance_structure.py"
+Ran 12 tests ... OK
+```
+
+### 10.4 正式构建与文件哈希
+
+- 正式命令：`python tools/build.py --language both --clean`，退出码 `4`；失败发生在正式 release staging/promote 前。
+- `release/CHNN_KAM_Manuscript_ZH.pdf` 修改前后均为 `C3B2B3948FB67F12D91A7437147614E13F396AB68FA2DF67337858B63BC0F162`。
+- `release/CHNN_KAM_Manuscript_EN.pdf` 修改前后均为 `7F76C275B1937E74F91593AFD93829B7EB55E5698710D77E149312767B2BB1D5`。
+- `FIGURE_TABLE_PROVENANCE.csv` 修改前后均为 `8AB2E3729A2A41259C05D19819A3E96EF9F70674F36E04ADD588C4C63CF78574`。
+- 现有 12 个 provenance 失配仍未刷新、补齐或生成新 hash；本轮没有改变正式 provenance CSV。
+- 本轮只修复 A-13 的测试可发现性和空 provenance entry 结构门，没有声称关闭其他 PARTIAL 或 BLOCKED 项。
