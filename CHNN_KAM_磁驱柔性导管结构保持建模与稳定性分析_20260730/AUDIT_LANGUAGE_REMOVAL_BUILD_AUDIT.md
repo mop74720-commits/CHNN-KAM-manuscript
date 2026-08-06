@@ -1,5 +1,7 @@
 # 编译、引用、标签、公式与结论边界审计
 
+> **历史审计记录。** 本文件保留专项构建审计的历史统计；当前符号合同以 `translation/terminology.md` 和最新双语正文为准，不据此声称正式源码接口或维度已经核验。
+
 日期：2026-07-30
 
 ## 1. 构建命令与结果
@@ -86,12 +88,13 @@ python tools/build.py --language both --clean
 
 ## 5. 公式与定量结果审计
 
-源码和 PDF 均检出：
+当前源码文本合同记录为（本轮不重新生成 release PDF）：
 
-- \(q=\Pi_{\mathrm{conf}}(U)\)；
-- \(p=B^{T}P_{\mathrm{full}}\)；
-- \(\dot q=M_N^{-1}p\)；
-- \(\dot p=B^{T}L\)；
+- \(q_N=\Pi_{\mathrm{conf},N}(U)\)；
+- \(p_N=B_N(q_N)^{T}P_{\mathrm{full}}\)；
+- \(\dot q_N=M_N(q_N)^{-1}p_N\)；
+- \(\dot p_N=\dot B_N(q_N)^{T}P_{\mathrm{full}}+B_N(q_N)^{T}L_{\mathrm{full}}\)，其中
+  \(L_{\mathrm{full}}:=\dot P_{\mathrm{full}}\) 仅在该定义明确激活时使用；
 - \(1.64186\)、\(2.00088\)；
 - \(0.00146226\)；
 - \(0.000221162\)；

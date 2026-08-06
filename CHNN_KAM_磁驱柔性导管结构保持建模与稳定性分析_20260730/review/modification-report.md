@@ -253,7 +253,7 @@ Ran 12 tests ... OK
 - `python tools/audit_semantics.py --language zh`：exit `0`，174 个 section label、424 个 equation label、607 个唯一 label。
 - `python tools/audit_semantics.py --language en`：exit `0`，同上；`python tools/audit_bilingual.py`：exit `0`；`python tools/check_bibliography.py`：exit `0`，37 个 BibTeX 条目、37 个活动引用、0 个未使用条目。
 - `python tools/build.py --language both --clean --diagnostic --allow-provenance-mismatch`：exit `0`；中文诊断 PDF 58 页，英文诊断 PDF 71 页，均位于 `build/diagnostic/{zh,en}`；日志无 `Overfull`、未解析引用、缺失图片/表格或 LaTeX 致命错误。MiKTeX 宿主的 Windows 版本警告不被解释为科学验证。
-- `python tools/build.py --language both --clean`：本次在正式 provenance 前置门处 exit `1`，报告同一 12 个资产/源失配；失败发生在正式 release staging/promote 前，未写入正式 release。
+- 第四轮原记录曾将 `python tools/build.py --language both --clean` 记为 exit `1`；该记录是调用层记录错误。实际正式 provenance 前置门结果为 exit `4`，报告同一 12 个资产/源失配；失败发生在正式 release staging/promote 前，未写入正式 release。
 - `git diff --check` 和最终文件范围检查在提交前执行；正文、附录和表格只发生本节列出的文本边界/理论修改，没有新增正式实验声明。
 
 ### 11.7 文件和证据状态
@@ -263,3 +263,39 @@ Ran 12 tests ... OK
 - 正式 release SHA-256（修改前后相同）：ZH `C3B2B3948FB67F12D91A7437147614E13F396AB68FA2DF67337858B63BC0F162`；EN `7F76C275B1937E74F91593AFD93829B7EB55E5698710D77E149312767B2BB1D5`。
 - 正式 provenance CSV SHA-256（修改前后相同）：`8AB2E3729A2A41259C05D19819A3E96EF9F70674F36E04ADD588C4C63CF78574`。
 - 本轮没有声称关闭 A-01、A-03、A-07、A-08、A-14、A-15，也没有因 A-11 的文本修订声称完成 KAM 认证、正式模型验证或工程安全域。
+
+## 12. 第五轮返工：A-16 文本层收口
+
+### 12.1 复审绑定与范围
+
+- 本轮起始 head：`19b4efeb208f218195464674ecfe20123d7e4146`；分支为 `fix/first-review`，PR #1 继续保持 Draft。
+- 本轮只处理 A-16 剩余的仓库文本层问题和第四轮构建退出码记录；未修改 `tools/build.py`、tests、verification skeleton、正文、release PDF、正式 provenance CSV、`review/first-review.md`、`review/issue-matrix.md` 或 `main`。
+
+### 12.2 旧合同清理
+
+- `AUDIT_LANGUAGE_REMOVAL_REPORT.md:68-75`：将专项报告中未标记的裸 `B^T P_full` / `B^T L` 公式更新为当前 `B_N(q_N)`、`L_full` 及输运项的 canonical 文本合同，并增加历史审计记录和实现未核验说明。
+- `AUDIT_LANGUAGE_REMOVAL_BUILD_AUDIT.md:89-98`：同步更新公式审计的 canonical 命中，明确 `L_full:=\dot P_full` 的条件性定义。
+- `FINAL_BUILD_AND_BOUNDARY_AUDIT.md:60-72`：将缺少输运项的 `\dot p_N=B_N^T L` 更新为 `\dot p_N=\dot B_N^T P_full+B_N^T L_full`，并标明该文件为历史审计记录。
+- `WRITEBACK_EXECUTION_PLAN.md:46-60`：将旧冻结合同改为当前文本合同，补充链式法则、`L_full` 的激活条件和历史计划边界。
+- `AUDIT_LANGUAGE_REMOVAL_COMPARISON.md`、`AUDIT_LANGUAGE_REMOVAL_CHANGELOG.md` 已逐项检查；未命中未标记的上述 canonical 旧公式，因此本轮无需修改。
+- `CHANGELOG_P2_B0_R2_WRITEBACK.md` 原有的 **Historical / superseded record** 标记保留；`review/first-review.md` 和 `review/issue-matrix.md` 中的旧符号保留为审查证据，不视为当前实现合同。正式代码对象、维度和接口仍未核验。
+
+### 12.3 构建退出码记录纠正
+
+- 第四轮报告中的 exit `1` 保留为“调用层记录错误”的历史说明；本轮将实际结果明确为正式 provenance 门 exit `4`。
+- 正式构建在 provenance 门退出，未进入 staging/promote；正式 release PDF 和 `FIGURE_TABLE_PROVENANCE.csv` 哈希未变化。当前 SHA-256 为：ZH `C3B2B3948FB67F12D91A7437147614E13F396AB68FA2DF67337858B63BC0F162`、EN `7F76C275B1937E74F91593AFD93829B7EB55E5698710D77E149312767B2BB1D5`、CSV `8AB2E3729A2A41259C05D19819A3E96EF9F70674F36E04ADD588C4C63CF78574`。
+- 12 个 provenance mismatch 仍未刷新、补齐或生成新 hash；本轮没有修改正式 provenance CSV。
+
+### 12.4 检索和验证
+
+- 全仓语义检索覆盖 `*.tex`、`*.md`、`*.py`、`*.json`、`*.csv`、`*.txt` 和 `*.bib`，排除 `build/` 与 `release/`；搜索词包括 `B`、`B_N`、`B_port`、`B_mag`、`L`、`L_full`、`N`、`N_diag`、`n_main`、`dot p`、`B^T L`、`Q_diss`、`Q_diss^bulk` 和 `Q_contact` 及其 TeX 变体。
+- 目标历史/计划文件中的未标记 canonical 旧合同已清除；保留在 changelog、review 文件和本报告中的旧符号均有历史、审查证据或 superseded 语境，且当前合同位置已指出。目标六文件的旧公式变体检索为 0 命中。
+- 变体检索命中文件数：`B_N`/canonical 映射 18，`B_port`/端口嵌入 8，`B_mag`/磁场 6，`L_full`/全空间载荷率 4，`N_diag`/诊断阶数 2，`n_main`/生产阶数 4，`Q_diss` 14，`Q_contact` 11；这些命中保留于当前正文、术语表、附录或审查/历史证据语境。剩余未核验项为正式代码对象、维度、控制器接口、端口实现和机器数据。
+- `python -m unittest discover -s tests -v`：exit `0`，12 项测试通过。
+- 只读 provenance 检查 `python -c "from tools.build import check_assets_and_provenance; check_assets_and_provenance(allow_mismatch=True)"`：exit `0`；仍报告 12 条 asset hash mismatch 及 formal source 缺失/失配，未刷新任何 hash。
+- `git diff --check`：exit `0`；禁止修改的正文、tests、构建脚本、release PDF 和正式 provenance CSV 均无本轮差异。
+
+### 12.5 A-16 状态
+
+- 文本层：`FIXED`。
+- 总体：`PARTIAL`，仍等待正式代码接口、对象维度和机器证据；本轮不声称 `VERIFIED`。

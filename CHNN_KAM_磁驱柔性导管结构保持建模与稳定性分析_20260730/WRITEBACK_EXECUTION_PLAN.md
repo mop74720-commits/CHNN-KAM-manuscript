@@ -1,5 +1,7 @@
 # 截至 P2-B0-R2 的论文回写执行计划
 
+> **历史 / 已被 superseded 的计划记录。** 本文件保留原写回计划的范围和证据边界；下列 canonical 公式已按当前文本合同收口，不构成正式源码接口、维度或机器重算证据。当前符号注册以 `translation/terminology.md` 和最新双语正文为准。
+
 状态：前置审计完成，正文尚未修改。  
 证据冻结点：`RES-B0-R2-001`。  
 回写原则：只写正式证据支持的局部结论，保留论文完整研究范围和所有未完成槽位。
@@ -45,16 +47,16 @@
 
 ## 4. 固定公式与术语
 
-正文采用同一冻结合同：
+正文采用同一当前文本合同：
 
 \[
 q_N=\Pi_{\mathrm{conf},N}(U),\qquad
 p_N=B_N(q_N)^\mathsf{T}P_{\mathrm{full}},\qquad
 \dot q_N=M_N(q_N)^{-1}p_N,\qquad
-\dot p_N=B_N(q_N)^\mathsf{T}L.
+\dot p_N=\dot B_N(q_N)^\mathsf{T}P_{\mathrm{full}}+B_N(q_N)^\mathsf{T}L_{\mathrm{full}}.
 \]
 
-其中 \(q_N\in\mathcal Q_N\)，\(\dot q_N\in T_{q_N}\mathcal Q_N\)，\(p_N,\dot p_N\) 按 paired-coordinate contract 解释为余切量。`p_mass=M_N*dq_native` 只作诊断；只有全场速度位于冻结切空间且离散/投影一致时才可与 projected momentum 等同。
+其中 \(q_N\in\mathcal Q_N\)，\(\dot q_N\in T_{q_N}\mathcal Q_N\)，\(p_N,\dot p_N\) 按 paired-coordinate contract 解释为余切量，\(L_{\mathrm{full}}:=\dot P_{\mathrm{full}}\) 仅在该定义明确激活时使用。`p_mass=M_N*dq_native` 只作诊断；只有全场速度位于冻结切空间且离散/投影一致时才可与 projected momentum 等同。\(\dot B_N(q_N)\) 表示沿轨迹的总时间导数。
 
 ## 5. A1、正式 P2 与数值 KAM 回填槽位
 
