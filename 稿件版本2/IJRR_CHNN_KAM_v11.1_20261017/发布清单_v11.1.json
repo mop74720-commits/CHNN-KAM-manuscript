@@ -1,0 +1,72 @@
+{
+  "version": "v11.1",
+  "date": "2026-10-17",
+  "timezone": "America/Tijuana",
+  "prepared_at": "2026-10-17T09:47:34.421481-07:00",
+  "formal_scope": "Six-work stage; S3.26 adds only a prospective 14-training/4-held-out protocol.",
+  "interruption_record_separate": true,
+  "research_status": "paused",
+  "full_research_goal_complete": false,
+  "new_physical_damping_model_trained": false,
+  "manuscript_pages": {
+    "main.pdf": 24,
+    "supplement.pdf": 109
+  },
+  "base_pdf_sha256": {
+    "main.pdf": "65b3640df0acd692c637459693488c26e71a4425966941b1e3d1f75c9f46e335",
+    "supplement.pdf": "b38185ef41ebbc40743771d832136ed2d028ac6eb849b35a8c7fe629d357c566"
+  },
+  "checked_local_evidence": [
+    {
+      "path": "pilot_learning_bridge_delivery_run01/manifest.json",
+      "sha256": "93ca969389c15c3cd377a26981881939a3e59b04079254e18b4eeb644a474bfd"
+    },
+    {
+      "path": "multidirection_native_design_20261017/selected_design.json",
+      "sha256": "7e99681ca741411b3a333a975f06422604481fc2b5b08de7d1295496f2561c30"
+    },
+    {
+      "path": "multidirection_native_design_20261017/trajectory_bridge_run01/train_direction_0_momentum_neg_run01/certificate.json",
+      "sha256": "734271c3e2bc9950ae90618b4c4fce6e2dafcf3e91e34d2d7e173a2ab2df495d"
+    },
+    {
+      "path": "multidirection_learning_budget_20261017/projection_run01/planner_certificate.json",
+      "sha256": "9eb0d0885d1338bc32232f88279e6fbde0af8c24eb4a972f6e338521bc014926"
+    },
+    {
+      "path": "multidirection_learning_budget_20261017/projection_run01/result.json",
+      "sha256": "8271b39e8aadb751743f106bc3152142dddc603e3ca3f52e51caa7563b335ed1"
+    },
+    {
+      "path": "multidirection_native_design_20261017/collection_run01/user_stop_run01/stop_verification.json",
+      "sha256": "801cc432571bd2a5fd86da07c06dceef61982bdd9c3e0f7e3b9b48c0c98af5f4"
+    },
+    {
+      "path": "multidirection_native_design_20261017/collection_run01/user_stop_run01/preservation_verification.json",
+      "sha256": "1985c5fc0fd50f43289188f93730f363808fd004a2a44b8863a59105985c321a"
+    }
+  ],
+  "files": [
+    {
+      "path": "main.pdf",
+      "bytes": 631068,
+      "sha256": "633092b934dc45aa66051f47f0315d4f656e46d452eee9f80d4c8409c9322f4c"
+    },
+    {
+      "path": "supplement.pdf",
+      "bytes": 2082589,
+      "sha256": "17b67dbf392adb4717a12c67b979786e56837ddce1456a3888f228190406b26e"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1520,
+      "sha256": "d7d2014cee282a3baa376bbc535386763bce573b42e47f46e34ef52594de0e2f"
+    },
+    {
+      "path": "中断说明_20261017.md",
+      "bytes": 12927,
+      "sha256": "a1bd1bb851e9294312f595ef4d84e7f76e3d7d263e6ddf5af80d7e33cb5ffc93"
+    }
+  ],
+  "publication": "PDFs and explanatory notes only; complete local research data/code are not included."
+}
