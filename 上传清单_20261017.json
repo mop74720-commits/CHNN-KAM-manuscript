@@ -1,0 +1,160 @@
+{
+  "snapshot_date": "2026-10-17",
+  "scope": "主要稿件 PDF",
+  "pdf_count": 19,
+  "total_bytes": 16646884,
+  "files": [
+    {
+      "version": "4月英文主稿",
+      "path": "稿件版本1/4月/Parts_1-5(1).pdf",
+      "pages": 32,
+      "bytes": 1695641,
+      "sha256": "b0b2bfaf041d2475273d1fb2c62520302b1cf85174383508118ef28d8ee40bab",
+      "source": "稿件版本1/4月/Parts_1-5(1).pdf"
+    },
+    {
+      "version": "5月英文主稿",
+      "path": "稿件版本1/5月/Parts_1-5_0519.pdf",
+      "pages": 32,
+      "bytes": 1698489,
+      "sha256": "9b7c3c8448c894fbae2847e501a995ff23b9e307b9f955ac7d3b276861ec10f7",
+      "source": "稿件版本1/5月/Parts_1-5_0519.pdf"
+    },
+    {
+      "version": "7月中文主稿",
+      "path": "稿件版本1/7月/CHNN_KAM_Manuscript_ZH(1).pdf",
+      "pages": 55,
+      "bytes": 957291,
+      "sha256": "6c1063a7006efa539e8ffcb53327b97cefc49bd55aa0324baa9ef9825275ee5e",
+      "source": "稿件版本1/7月/CHNN_KAM_Manuscript_ZH(1).pdf"
+    },
+    {
+      "version": "7月英文主稿",
+      "path": "稿件版本1/7月/CHNN_KAM_Manuscript_EN.pdf",
+      "pages": 67,
+      "bytes": 432864,
+      "sha256": "2044ba068b8c9c2b90b1e73094bde4a90bfc263fcb5e8f3294f608427b0cb3ac",
+      "source": "稿件版本1/7月/CHNN_KAM_Manuscript_EN.pdf"
+    },
+    {
+      "version": "8月 R7.4中文主稿",
+      "path": "稿件版本1/8月_R7.4/CHNN_KAM_Manuscript_ZH.pdf",
+      "pages": 64,
+      "bytes": 1047186,
+      "sha256": "fba997e611c8d70975c073667b3b1f5bc9380578f0017d13646898f9a004c55c",
+      "source": "稿件版本1/CHNN_KAM_LOCAL_KEEP-20261013T154107Z-1-001/CHNN_KAM_LOCAL_KEEP/02_PERMANENT_ARCHIVE/00_MANUSCRIPT/R7.4_MANUSCRIPT/CHNN_KAM_20260826_R7_4_JOURNAL_STYLE_RELEASE_INTEGRITY_FIXED_FINAL.zip!/CHNN_KAM_20260826_R7_4_JOURNAL_STYLE_RELEASE_INTEGRITY_FIXED_FINAL/release/CHNN_KAM_Manuscript_ZH.pdf"
+    },
+    {
+      "version": "8月 R7.4英文主稿",
+      "path": "稿件版本1/8月_R7.4/CHNN_KAM_Manuscript_EN.pdf",
+      "pages": 78,
+      "bytes": 493455,
+      "sha256": "8c517b7454f754f957257b31808c6021eccbf33ff41d7b7a4700a082591f81f4",
+      "source": "稿件版本1/CHNN_KAM_LOCAL_KEEP-20261013T154107Z-1-001/CHNN_KAM_LOCAL_KEEP/02_PERMANENT_ARCHIVE/00_MANUSCRIPT/R7.4_MANUSCRIPT/CHNN_KAM_20260826_R7_4_JOURNAL_STYLE_RELEASE_INTEGRITY_FIXED_FINAL.zip!/CHNN_KAM_20260826_R7_4_JOURNAL_STYLE_RELEASE_INTEGRITY_FIXED_FINAL/release/CHNN_KAM_Manuscript_EN.pdf"
+    },
+    {
+      "version": "9月 R7.5.1中文主稿",
+      "path": "稿件版本1/9月/CHNN_KAM_Manuscript_ZH(2).pdf",
+      "pages": 59,
+      "bytes": 1277883,
+      "sha256": "7022275e944a1422048bc40f00f563b68792fab2c18852fc90785edf48af03c8",
+      "source": "稿件版本1/9月/CHNN_KAM_Manuscript_ZH(2).pdf"
+    },
+    {
+      "version": "9月 R7.5.1英文主稿",
+      "path": "稿件版本1/9月/CHNN_KAM_Manuscript_EN.pdf",
+      "pages": 71,
+      "bytes": 733536,
+      "sha256": "6209c83e92eee8e21736e654c7d356018699f2ded666f85450455a436884d056",
+      "source": "稿件版本1/9月/CHNN_KAM_Manuscript_EN.pdf"
+    },
+    {
+      "version": "v1",
+      "path": "稿件版本2/v1.pdf",
+      "pages": 22,
+      "bytes": 248498,
+      "sha256": "77c2ec1982f1c71a8715524a7a700aa12ae532d87b27607fe280326634505c61",
+      "source": "稿件版本2/历史版本归档_20261008/论文PDF版本汇总_v1-v10_20261008.zip!/v1.pdf"
+    },
+    {
+      "version": "v2",
+      "path": "稿件版本2/v2.pdf",
+      "pages": 8,
+      "bytes": 276021,
+      "sha256": "e8de5504ef88916e592490effe7ef156b5387c6a8c69f94924ebf245ba1226dc",
+      "source": "稿件版本2/历史版本归档_20261008/论文PDF版本汇总_v1-v10_20261008.zip!/v2.pdf"
+    },
+    {
+      "version": "v3",
+      "path": "稿件版本2/v3.pdf",
+      "pages": 11,
+      "bytes": 374160,
+      "sha256": "6855181cbe0f76160dd8f4c2dcb67cc6fa9910648cacdea0b0e07affd9d32990",
+      "source": "稿件版本2/历史版本归档_20261008/论文PDF版本汇总_v1-v10_20261008.zip!/v3.pdf"
+    },
+    {
+      "version": "v4",
+      "path": "稿件版本2/v4.pdf",
+      "pages": 21,
+      "bytes": 851358,
+      "sha256": "0efa48498d09ab8efd10e40c81080bce2af8154f31af1fb9c71808bf0ec915f2",
+      "source": "稿件版本2/历史版本归档_20261008/论文PDF版本汇总_v1-v10_20261008.zip!/v4.pdf"
+    },
+    {
+      "version": "v5",
+      "path": "稿件版本2/v5.pdf",
+      "pages": 28,
+      "bytes": 1018443,
+      "sha256": "00f6856e2b0dbeed1d71dec65ef5b2a2c9eb955336c6ad73859d91d8e0e8cae2",
+      "source": "稿件版本2/历史版本归档_20261008/论文PDF版本汇总_v1-v10_20261008.zip!/v5.pdf"
+    },
+    {
+      "version": "v6",
+      "path": "稿件版本2/v6.pdf",
+      "pages": 37,
+      "bytes": 1186880,
+      "sha256": "ceae0d1e50b1a75f2d7f617ebd9796f1842e3dbb281ceea8d78a0fb6a9a0e1ff",
+      "source": "稿件版本2/历史版本归档_20261008/论文PDF版本汇总_v1-v10_20261008.zip!/v6.pdf"
+    },
+    {
+      "version": "v7",
+      "path": "稿件版本2/v7.pdf",
+      "pages": 43,
+      "bytes": 1333215,
+      "sha256": "60e072e2f395a79706d7c58eeb2924a2e825aa9370b74900bf391e492f3a1ab9",
+      "source": "稿件版本2/历史版本归档_20261008/论文PDF版本汇总_v1-v10_20261008.zip!/v7.pdf"
+    },
+    {
+      "version": "v8",
+      "path": "稿件版本2/v8.pdf",
+      "pages": 42,
+      "bytes": 1336144,
+      "sha256": "7a7a106c06277d10b2c49d4270f821f855cb3497cd5fd74913e29f9f5d0984f5",
+      "source": "稿件版本2/历史版本归档_20261008/论文PDF版本汇总_v1-v10_20261008.zip!/v8.pdf"
+    },
+    {
+      "version": "v9",
+      "path": "稿件版本2/v9.pdf",
+      "pages": 15,
+      "bytes": 537881,
+      "sha256": "c1fbcf4d08bf21732185ed6a5ce60bb8ca66d9b3e58ff98510eeb1f031fc0aff",
+      "source": "稿件版本2/历史版本归档_20261008/论文PDF版本汇总_v1-v10_20261008.zip!/v9.pdf"
+    },
+    {
+      "version": "v10 最新修订稿",
+      "path": "稿件版本2/IJRR_CHNN_KAM_v10_20261007/main.pdf",
+      "pages": 15,
+      "bytes": 529769,
+      "sha256": "a1ba1d1f7810caea5b900bbaf5195812f8480ea8fb227f97b4f2778855806f06",
+      "source": "稿件版本2/IJRR_CHNN_KAM_v10_20261007/main.pdf"
+    },
+    {
+      "version": "v11 当前稿",
+      "path": "稿件版本2/IJRR_CHNN_KAM_v11_20261012/main.pdf",
+      "pages": 23,
+      "bytes": 618170,
+      "sha256": "ed883d6d974a440bbd4507ecda60e88b4208f0f664b0e705d032ab09d85f0d7e",
+      "source": "稿件版本2/IJRR_CHNN_KAM_v11_20261012/main.pdf"
+    }
+  ]
+}
