@@ -1,6 +1,6 @@
 {
   "snapshot_date": "2026-10-17",
-  "scope": "主要稿件 PDF",
+  "scope": "两个稿件目录的主要 PDF 与完整主线参考目录",
   "pdf_count": 19,
   "total_bytes": 16646884,
   "files": [
@@ -155,6 +155,148 @@
       "bytes": 618170,
       "sha256": "ed883d6d974a440bbd4507ecda60e88b4208f0f664b0e705d032ab09d85f0d7e",
       "source": "稿件版本2/IJRR_CHNN_KAM_v11_20261012/main.pdf"
+    }
+  ],
+  "reference_count": 20,
+  "reference_total_bytes": 45535164,
+  "reference_files": [
+    {
+      "path": "主线参考/SRT文档（老师给的）/SRT文档（老师给的）.md",
+      "source": "主线参考/SRT文档（老师给的）/SRT文档（老师给的）.md",
+      "bytes": 23080,
+      "sha256": "7685b8e2d486a48903707e0f3bc3330ef3a4e3c7fd8836ce1cd6f788784b352b"
+    },
+    {
+      "path": "主线参考/SRT文档（老师给的）/参考文献/cvnn/27.Deep complex networks.pdf",
+      "source": "主线参考/SRT文档（老师给的）/参考文献/cvnn/27.Deep complex networks.pdf",
+      "bytes": 2273630,
+      "sha256": "17c3ec446512b7c3a1f16090cd6c061682b823bb8219e1316c32628a6f654f82",
+      "pages": 19
+    },
+    {
+      "path": "主线参考/SRT文档（老师给的）/参考文献/cvnn/29.Complex-Valued Neural Networks.pdf",
+      "source": "主线参考/SRT文档（老师给的）/参考文献/cvnn/29.Complex-Valued Neural Networks.pdf",
+      "bytes": 7856342,
+      "sha256": "daad63b66555a17a1dff0a087570bf1a72331c7d226df8d873c3f3d1b404b7d3",
+      "pages": 204
+    },
+    {
+      "path": "主线参考/SRT文档（老师给的）/参考文献/cvnn/30.Towards understanding theoretical advantages of complex-reaction networks.pdf",
+      "source": "主线参考/SRT文档（老师给的）/参考文献/cvnn/30.Towards understanding theoretical advantages of complex-reaction networks.pdf",
+      "bytes": 293367,
+      "sha256": "20d9a7d7eb220c4609870976dcdbe43e7a304fed2e03ecbb0bdcc8b211356b4c",
+      "pages": 17
+    },
+    {
+      "path": "主线参考/SRT文档（老师给的）/参考文献/物理神经网络/22. Hamiltonian neural networks.pdf",
+      "source": "主线参考/SRT文档（老师给的）/参考文献/物理神经网络/22. Hamiltonian neural networks.pdf",
+      "bytes": 1871904,
+      "sha256": "1e75de8d25b3367dd286fb74f8e97c60889c9aacc23be88d084cf3683bddada4",
+      "pages": 11
+    },
+    {
+      "path": "主线参考/SRT文档（老师给的）/参考文献/物理神经网络/23.Lagrangian neural networks.pdf",
+      "source": "主线参考/SRT文档（老师给的）/参考文献/物理神经网络/23.Lagrangian neural networks.pdf",
+      "bytes": 2616562,
+      "sha256": "89dcbc49c87387370f9b168f863397cba1186183b5b378bc5477679cdd2b04a3",
+      "pages": 9
+    },
+    {
+      "path": "主线参考/SRT文档（老师给的）/参考文献/物理神经网络/24. Dissipative SymODEN encoding Hamiltonian dynamics with dissipation and control into deep learning.pdf",
+      "source": "主线参考/SRT文档（老师给的）/参考文献/物理神经网络/24. Dissipative SymODEN encoding Hamiltonian dynamics with dissipation and control into deep learning.pdf",
+      "bytes": 378727,
+      "sha256": "8dbd3a46936a4c5d7dbea74ad02825bc1c1cffb9c30231789cd9db73603a1e5a",
+      "pages": 6
+    },
+    {
+      "path": "主线参考/SRT文档（老师给的）/参考文献/物理神经网络/25.Port-Hamiltonian neural networks for learning explicit time-dependent dynamical systems.pdf",
+      "source": "主线参考/SRT文档（老师给的）/参考文献/物理神经网络/25.Port-Hamiltonian neural networks for learning explicit time-dependent dynamical systems.pdf",
+      "bytes": 1654816,
+      "sha256": "b5131a0ba3624dcab399dc80b05cdbe0107025bbd7bc43d19015e5b11f21ba5e",
+      "pages": 21
+    },
+    {
+      "path": "主线参考/SRT文档（老师给的）/参考文献/物理神经网络/26.Physics-informed neural networks a deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations.PDF",
+      "source": "主线参考/SRT文档（老师给的）/参考文献/物理神经网络/26.Physics-informed neural networks a deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations.PDF",
+      "bytes": 4251127,
+      "sha256": "f8fc63c6ce64e09f4d09873eb2d705e6b1a07079550c08e177c3a5f7cb88c0fb",
+      "pages": 45
+    },
+    {
+      "path": "主线参考/SRT文档（老师给的）/参考文献/物理神经网络/28.Hamiltonian generative networks.pdf",
+      "source": "主线参考/SRT文档（老师给的）/参考文献/物理神经网络/28.Hamiltonian generative networks.pdf",
+      "bytes": 3182309,
+      "sha256": "e2bec98fcfb4c7146e3092e9508ab190214089b389c948c7d3bb2f979f872d25",
+      "pages": 19
+    },
+    {
+      "path": "主线参考/SRT文档（老师给的）/参考文献/物理神经网络/31.The Deep Ritz method：a deep learning-based numerical method for solving variational problems.pdf",
+      "source": "主线参考/SRT文档（老师给的）/参考文献/物理神经网络/31.The Deep Ritz method：a deep learning-based numerical method for solving variational problems.pdf",
+      "bytes": 461563,
+      "sha256": "da3d20abc3c9aa279826fc9271efaf6648881c58d631c786e83ea5cae2f61031",
+      "pages": 14
+    },
+    {
+      "path": "主线参考/SRT文档（老师给的）/参考文献/物理神经网络/32.DeepXDE a deep learning library for solving differential equations.pdf",
+      "source": "主线参考/SRT文档（老师给的）/参考文献/物理神经网络/32.DeepXDE a deep learning library for solving differential equations.pdf",
+      "bytes": 1118278,
+      "sha256": "d17f9bf6b8f346baaa52b6ec81223c53dd3da6899324114c72c7e8c3432d9368",
+      "pages": 21
+    },
+    {
+      "path": "主线参考/SRT文档（老师给的）/参考文献/物理神经网络/44. KAM theory meets statistical learning theory：Hamiltonian neural networks with non-zero training loss.pdf",
+      "source": "主线参考/SRT文档（老师给的）/参考文献/物理神经网络/44. KAM theory meets statistical learning theory：Hamiltonian neural networks with non-zero training loss.pdf",
+      "bytes": 4183214,
+      "sha256": "e8b5bd9478314d5a41ebf1e14ff9ede8912c9098ed9a1dae5a664679688054cf",
+      "pages": 11
+    },
+    {
+      "path": "主线参考/SRT文档（老师给的）/图片和附件/0. Classical KAM Theory.pdf",
+      "source": "主线参考/SRT文档（老师给的）/图片和附件/0. Classical KAM Theory.pdf",
+      "bytes": 427992,
+      "sha256": "ff8c7fed300db12d8b9b4dde9085b9357043241fa2bb9c763270677300d7a47c",
+      "pages": 31
+    },
+    {
+      "path": "主线参考/SRT文档（老师给的）/图片和附件/0. Complex-Valued Neural Networks.pdf",
+      "source": "主线参考/SRT文档（老师给的）/图片和附件/0. Complex-Valued Neural Networks.pdf",
+      "bytes": 6401361,
+      "sha256": "b164fe0443cf6291169197883a5ecfe8d5156ff59e294f0d2033ee03a60be69d",
+      "pages": 205
+    },
+    {
+      "path": "主线参考/SRT文档（老师给的）/图片和附件/0. Hamiltonian Neural Networks.pdf",
+      "source": "主线参考/SRT文档（老师给的）/图片和附件/0. Hamiltonian Neural Networks.pdf",
+      "bytes": 1871904,
+      "sha256": "1e75de8d25b3367dd286fb74f8e97c60889c9aacc23be88d084cf3683bddada4",
+      "pages": 11
+    },
+    {
+      "path": "主线参考/SRT文档（老师给的）/图片和附件/1. KAM theory meets statistical learning theory：HNN.pdf",
+      "source": "主线参考/SRT文档（老师给的）/图片和附件/1. KAM theory meets statistical learning theory：HNN.pdf",
+      "bytes": 4183214,
+      "sha256": "e8b5bd9478314d5a41ebf1e14ff9ede8912c9098ed9a1dae5a664679688054cf",
+      "pages": 11
+    },
+    {
+      "path": "主线参考/SRT文档（老师给的）/图片和附件/2. Towards understanding theoretical advantages of complex-r.pdf",
+      "source": "主线参考/SRT文档（老师给的）/图片和附件/2. Towards understanding theoretical advantages of complex-r.pdf",
+      "bytes": 516472,
+      "sha256": "5f7e608ae76f89a3e074c601a2e895ee44d1ad0e313ef2aa498742e4edf9b137",
+      "pages": 14
+    },
+    {
+      "path": "主线参考/基于CHNN和KAM理论的空间站磁驱动导管机器人稳定性研究.docx",
+      "source": "主线参考/基于CHNN和KAM理论的空间站磁驱动导管机器人稳定性研究.docx",
+      "bytes": 196528,
+      "sha256": "c25c19f426949ec37defedee152f452f4fe451d825e4a3c5e0c4d52e4a42786e"
+    },
+    {
+      "path": "主线参考/推理草稿0710(1).pdf",
+      "source": "主线参考/推理草稿0710(1).pdf",
+      "bytes": 1772774,
+      "sha256": "67d5480d2d69869f015fd9b4ce4ea57008672d4ed40e23a6eab7a5dfb2e8372f",
+      "pages": 46
     }
   ]
 }

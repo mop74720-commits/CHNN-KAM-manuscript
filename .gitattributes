@@ -1,1 +1,4 @@
 *.pdf binary
+*.PDF binary
+*.docx binary
+"主线参考/**" -text
