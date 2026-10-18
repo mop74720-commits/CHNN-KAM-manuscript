@@ -1,0 +1,34 @@
+{
+  "schema": "v11.5-historical-manuscript-PDF-release-v1",
+  "version": "v11.5",
+  "publication_date_local": "2026-10-18",
+  "verification_record_created_utc": "2026-10-18T15:29:44.722589+00:00",
+  "page_counts": {
+    "main.pdf": 19,
+    "supplement.pdf": 31
+  },
+  "files": [
+    {
+      "path": "main.pdf",
+      "bytes": 208849,
+      "sha256": "12d11bd06b61f606513b95b95b1a057d1e3ab256dd75e0b05df8d79b7f97612e"
+    },
+    {
+      "path": "supplement.pdf",
+      "bytes": 257798,
+      "sha256": "8cd350a9bfe6f87b60d37dab5921a4dc5480b72a3cfe791c2c9014be266e262f"
+    },
+    {
+      "path": "README.md",
+      "bytes": 737,
+      "sha256": "004acb2afd77f7de371427f04a520ad7e7989f66241a95614a39edf69ee002b6"
+    }
+  ],
+  "source_frozen_manifest_sha256": "75231b4c82704503d71498149f9e8b32ba75e5758cc6a37bb28a96f07bcbdea7",
+  "frozen_local_main_and_supplement_byte_identical": true,
+  "scientific_content_matches_corresponding_frozen_version": true,
+  "historical_backfill": true,
+  "later_research_results_included": false,
+  "full_goal_completed": false,
+  "scope": "Main and supplementary PDFs with version notes only; not a complete code/data release."
+}

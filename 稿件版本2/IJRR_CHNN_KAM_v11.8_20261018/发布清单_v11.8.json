@@ -1,0 +1,39 @@
+{
+  "schema": "v11.8-historical-manuscript-PDF-release-v1",
+  "version": "v11.8",
+  "publication_date_local": "2026-10-18",
+  "verification_record_created_utc": "2026-10-18T15:29:44.756149+00:00",
+  "page_counts": {
+    "main.pdf": 24,
+    "supplement.pdf": 50
+  },
+  "files": [
+    {
+      "path": "main.pdf",
+      "bytes": 854437,
+      "sha256": "8eef01d0176e2beee8556d70daacf07675ca47cd4fce906f3046f4ee7d8ee172"
+    },
+    {
+      "path": "supplement.pdf",
+      "bytes": 360432,
+      "sha256": "7ff4119cf0a2fba221a62cdefff84a64b84c5599292b6e9bcc03abb6daf29224"
+    },
+    {
+      "path": "本轮研究说明.md",
+      "bytes": 4374,
+      "sha256": "5c2509597b2c445c86597574a863fb9a8d31b1a6d6779c47487809c193efed10"
+    },
+    {
+      "path": "README.md",
+      "bytes": 883,
+      "sha256": "f76664c52fb15cbe3179b5c3ebdd0a7e5a4394b3e557f86e0fad46d28be98c09"
+    }
+  ],
+  "source_frozen_manifest_sha256": "68585aebe56e5cd62d84c0540ee325f3a63a2fbee794fbd8fd6c210b2f6b411b",
+  "frozen_local_main_and_supplement_byte_identical": true,
+  "scientific_content_matches_corresponding_frozen_version": true,
+  "historical_backfill": true,
+  "later_research_results_included": false,
+  "full_goal_completed": false,
+  "scope": "Main and supplementary PDFs with version notes only; not a complete code/data release."
+}
