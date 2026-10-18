@@ -1,0 +1,38 @@
+{
+  "schema": "v11.4-public-manuscript-PDF-release-v1",
+  "version": "v11.4",
+  "publication_date_local": "2026-10-17",
+  "verification_record_created_utc": "2026-10-18T03:40:33.335172+00:00",
+  "page_counts": {
+    "main.pdf": 20,
+    "supplement.pdf": 40
+  },
+  "files": [
+    {
+      "path": "main.pdf",
+      "bytes": 500256,
+      "sha256": "b159fd7274bb35862a3118f4a145a96e88f25a7336cffa640bf7f3827caea9fe"
+    },
+    {
+      "path": "supplement.pdf",
+      "bytes": 691597,
+      "sha256": "78277b4852eb276fad61ebc676b3cd3136ea804e0c475af6c9fcd0e9dac55b32"
+    },
+    {
+      "path": "README.md",
+      "bytes": 878,
+      "sha256": "5a61c29e69d469110f711c4f9667d46c1cad09cb617ff9acad8c6d23608801af"
+    },
+    {
+      "path": "暂停与继续说明.md",
+      "bytes": 1861,
+      "sha256": "e47f55b349524ec09ccb0ef67c977196b9b7bfb82c52b862d1c518fcfa829b87"
+    }
+  ],
+  "frozen_local_main_and_supplement_byte_identical": true,
+  "compile_and_visual_review_passed": true,
+  "research_status": "paused",
+  "full_goal_completed": false,
+  "new_generic_model_KAM_or_control_certified": false,
+  "scope": "Main manuscript PDF, supplementary PDF and status documentation only; not a complete source/data reproduction release."
+}
