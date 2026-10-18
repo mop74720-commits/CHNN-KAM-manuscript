@@ -1,0 +1,40 @@
+{
+  "schema": "v11.9-public-manuscript-PDF-release-v1",
+  "version": "v11.9",
+  "publication_date_local": "2026-10-18",
+  "verification_record_created_utc": "2026-10-18T14:14:34.383143+00:00",
+  "page_counts": {
+    "main.pdf": 27,
+    "supplement.pdf": 59
+  },
+  "files": [
+    {
+      "path": "main.pdf",
+      "bytes": 891209,
+      "sha256": "e81632bd33ea9d87b1b682692fdfca33e60712641ccea1e9e0264fc5cb9c1a0a"
+    },
+    {
+      "path": "supplement.pdf",
+      "bytes": 406918,
+      "sha256": "1f46074c51fdf5973709d76454b9a1159bbd7c678e06731e502d8d4b3a3182ad"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1230,
+      "sha256": "9818987f6f2a7e67d82c69793f91f604dfe282c873779b96d4aa8d2f689a1d4e"
+    },
+    {
+      "path": "本轮研究说明.md",
+      "bytes": 3669,
+      "sha256": "8c79f38fefc39acda07a02913134e8d05744441341927878dc2951e0d8796cfc"
+    }
+  ],
+  "frozen_local_main_and_supplement_byte_identical": true,
+  "source_frozen_manifest_sha256": "cb383752e8af783337e3b44175191f0bf0fff10e87bce56fe73d7e211a3427c7",
+  "compile_and_visual_review_passed_at_freeze": true,
+  "scientific_content_matches_frozen_v11_9": true,
+  "explanatory_note_publication_status_adapted_only": true,
+  "post_v11_9_research_results_included": false,
+  "full_goal_completed": false,
+  "scope": "Main and supplementary PDFs with version notes only; not a complete source/data reproduction release."
+}
