@@ -53,7 +53,7 @@ Hamiltonian Birkhoff 正规形用于第三、四部分构造 \(H_{0} + \varepsil
 
 在扩展标准辛形式上积分。只有在变量本身非正则或系统满足特殊 Birkhoff 表示时，才需要转入下一节。
 
-canonical 数据处理所用的 BDF order-2 不是本节所述辛步进器。它只为 COMSOL solver-step 状态采样和 canonical 向量场标签生成提供可观察的 \texttt{tsteps} 序列；三层观察收敛及 G0--G6 满足预设阈值仅说明数据合同适用于后续幅值哨兵实验。本文不从 BDF 的能量漂移或二阶收敛推断辛性，后续 KAM 计算必须采用另行证明的辛映射并评估其离散缺陷。
+canonical 数据处理所用的 BDF order-2 不是本节所述辛步进器。它只为 COMSOL solver-step 状态采样和 canonical 向量场标签生成提供可观察的 \texttt{tsteps} 序列；冻结的单一哨兵记录至多可作为后续 A1 资格实验的候选输入，不认证跨 mode、幅值或工况的 G0--G6 资格。本文不从 BDF 的能量漂移或二阶收敛推断辛性，后续 KAM 计算必须采用另行证明的辛映射并评估其离散缺陷。
 
 \subsection{Birkhoff 系统自伴表示}\label{sec:symplectic-kam-5-3}
 
@@ -78,7 +78,12 @@ Birkhoff 方程写为
 K_{ij}{\dot{z}}_{j} + D_{i} = 0.
 \end{equation}
 
-在局部星形区域内，若 \(\mathbf{K}\) 非退化并满足反对称性、空间闭合条件和时间相容条件，则系统具有正则、自伴 Birkhoff 表示；等价地，可找到 \(F_{i}\) 与 \(B\) 使上述方程成立\cite[第15章]{COMSOLWeakContribution2025}。定义时变二形式
+在局部星形区域内，若 \(\mathbf{K}\) 非退化并满足反对称性、空间闭合条件和时间相容条件，则系统具有正则、自伴 Birkhoff 表示；等价地，可找到 \(F_{i}\) 与 \(B\) 使上述方程成立\cite{FengQin2010,HairerLubichWanner2006GNI}。为避免条件只停留在名称上，本文采用
+\[
+\partial_{z_k}K_{ij}+\partial_{z_i}K_{jk}+\partial_{z_j}K_{ki}=0,\qquad
+\partial_t K_{ij}=\partial_{z_j}D_i-\partial_{z_i}D_j,
+\]
+并同时要求 \(K_{ij}=-K_{ji}\) 及 \(\inf_{\mathcal{D}}\sigma_{min}(K)>0\)。当前稿件尚未对这些条件给出数值实例化。
 
 \begin{equation}
 \label{eq:symplectic-kam-5-8}
@@ -128,21 +133,40 @@ K_{ij}{\dot{z}}_{j} + D_{i} = 0.
 
 \subsection{\texorpdfstring{Birkhoff 系统的 \(K\left( \mathbf{z},t \right)\)-辛离散格式}{Birkhoff 系统的 K\textbackslash left( \textbackslash mathbf\{z\},t \textbackslash right)-辛离散格式}}\label{sec:symplectic-kam-5-5}
 
-在正则、自伴、解析和非退化条件下，Birkhoff 相流在适当局部投影中具有梯度映射和标量生成函数。若生成函数关于步长解析，可展开为
+在正则、自伴、解析和非退化条件下，Birkhoff 相流在适当局部投影中具有梯度映射和标量生成函数。为避免把不同对象的阶数混为一谈，取同一局部定义域 \(\mathcal{D}'\Subset\mathcal{D}\)，令 \(\Phi_h\) 为精确相流映射，令 \(\Psi_h\) 为候选离散映射，并分别定义：
+
+\begin{itemize}
+\tightlist
+\item
+  数值方法的代数阶 \(r_{\rm alg}\)：若在所需正则性和相容范数下有 \(\|\Psi_h-\Phi_h\|_{C^{1}(\mathcal{D}')}\leq C_{\rm alg}h^{r_{\rm alg}+1}\)，这是局部一步映射误差；在固定时间区间和稳定性条件下，轨迹的全局误差通常为 \(O(h^{r_{\rm alg}})\)。
+\item
+  生成函数截断阶 \(m_{\rm gen}\)：它只表示生成函数展开保留到 \(h^{m_{\rm gen}}\) 的阶数。若 \(S\) 关于 \(h\) 解析，则
+\end{itemize}
 
 \begin{equation}
 \label{eq:symplectic-kam-5-14}
 S\left( \mathbf{Z},h \right) = \sum_{r = 1}^{\infty}S_{r}\left( \mathbf{Z} \right)h^{r}.
 \end{equation}
 
-截断至 \(m\) 阶得到隐式 \(m\) 阶 \(K\left( \mathbf{z},t \right)\)-辛格式，并满足
+并可定义 \(S^{[m_{\rm gen}]}=\sum_{r=1}^{m_{\rm gen}}S_rh^r\) 及其余项 \(R_S=S-S^{[m_{\rm gen}]}\)。余项必须在明确的 \(C^{2}\) 或解析范数和定义域上估计；生成函数截断阶不自动等于数值方法代数阶。
 
-\begin{equation}
-\label{eq:symplectic-kam-5-15}
-\left( D\Psi_{h} \right)^{T}\mathbf{K}\left( \Psi_{h}\left( \mathbf{z} \right),t + h \right)D\Psi_{h} = \mathbf{K}\left( \mathbf{z},t \right) + O\left( h^{m + 1} \right).
-\end{equation}
+\begin{itemize}
+\tightlist
+\item
+  离散结构缺陷定义为 \(\Delta_K\)：
+  \[
+  \Delta_{K}(\Psi_h;\mathcal{D}'):=\left\|D\Psi_h^{T}\mathbf{K}\left(\Psi_h(\mathbf{z}),t+h\right)D\Psi_h-\mathbf{K}(\mathbf{z},t)\right\|_{C^{0}(\mathcal{D}')}.
+  \]
+  它不是由 \(r_{\rm alg}\) 或 \(m_{\rm gen}\) 单独定义的量。
+\item
+  只有在 \(\Omega_K\) 闭合且非退化、\(\Phi_h\) 精确保持该结构，并且 \(D(\Psi_h-\Phi_h)\) 与 \(R_S\) 的相应范数界已经给出时，才能由 \(\mathbf{K}\) 的 \(C^{1}\) 界推得 \(\Delta_K\) 的上界。例如，若两项映射误差都在 \(C^{1}\) 范数下为 \(O(h^{r_{\rm alg}+1})\)，才可条件性地得到同阶结构缺陷；不能未经该推导直接把算法阶数写成 \(O(h^{m+1})\) 的辛结构缺陷。
+\item
+  KAM 小扰动不是上述任一阶数的同义词。它还必须在指定解析或有限光滑范数中合并模型、学习、截断、映射和结构误差，并同时满足解析域、Diophantine 常数、非退化裕度、维数及步长非共振条件。
+\end{itemize}
 
-该结论保证条件成立时的结构保持和阶数，不自动推出经典 Hamiltonian KAM 环面持续性。若再叠加非结构残差，结构缺陷应进入误差预算。
+上述生成函数和结构保持算法的依据是 Feng--Qin 的辛几何算法专著及 Hairer--Lubich--Wanner 的几何数值积分专著；辛算法和辛映射的 KAM 条件分别对应 Shang 1999（Numerische Mathematik 83:477--496）和 Shang 2000（Journal of Dynamics and Differential Equations 12(2):357--383）\cite{FengQin2010,HairerLubichWanner2006GNI,Shang1999KAMAlgorithms,Shang2000KAMMappings}。这些引用提供理论条件和方法来源，不表示当前稿件已经完成相应证明或数值证书。
+
+因此，当前文本只支持“满足上述条件时的近似 \(K\)-辛结构保持”这一条件性命题；只有 \(\Delta_K=0\) 且相应映射假设成立时才可称为精确 \(K\)-辛。近似 \(K\)-辛不等于数值 KAM 认证。当前没有不变环面、频率映射、Diophantine 条件和非退化常数的完整数值证书，现有结果只支持结构保持数值框架，不支持工程安全域结论。若再叠加非结构残差，结构缺陷应进入误差预算。
 
 \subsection{参数化方法计算不变环面}\label{sec:symplectic-kam-5-6}
 

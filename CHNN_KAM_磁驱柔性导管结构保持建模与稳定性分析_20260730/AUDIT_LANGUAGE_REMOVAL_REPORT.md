@@ -1,5 +1,7 @@
 # 去审计语言专项清理报告
 
+> **历史审计记录。** 本文件记录去审计语言专项的历史结果；当前符号合同以 `translation/terminology.md` 和最新双语正文为准，本文不构成正式源码接口或维度已核验的证明。
+
 日期：2026-07-30  
 工作对象：磁驱柔性导管结构保持建模与稳定性分析论文工程  
 结论：专项清理完成，中英文 PDF 均通过严格构建、文本扫描和关键页视觉检查。
@@ -63,13 +65,14 @@
 
 ## 4. 科学内容保留
 
-以下内容在源码与中英文 PDF 中均已确认存在：
+以下内容作为当前仓库文本合同记录；本轮不重新生成 release PDF，历史 PDF 验收结论不因本节文字收口而变化：
 
-- canonical contract：
-  \(q=\Pi_{\mathrm{conf}}(U)\)、
-  \(p=B^{T}P_{\mathrm{full}}\)、
-  \(\dot q=M_N^{-1}p\)、
-  \(\dot p=B^{T}L\)；
+- canonical contract（当前文本合同）：
+  \(q_N=\Pi_{\mathrm{conf},N}(U)\)、
+  \(p_N=B_N(q_N)^{T}P_{\mathrm{full}}\)、
+  \(\dot q_N=M_N(q_N)^{-1}p_N\)、
+  \(\dot p_N=\dot B_N(q_N)^{T}P_{\mathrm{full}}+B_N(q_N)^{T}L_{\mathrm{full}}\)，其中
+  \(L_{\mathrm{full}}:=\dot P_{\mathrm{full}}\) 仅在该定义明确激活时使用；
 - 三层观察收敛阶：\(1.64186\)--\(2.00088\)；
 - \(1\,\mathrm{s}\) G2：\(0.00146226\)；
 - G3 点态：\(0.000221162\)；

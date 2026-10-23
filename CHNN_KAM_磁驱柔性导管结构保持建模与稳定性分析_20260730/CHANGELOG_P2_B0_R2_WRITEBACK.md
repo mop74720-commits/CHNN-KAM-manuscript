@@ -4,6 +4,8 @@
 当前论文工程：`CHNN_KAM_磁驱柔性导管结构保持建模与稳定性分析_20260730`  
 基线目录：`CHNN_KAM_Word基线完整迁移版_v2_清理核验版`（未修改）
 
+> **Historical / superseded record.** 本 changelog 记录 A-01 canonical 合同修订前的 P2-B0-R2 回写状态；其中出现的旧符号（包括 `B^T P_full`、`B^T L`）仅作为历史变更证据，不是当前实现合同。当前文本合同以 `translation/terminology.md` 和本分支最新双语正文为准。
+
 ## 1. 项目入口与构建
 
 | 文件 | 变更 |

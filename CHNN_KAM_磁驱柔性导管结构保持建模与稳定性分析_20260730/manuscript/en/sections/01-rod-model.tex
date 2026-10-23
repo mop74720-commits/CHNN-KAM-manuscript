@@ -388,10 +388,10 @@ In the air or vacuum region surrounding an infinitesimal magnetic catheter segme
 
 \begin{equation}
 \label{eq:rod-1-43}
-\mathbf{T}_{M} = \frac{1}{\mu_{0}}\left( \mathbf{B} \otimes \mathbf{B} - \frac{1}{2}\left| \mathbf{B} \right|^{2}\mathbf{I} \right),
+\mathbf{T}_{M} = \frac{1}{\mu_{0}}\left( \mathbf{B}_{mag} \otimes \mathbf{B}_{mag} - \frac{1}{2}\left| \mathbf{B}_{mag} \right|^{2}\mathbf{I} \right),
 \end{equation}
 
-where \(\mathbf{B}\) is the magnetic flux density and \(\mu_{0}\) is the permeability of free space. For a segment of reference length \(\Delta S\), the magnetic force per unit reference length and the magnetic couple about the centerline are defined by
+where \(\mathbf{B}_{mag}\) is the magnetic flux density and \(\mu_{0}\) is the permeability of free space. For a segment of reference length \(\Delta S\), the magnetic force per unit reference length and the magnetic couple about the centerline are defined by
 
 \begin{equation}
 \label{eq:rod-1-44}
@@ -412,18 +412,18 @@ When a magnetic segment can be represented by a dipole approximation, let \(\bm{
 \bm{\mu}(S,t) = \mathbf{R}(S,t)\bm{\mu}_{0}^{b}(S).
 \end{equation}
 
-For a prescribed external magnetic field \(\mathbf{B}\left( \mathbf{r},t \right)\), the magnetic potential energy is
+For a prescribed external magnetic field \(\mathbf{B}_{mag}\left( \mathbf{r},t \right)\), the magnetic potential energy is
 
 \begin{equation}
 \label{eq:rod-1-47}
-V_{mag} = - \int_{0}^{L}\bm{\mu} \cdot \mathbf{B}\left( \mathbf{r},t \right)\, dS.
+V_{mag} = - \int_{0}^{L}\bm{\mu} \cdot \mathbf{B}_{mag}\left( \mathbf{r},t \right)\, dS.
 \end{equation}
 
 The associated magnetic force and couple are
 
 \begin{equation}
 \label{eq:rod-1-48}
-\mathbf{f}_{mag} = \nabla_{\mathbf{r}}\left( \bm{\mu} \cdot \mathbf{B} \right),\quad\quad\mathbf{l}_{mag} = \bm{\mu} \times \mathbf{B}.
+\mathbf{f}_{mag} = \nabla_{\mathbf{r}}\left( \bm{\mu} \cdot \mathbf{B}_{mag} \right),\quad\quad\mathbf{l}_{mag} = \bm{\mu} \times \mathbf{B}_{mag}.
 \end{equation}
 
 The Maxwell-stress integral and the magnetic-dipole potential are two scale-dependent representations of the same magnetic action. One should be selected as the primary load model according to the required fidelity; they must not be superposed and counted twice.
@@ -549,7 +549,7 @@ The term \({\dot{\mathbf{r}}}^{T}\mathbf{f}_{drag,flow}\) is generally sign-inde
 \left( \dot{\mathbf{r}} - \mathbf{v}_{f} \right)^{T}\mathbf{f}_{drag} = - d_{f} \parallel \mathbf{P}_{\bot}\left( \dot{\mathbf{r}} - \mathbf{v}_{f} \right) \parallel^{2} \leq 0,
 \end{equation}
 
-This identity, however, does not replace the port accounting in the structural mechanical-energy balance. Thus, when \(\mathbf{v}_{f} \neq \mathbf{0}\), the complete quadratic drag must not be assigned entirely to \(\mathbf{Q}_{diss}\). Because \(d_{f}\) depends on the relative velocity, the passive kernel is a statewise positive-semidefinite nonlinear operator rather than a constant damping matrix.
+This identity, however, does not replace the port accounting in the structural mechanical-energy balance. Thus, when \(\mathbf{v}_{f} \neq \mathbf{0}\), the complete quadratic drag must not be assigned entirely to \(\mathbf{Q}_{diss}^{bulk}\). Because \(d_{f}\) depends on the relative velocity, the passive kernel is a statewise positive-semidefinite nonlinear operator rather than a constant damping matrix.
 
 If damping of cross-sectional spin by the fluid is relevant, an additional fluid couple per unit reference length may be introduced, for example,
 
@@ -884,10 +884,10 @@ After all conservative external loads have been incorporated into \(V\), one obt
 
 \begin{equation}
 \label{eq:rod-1-105}
-\boxed{\frac{dE}{dt} = P_{\partial} + P_{diss} + P_{in} + P_{flow} + \frac{\partial V_{ext}}{\partial t}.}
+\boxed{\frac{dE}{dt} = P_{\partial} + P_{diss}^{bulk} + P_{contact} + P_{in} + P_{flow} + \frac{\partial V_{ext}}{\partial t}.}
 \end{equation}
 
-Here, \(P_{diss}\) contains only the passive components obtained after the input--dissipation split, including \(P_{drag,diss}\), normal contact damping and friction for a fixed wall, and any retained spin damping, and it satisfies \(P_{diss} \leq 0\). The term \(P_{flow}\) collects the background-flow drag power \(P_{drag,flow}\), the Froude--Krylov input, and reactive-flow power assigned to the port under the selected representation; it is generally sign-indefinite. The term \(P_{in}\) contains only nonfluid nonconservative body inputs and control inputs. Terminal actuation contributes only through \(P_{\partial}\). If a nonautonomous magnetic action has already been represented by \(V_{mag}\left( \mathbf{r},\mathbf{R},t \right)\), its explicit-time power appears only through \(\partial V_{ext}/\partial t\) and must not be counted again in \(P_{in}\). The extended mechanical energy is conserved only when \(P_{diss} = P_{in} = P_{flow} = P_{\partial} = 0\) and the potential is time independent.
+Here, \(P_{diss}^{bulk}\) contains only the passive bulk/drag components obtained after the input--dissipation split, excludes every contact term, and satisfies \(P_{diss}^{bulk} \leq 0\). \(P_{contact}\) is the unique nonpotential contact-port power for elastic contact not represented in the potential, normal contact damping, tangential friction, impact, and contact-spin couples; if elastic contact has already been included in the potential, it must not be counted again in \(P_{contact}\), and contact damping, friction, and impact must not also appear in \(P_{diss}^{bulk}\). The term \(P_{flow}\) collects the background-flow drag power \(P_{drag,flow}\), the Froude--Krylov input, and reactive-flow power assigned to the port under the selected representation; it is generally sign-indefinite. The term \(P_{in}\) contains only nonfluid nonconservative body inputs and control inputs. Terminal actuation contributes only through \(P_{\partial}\). If a nonautonomous magnetic action has already been represented by \(V_{mag}\left( \mathbf{r},\mathbf{R},t \right)\), its explicit-time power appears only through \(\partial V_{ext}/\partial t\) and must not be counted again in \(P_{in}\). The extended mechanical energy is conserved only when \(P_{diss}^{bulk}=P_{contact}=P_{in}=P_{flow}=P_{\partial}=0\) and the potential is time independent.
 
 \subsection{Section summary}\label{sec:rod-1-8}
 

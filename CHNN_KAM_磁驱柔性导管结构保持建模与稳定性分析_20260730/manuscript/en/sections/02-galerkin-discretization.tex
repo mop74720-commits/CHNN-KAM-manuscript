@@ -782,7 +782,7 @@ Introduce the Lagrange multiplier \(\bm{\lambda}_{c}\). The generalized constrai
 
 \begin{equation}
 \label{eq:galerkin-2-95}
-\mathbf{Q}_{c} = \mathbf{G}^{T}\left( \mathbf{q} \right)\bm{\lambda}_{c}.
+\mathbf{Q}_{c} := -\mathbf{G}^{T}\left( \mathbf{q} \right)\bm{\lambda}_{c}.
 \end{equation}
 
 The complete constrained discrete system is
@@ -818,10 +818,10 @@ If the prescribed-flow cross terms are moved collectively to the input port and 
 
 \begin{equation}
 \label{eq:galerkin-2-98}
-\mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{M} + \nabla_{\mathbf{q}}V_{h} = \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial}.
+\mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{M} + \nabla_{\mathbf{q}}V_{h} = \mathbf{Q}_{diss}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial}.
 \end{equation}
 
-The passively dissipative drag kernel obtained by exclusive splitting, normal contact damping and friction for a fixed wall, and any retained spin damping constitute \(\mathbf{Q}_{diss}\), with \({\dot{\mathbf{q}}}^{T}\mathbf{Q}_{diss} \leq 0\). The background-flow drag term \(\mathbf{Q}_{drag,flow}\) must be assigned to \(\mathbf{Q}_{flow}\), and its power is generally sign-indefinite; therefore, no global dissipativity claim may be made for the complete relative drag. Nor should \(\mathbf{Q}_{diss}\) be forced into the form of a constant damping matrix times velocity, because the quadratic-drag matrix \(\mathbf{D}_{drag}\left( \mathbf{q},\dot{\mathbf{q}},t \right)\) itself depends on state and relative velocity. The same fluid action may be counted only once in any selected representation.
+The passively dissipative bulk/drag kernel obtained by exclusive splitting constitutes \(\mathbf{Q}_{diss}^{bulk}\), with \({\dot{\mathbf{q}}}^{T}\mathbf{Q}_{diss}^{bulk} \leq 0\). \(\mathbf{Q}_{contact}\) is the unique nonpotential contact port for elastic contact not included in \(V_h\), contact damping, friction, impact, and contact-spin couples; if elastic contact is already included in \(V_h\), it must not be included again, and contact damping or friction must not also enter \(\mathbf{Q}_{diss}^{bulk}\). The background-flow drag term \(\mathbf{Q}_{drag,flow}\) must be assigned to \(\mathbf{Q}_{flow}\), and its power is generally sign-indefinite; therefore, no global dissipativity claim may be made for the complete relative drag. Nor should \(\mathbf{Q}_{diss}^{bulk}\) be forced into the form of a constant damping matrix times velocity, because the quadratic-drag matrix \(\mathbf{D}_{drag}\left( \mathbf{q},\dot{\mathbf{q}},t \right)\) itself depends on state and relative velocity. The same fluid action may be counted only once in any selected representation.
 
 \subsubsection{Constrained form}\label{sec:galerkin-2-8-2}
 
@@ -870,10 +870,10 @@ If the complete Euler--Lagrange contribution of the prescribed-flow cross action
 
 \begin{equation}
 \label{eq:galerkin-2-104}
-\boxed{\frac{dE_{h}}{dt} = {\dot{\mathbf{q}}}^{T}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} \right) + \frac{\partial V_{h}}{\partial t}.}
+\boxed{\frac{dE_{h}}{dt} = {\dot{\mathbf{q}}}^{T}\left( \mathbf{Q}_{diss}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} \right) + \frac{\partial V_{h}}{\partial t}.}
 \end{equation}
 
-Here, \(\mathbf{Q}_{diss}\) contains only the passive dissipative kernel after splitting and satisfies \({\dot{\mathbf{q}}}^{T}\mathbf{Q}_{diss} \leq 0\). The term \(\mathbf{Q}_{flow}\) collects \(\mathbf{Q}_{drag,flow}\), the Froude--Krylov input, and the reactive-flow contribution determined by the selected representation; its power is not assigned a fixed sign. The relative-motion identity verifies physical passivity of the drag law, whereas the dissipative structural constraint of the CHNN must be imposed on the preceding \(\mathbf{Q}_{diss}\); the two must not be conflated. For an ideal constraint,
+Here, \(\mathbf{Q}_{diss}^{bulk}\) contains only the passive bulk/drag kernel after splitting and satisfies \({\dot{\mathbf{q}}}^{T}\mathbf{Q}_{diss}^{bulk} \leq 0\); \(\mathbf{Q}_{contact}\) records contact power separately under the preceding mutually exclusive contract. The term \(\mathbf{Q}_{flow}\) collects \(\mathbf{Q}_{drag,flow}\), the Froude--Krylov input, and the reactive-flow contribution determined by the selected representation; its power is not assigned a fixed sign. The relative-motion identity verifies physical passivity of the drag law, whereas the dissipative structural constraint of the CHNN must be imposed only on the preceding \(\mathbf{Q}_{diss}^{bulk}\); the two must not be conflated. For an ideal constraint,
 
 \begin{equation}
 \label{eq:galerkin-2-105}
@@ -908,7 +908,7 @@ Use the dissipation--input decomposition
 
 \begin{equation}
 \label{eq:galerkin-2-108}
-\mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{M} + \nabla V_{h} + \mathbf{G}^{T}\bm{\lambda}_{c} = \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial}.
+\mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{M} + \nabla V_{h} + \mathbf{G}^{T}\bm{\lambda}_{c} = \mathbf{Q}_{diss}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial}.
 \end{equation}
 
 Let \(\mathbf{q}_{e}\) be a static equilibrium configuration with \({\dot{\mathbf{q}}}_{e} = \mathbf{0}\). Then
@@ -917,10 +917,10 @@ Here, a ``static equilibrium configuration'' requires that the explicit time-dep
 
 \begin{equation}
 \label{eq:galerkin-2-109}
-\nabla V_{h}\left( \mathbf{q}_{e} \right) + \mathbf{G}^{T}\left( \mathbf{q}_{e} \right)\bm{\lambda}_{ce} = \mathbf{Q}_{diss}\left( \mathbf{q}_{e},\mathbf{0} \right) + \mathbf{Q}_{in,e} + \mathbf{Q}_{flow,e} + \mathbf{Q}_{\partial,e}.
+\nabla V_{h}\left( \mathbf{q}_{e} \right) + \mathbf{G}^{T}\left( \mathbf{q}_{e} \right)\bm{\lambda}_{ce} = \mathbf{Q}_{diss}^{bulk}\left( \mathbf{q}_{e},\mathbf{0} \right) + \mathbf{Q}_{contact}\left( \mathbf{q}_{e},\mathbf{0} \right) + \mathbf{Q}_{in,e} + \mathbf{Q}_{flow,e} + \mathbf{Q}_{\partial,e}.
 \end{equation}
 
-Usually, \(\mathbf{Q}_{diss}\left( \mathbf{q},\mathbf{0} \right) = \mathbf{0}\). Let \(\mathbf{q} = \mathbf{q}_{e} + \bm{\eta}\) and neglect second- and higher-order perturbation terms. For the unconstrained system,
+Usually, \(\mathbf{Q}_{diss}^{bulk}\left( \mathbf{q},\mathbf{0} \right) = \mathbf{0}\); whether \(\mathbf{Q}_{contact}\left( \mathbf{q},\mathbf{0} \right)\) vanishes depends on the contact terms not represented in the potential. Let \(\mathbf{q} = \mathbf{q}_{e} + \bm{\eta}\) and neglect second- and higher-order perturbation terms. For the unconstrained system,
 
 \begin{equation}
 \label{eq:galerkin-2-110}
@@ -936,12 +936,12 @@ where
 
 \begin{equation}
 \label{eq:galerkin-2-112}
-\mathbf{C}_{e} = - \left. \ \ \ \frac{\partial\mathbf{Q}_{diss}}{\partial\dot{\mathbf{q}}} \right|_{e},
+\mathbf{C}_{e} = - \left. \ \ \ \frac{\partial\left(\mathbf{Q}_{diss}^{bulk}+\mathbf{Q}_{contact}\right)}{\partial\dot{\mathbf{q}}} \right|_{e},
 \end{equation}
 
 \begin{equation}
 \label{eq:galerkin-2-113}
-\boxed{\mathbf{K}_{e} = \left. \ \ \ \left\lbrack \nabla_{\mathbf{q}}^{2}V_{h} - \frac{\partial\mathbf{Q}_{diss}}{\partial\mathbf{q}} - \frac{\partial\left( \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} \right)}{\partial\mathbf{q}} \right\rbrack \right|_{e}.}
+\boxed{\mathbf{K}_{e} = \left. \ \ \ \left\lbrack \nabla_{\mathbf{q}}^{2}V_{h} - \frac{\partial\left(\mathbf{Q}_{diss}^{bulk}+\mathbf{Q}_{contact}\right)}{\partial\mathbf{q}} - \frac{\partial\left( \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} \right)}{\partial\mathbf{q}} \right\rbrack \right|_{e}.}
 \end{equation}
 
 Here, \(\delta\mathbf{Q}(t)\) collects explicit time-dependent input perturbations not absorbed by the state Jacobian. Under the actual dissipative-force convention above, passive dissipation gives \(\mathbf{C}_{e} \succcurlyeq \mathbf{0}\) near the equilibrium. If the load Jacobian contains nonsymmetric follower terms, \(\mathbf{K}_{e}\) need not be symmetric.
@@ -967,12 +967,12 @@ The CHNN and KAM analyses must use a finite-dimensional system of fixed dimensio
 
 \begin{equation}
 \label{eq:galerkin-2-115}
-e_{n}^{freq} = \max_{1 \leq j \leq m}\frac{\left| \omega_{j}^{(n + 1)} - \omega_{j}^{(n)} \right|}{\left| \omega_{j}^{(n + 1)} \right|},\quad\quad e_{n}^{traj} = \frac{\parallel \mathbf{q}^{(n + 1)} - \Pi_{n + 1 \rightarrow n}\mathbf{q}^{(n + 1)} \parallel}{\parallel \mathbf{q}^{(n + 1)} \parallel},
+e_{n}^{freq} = \max_{1 \leq j \leq m}\frac{\left| \omega_{j}^{(n + 1)} - \omega_{j}^{(n)} \right|}{\left| \omega_{j}^{(n + 1)} \right|},\quad\quad e_{n}^{traj} = \frac{\parallel \mathbf{q}^{(n)} - \Pi_{n + 1 \rightarrow n}\mathbf{q}^{(n + 1)} \parallel}{\parallel \mathbf{q}^{(n)} \parallel},
 \end{equation}
 
-and define analogous indicators for energy and torsion. The principal computational order \(n_{*}\) is the first order at which all prescribed indicators simultaneously fall below their tolerances. Until this computation has been completed, the manuscript may retain \(n_{*}\) only as an undetermined parameter and must not describe an empirically selected order as proven sufficient.
+Here \(\mathbf{q}^{(n)}\in\mathbb{R}^{n}\), \(\mathbf{q}^{(n+1)}\in\mathbb{R}^{n+1}\), and \(\Pi_{n+1\rightarrow n}\in\mathbb{R}^{n\times(n+1)}\); the two trajectories must use the same physical operating condition and time grid. If the denominator vanishes, report the unnormalised absolute error. Define analogous indicators for energy and torsion. The formal production order is denoted \(n_{\mathrm{main}}\) and is the first order at which all prescribed indicators simultaneously fall below their tolerances. Until this computation has been completed, the manuscript may retain \(n_{\mathrm{main}}\) only as an undetermined parameter and must not describe an empirically selected order as proven sufficient.
 
-The canonical data mapping is examined using a fixed \(N=2\) basis. It is extracted from the mesh-80 near-frequency cluster, orthonormalized in the consistent finite-element mass metric, and fixed with respect to sign, normalization, and degree-of-freedom row order. It defines the paired-coordinate contract used in the P1 series and the subsequent consistency analysis. The complete bridge retains the first 12 production modes and the mesh-40/80 comparison, so \(N=2\) neither replaces the convergence criterion for \(n_{*}\) nor establishes high-fidelity sufficiency.
+The canonical data mapping is examined using a fixed \(N_{\mathrm{diag}}=2\) diagnostic basis. It is extracted from the mesh-80 near-frequency cluster, orthonormalized in the consistent finite-element mass metric, and fixed with respect to sign, normalization, and degree-of-freedom row order. It defines the paired-coordinate contract used in the P1 series and the subsequent consistency analysis. The complete bridge retains the first 12 candidate modes and the mesh-40/80 comparison, so \(N_{\mathrm{diag}}=2\) neither replaces the convergence criterion for \(n_{\mathrm{main}}\) nor establishes high-fidelity sufficiency.
 
 \subsection{Numerical implementation and finite-dimensional model outputs}\label{sec:galerkin-2-11}
 
@@ -1033,7 +1033,7 @@ After the joint Galerkin discretization and the consistent Legendre postprocessi
 
 \begin{equation}
 \label{eq:galerkin-2-120}
-\mathcal{O}_{h} = \left( \mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}},\mathbf{p}_{rep},{\dot{\mathbf{p}}}_{rep},\mathbf{M}\left( \mathbf{q} \right),V_{h},E_{h},\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow},\mathbf{Q}_{\partial},\mathbf{c},\mathbf{G},representation \right).
+\mathcal{O}_{h} = \left( \mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}},\mathbf{p}_{rep},{\dot{\mathbf{p}}}_{rep},\mathbf{M}\left( \mathbf{q} \right),V_{h},E_{h},\mathbf{Q}_{diss}^{bulk},\mathbf{Q}_{contact},\mathbf{Q}_{in},\mathbf{Q}_{flow},\mathbf{Q}_{\partial},\mathbf{c},\mathbf{G},representation \right).
 \end{equation}
 
 Here, \(\mathbf{p}_{rep}\) and \({\dot{\mathbf{p}}}_{rep}\) must be consistent with the selected Lagrangian representation. The \(representation\) label must distinguish at least the autonomous-backbone, exact-nonautonomous, and engineering-reduction representations. The strict Kirchhoff branch also stores the discrete constraint \(\mathbf{c}\left( \mathbf{q} \right)\) and its Jacobian \(\mathbf{G}\left( \mathbf{q} \right)\); these two components may be marked as empty in an unconstrained branch.
@@ -1042,14 +1042,14 @@ On this basis, \Cref{sec:hamiltonian-structure} constructs two data objects that
 
 \begin{equation}
 \label{eq:galerkin-2-121}
-\mathcal{D}_{sk} = \left( \mathbf{z}_{0},{\dot{\mathbf{z}}}_{0},H_{cons},\nabla_{\mathbf{z}_{0}}H_{cons},\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{sk},\mathbf{Q}_{\partial} \right),\quad\quad\mathbf{z}_{0} = \left( \mathbf{q},\mathbf{p}_{0} \right),
+\mathcal{D}_{sk} = \left( \mathbf{z}_{0},{\dot{\mathbf{z}}}_{0},H_{cons},\nabla_{\mathbf{z}_{0}}H_{cons},\mathbf{Q}_{diss}^{bulk},\mathbf{Q}_{contact},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{sk},\mathbf{Q}_{\partial} \right),\quad\quad\mathbf{z}_{0} = \left( \mathbf{q},\mathbf{p}_{0} \right),
 \end{equation}
 
 and the exact nonautonomous data are
 
 \begin{equation}
 \label{eq:galerkin-2-122}
-\mathcal{D}_{na} = \left( \mathbf{z},\dot{\mathbf{z}},t,H,\nabla_{\mathbf{z}}H,\partial_{t}H,\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{H},\mathbf{Q}_{\partial} \right),\quad\quad\mathbf{z} = \left( \mathbf{q},\mathbf{p} \right).
+\mathcal{D}_{na} = \left( \mathbf{z},\dot{\mathbf{z}},t,H,\nabla_{\mathbf{z}}H,\partial_{t}H,\mathbf{Q}_{diss}^{bulk},\mathbf{Q}_{contact},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{H},\mathbf{Q}_{\partial} \right),\quad\quad\mathbf{z} = \left( \mathbf{q},\mathbf{p} \right).
 \end{equation}
 
 If \({\dot{\mathbf{p}}}_{rep}\) or \({\dot{\mathbf{z}}}_{rep}\) is obtained by numerical differentiation rather than from a solver residual, analytic equations, or automatic differentiation, the differentiation order, time step, and derivative-error estimate must also be recorded. CHNN derivative supervision, energy-balance supervision, and the subsequent KAM error budget may use only representation-consistent data with traceable errors.
@@ -1076,7 +1076,7 @@ The open-port training set is
 
 \begin{equation}
 \label{eq:galerkin-2-125}
-\mathcal{D}_{K}^{port} = \{\left( \mathbf{z}_{rep},{\dot{\mathbf{z}}}_{rep},\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow},\mathbf{Q}_{\partial} \right):model\_ level = K\},
+\mathcal{D}_{K}^{port} = \{\left( \mathbf{z}_{rep},{\dot{\mathbf{z}}}_{rep},\mathbf{Q}_{diss}^{bulk},\mathbf{Q}_{contact},\mathbf{Q}_{in},\mathbf{Q}_{flow},\mathbf{Q}_{\partial} \right):model\_ level = K\},
 \end{equation}
 
 The high-fidelity comparison set is

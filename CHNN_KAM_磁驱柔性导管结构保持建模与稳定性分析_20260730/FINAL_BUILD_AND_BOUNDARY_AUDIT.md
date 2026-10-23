@@ -1,5 +1,7 @@
 # 最终构建、引用、公式与结论边界审计
 
+> **历史审计记录。** 本文件保留原构建、引用和结论边界审计的历史结果；旧版本公式不构成当前实现合同。当前符号合同以 `translation/terminology.md` 和最新双语正文为准，正式代码对象、维度和接口仍未核验。
+
 审计日期：2026-07-30  
 科学结论截止点：P2-B0-R2  
 验收状态：通过
@@ -57,15 +59,17 @@ XeLaTeX → BibTeX → XeLaTeX（至少两遍，并按日志迭代至交叉引�
 - 保留 9 个中文和 16 个英文 underfull box，来自附录长路径/哈希及少量英文断行；关键页目视检查未发现裁切、重叠或越界。
 - 两份日志各有 2 个字体提示：Latin Modern Mono 无粗体字形时退回常规字形；不存在字符缺失。
 
-Canonical contract 在中英文 `manuscript/*/sections/03-hamiltonian-structure.tex` 的同一位置和同一公式标签
+当前 canonical contract 在中英文 `manuscript/*/sections/03-hamiltonian-structure.tex` 的同一位置和同一公式标签
 `eq:hamiltonian-canonical-data-contract` 下固定为：
 
 \[
 q_N=\Pi_{\mathrm{conf},N}(U),\qquad
 p_N=B_N(q_N)^T P_{\mathrm{full}},\qquad
 \dot q_N=M_N(q_N)^{-1}p_N,\qquad
-\dot p_N=B_N(q_N)^T L .
+\dot p_N=\dot B_N(q_N)^T P_{\mathrm{full}}+B_N(q_N)^T L_{\mathrm{full}},
 \]
+
+其中 \(L_{\mathrm{full}}:=\dot P_{\mathrm{full}}\) 仅在该定义明确激活时使用；\(\dot B_N(q_N)\) 是沿轨迹的总时间导数。该链式法则是文本合同，不能替代正式实现和原始数组证据。
 
 相邻正文同时定义了构形空间、切空间和余切空间，并明确 `p_mass=M_N*dq_native` 仅为诊断量；BDF order-2 仅承担同一 solver-step 状态采样和向量场标签生成。
 

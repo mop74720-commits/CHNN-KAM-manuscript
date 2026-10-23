@@ -1,16 +1,65 @@
 {
+  "artifact_type": "verification_skeleton_result",
   "complex_round_trip_error": 2.2887833992611187e-16,
   "conservative": {
     "max_quadratic_energy_drift": 3.1086244689504383e-15,
     "observed_order": 1.9935495992663073
   },
   "dissipative": {
-    "midpoint_discrete_conformal_defect": 1.3136096125723746e-09,
+    "finite_difference_sweep": {
+      "0.0001": {
+        "midpoint_defect": 8.717153330612319e-13,
+        "strang_defect": 2.81988605579606e-13
+      },
+      "0.001": {
+        "midpoint_defect": 1.0252703755205051e-13,
+        "strang_defect": 5.605230077501077e-14
+      },
+      "0.01": {
+        "midpoint_defect": 1.0990647210786425e-15,
+        "strang_defect": 4.239249638446193e-15
+      },
+      "1e-05": {
+        "midpoint_defect": 8.812457942854425e-12,
+        "strang_defect": 8.824076627048684e-12
+      },
+      "1e-06": {
+        "midpoint_defect": 7.569714060881629e-11,
+        "strang_defect": 8.568716789568355e-11
+      },
+      "1e-07": {
+        "midpoint_defect": 1.3136095340677493e-09,
+        "strang_defect": 1.9270264446029797e-09
+      },
+      "1e-08": {
+        "midpoint_defect": 4.11399833872112e-09,
+        "strang_defect": 5.692028870857509e-09
+      },
+      "1e-09": {
+        "midpoint_defect": 2.959871071751572e-08,
+        "strang_defect": 7.921677071272943e-08
+      }
+    },
+    "midpoint_discrete_conformal_defect": 1.3136095340677493e-09,
     "midpoint_power_balance_error": 1.6994869053710282e-16,
-    "strang_exact_conformal_defect": 1.927026523107604e-09
+    "strang_exact_conformal_defect": 1.9270264446029797e-09
   },
   "environment": {
-    "date": "2026-07-13",
-    "scope": "V1--V3 NumPy verification skeleton"
-  }
+    "date": "2026-08-06",
+    "scope": "V1--V3 NumPy verification skeleton only"
+  },
+  "formal_experiment": false,
+  "formal_implementation": false,
+  "numerical_kam_certificate": false,
+  "required_formal_materials": [
+    "formal source code",
+    "configuration",
+    "environment lock",
+    "raw arrays",
+    "manifest",
+    "clean-run logs",
+    "automatically generated tables and figures",
+    "provenance-consistency records"
+  ],
+  "scope": "V1--V3 NumPy verification skeleton only"
 }

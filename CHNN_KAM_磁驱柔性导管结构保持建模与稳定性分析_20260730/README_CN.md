@@ -43,3 +43,9 @@ PDF 首页不显示内部审计、阶段或工作稿状态文字。实验占位�
 3. 中英文修改后必须运行双语审计；
 4. 期刊切换只调整类文件、前置信息、声明和文献样式；
 5. 不在 PDF 中加入内部审计提示、版本声明或工作稿水印，除非明确要求。
+
+## 代码与验证边界
+
+当前代码目录可执行的 verification_skeleton.py 仅是接口示例、回归测试骨架、数值流程演示和构建门测试对象。它不是正式 CHNN、COMSOL--Galerkin bridge、force-v2、P0/P1/P2 生产实验、控制器、自适应律或 KAM 数值证书；verification_results.json 只描述 skeleton 运行结果，不能作为论文正式实验结果。
+
+解除该边界至少需要正式源码、配置、环境锁、原始数组、manifest、clean-run 日志、自动生成的表格和图以及 provenance 一致性记录。材料未交付前，A-17 保持 PARTIAL。

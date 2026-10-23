@@ -23,3 +23,15 @@ The verified Chinese LaTeX manuscript is authoritative. This glossary fixes pref
 - 安全操控域: safe operating domain
 - 高保真对照: high-fidelity reference/validation model
 - Kirchhoff 无剪切约束: Kirchhoff shear-free constraint
+
+## Symbol contract
+
+- B_mag: magnetic induction or magnetic field quantity; do not reuse it for a port or basis matrix.
+- B_port: port embedding matrix; in the reduced state, B_port maps u in R^d to U_port in R^(2d) and acts only in the momentum channel.
+- B_N: configuration-dependent modal or canonical pullback matrix; its dimension is m_f by N_diag.
+- L_full: full-order load rate, defined as dot P_full when that definition is explicitly active; it is not the generic unqualified L in the canonical momentum-rate equation.
+- N_diag: diagnostic order only; the current diagnostic basis uses N_diag = 2.
+- n_main: production order to be selected by a formal convergence study; it is not fixed by the diagnostic basis.
+- Q_diss and Q_contact: bulk passive dissipation and nonpotential contact channels are separate contracts; a formal implementation must not merge or double-count them.
+
+Generic B, L, N, J, or n occurrences in local algebra, sample-count sums, historical reports, or literature quotations are retained when their local meaning is explicit. Historical and review files are not current implementation contracts.

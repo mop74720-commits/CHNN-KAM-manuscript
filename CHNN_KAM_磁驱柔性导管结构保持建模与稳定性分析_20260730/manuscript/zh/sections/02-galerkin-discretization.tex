@@ -782,7 +782,7 @@ g_{M,i} = \sum_{j,k = 1}^{n}\Gamma_{ijk}{\dot{q}}_{j}{\dot{q}}_{k}.
 
 \begin{equation}
 \label{eq:galerkin-2-95}
-\mathbf{Q}_{c} = \mathbf{G}^{T}\left( \mathbf{q} \right)\bm{\lambda}_{c}.
+\mathbf{Q}_{c} := -\mathbf{G}^{T}\left( \mathbf{q} \right)\bm{\lambda}_{c}.
 \end{equation}
 
 完整受约束离散系统写为
@@ -818,10 +818,10 @@ g_{M,i} = \sum_{j,k = 1}^{n}\Gamma_{ijk}{\dot{q}}_{j}{\dot{q}}_{k}.
 
 \begin{equation}
 \label{eq:galerkin-2-98}
-\mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{M} + \nabla_{\mathbf{q}}V_{h} = \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial}.
+\mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{M} + \nabla_{\mathbf{q}}V_{h} = \mathbf{Q}_{diss}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial}.
 \end{equation}
 
-经过排他拆分的拖曳被动核、固定壁条件下的接触法向阻尼与摩擦以及所保留的自转阻尼组成 \(\mathbf{Q}_{diss}\)，并满足 \({\dot{\mathbf{q}}}^{T}\mathbf{Q}_{diss} \leq 0\)。背景流拖曳项 \(\mathbf{Q}_{drag,flow}\) 必须归入 \(\mathbf{Q}_{flow}\)，其功率一般不定号；因此不能对完整相对拖曳作整体耗散断言。\(\mathbf{Q}_{diss}\) 也不应被强制写成常阻尼矩阵乘以速度，因为二次拖曳的 \(\mathbf{D}_{drag}\left( \mathbf{q},\dot{\mathbf{q}},t \right)\) 本身依赖状态与相对速度。同一流体作用在任一选定表示中只能计入一次。
+经过排他拆分的体内/拖曳被动核组成 \(\mathbf{Q}_{diss}^{bulk}\)，并满足 \({\dot{\mathbf{q}}}^{T}\mathbf{Q}_{diss}^{bulk} \leq 0\)。\(\mathbf{Q}_{contact}\) 是未计入 \(V_h\) 的接触弹性、接触阻尼、摩擦、冲击和自转接触力矩的唯一非势接触端口；若接触弹性已进入 \(V_h\)，不得再次进入该端口，接触阻尼和摩擦也不得同时放入 \(\mathbf{Q}_{diss}^{bulk}\)。背景流拖曳项 \(\mathbf{Q}_{drag,flow}\) 必须归入 \(\mathbf{Q}_{flow}\)，其功率一般不定号；因此不能对完整相对拖曳作整体耗散断言。\(\mathbf{Q}_{diss}^{bulk}\) 也不应被强制写成常阻尼矩阵乘以速度，因为二次拖曳的 \(\mathbf{D}_{drag}\left( \mathbf{q},\dot{\mathbf{q}},t \right)\) 本身依赖状态与相对速度。同一流体作用在任一选定表示中只能计入一次。
 
 \subsubsection{受约束形式}\label{sec:galerkin-2-8-2}
 
@@ -870,10 +870,10 @@ E_{h}\left( \mathbf{q},\dot{\mathbf{q}},t \right) = \frac{1}{2}{\dot{\mathbf{q}}
 
 \begin{equation}
 \label{eq:galerkin-2-104}
-\boxed{\frac{dE_{h}}{dt} = {\dot{\mathbf{q}}}^{T}\left( \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} \right) + \frac{\partial V_{h}}{\partial t}.}
+\boxed{\frac{dE_{h}}{dt} = {\dot{\mathbf{q}}}^{T}\left( \mathbf{Q}_{diss}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} \right) + \frac{\partial V_{h}}{\partial t}.}
 \end{equation}
 
-这里 \(\mathbf{Q}_{diss}\) 只含拆分后的被动耗散核，满足 \({\dot{\mathbf{q}}}^{T}\mathbf{Q}_{diss} \leq 0\)；\(\mathbf{Q}_{flow}\) 同时收纳 \(\mathbf{Q}_{drag,flow}\)、Froude--Krylov 输入以及由所选表示决定的反应性流场贡献，其功率不预设符号。相对运动恒等式用于校验拖曳定律的物理被动性，而 CHNN 的耗散结构约束应作用于前述 \(\mathbf{Q}_{diss}\)，二者不得混用。对于理想约束，
+这里 \(\mathbf{Q}_{diss}^{bulk}\) 只含拆分后的体内/拖曳被动耗散核，满足 \({\dot{\mathbf{q}}}^{T}\mathbf{Q}_{diss}^{bulk} \leq 0\)；\(\mathbf{Q}_{contact}\) 按前述排他合同单列接触功率；\(\mathbf{Q}_{flow}\) 同时收纳 \(\mathbf{Q}_{drag,flow}\)、Froude--Krylov 输入以及由所选表示决定的反应性流场贡献，其功率不预设符号。相对运动恒等式用于校验拖曳定律的物理被动性，而 CHNN 的耗散结构约束应只作用于前述 \(\mathbf{Q}_{diss}^{bulk}\)，二者不得混用。对于理想约束，
 
 \begin{equation}
 \label{eq:galerkin-2-105}
@@ -908,7 +908,7 @@ E_{h}\left( \mathbf{q},\dot{\mathbf{q}},t \right) = \frac{1}{2}{\dot{\mathbf{q}}
 
 \begin{equation}
 \label{eq:galerkin-2-108}
-\mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{M} + \nabla V_{h} + \mathbf{G}^{T}\bm{\lambda}_{c} = \mathbf{Q}_{diss} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial}.
+\mathbf{M}\ddot{\mathbf{q}} + \mathbf{g}_{M} + \nabla V_{h} + \mathbf{G}^{T}\bm{\lambda}_{c} = \mathbf{Q}_{diss}^{bulk} + \mathbf{Q}_{contact} + \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial}.
 \end{equation}
 
 设 \(\mathbf{q}_{e}\) 为静态平衡构形，\({\dot{\mathbf{q}}}_{e} = \mathbf{0}\)，则
@@ -917,10 +917,10 @@ E_{h}\left( \mathbf{q},\dot{\mathbf{q}},t \right) = \frac{1}{2}{\dot{\mathbf{q}}
 
 \begin{equation}
 \label{eq:galerkin-2-109}
-\nabla V_{h}\left( \mathbf{q}_{e} \right) + \mathbf{G}^{T}\left( \mathbf{q}_{e} \right)\bm{\lambda}_{ce} = \mathbf{Q}_{diss}\left( \mathbf{q}_{e},\mathbf{0} \right) + \mathbf{Q}_{in,e} + \mathbf{Q}_{flow,e} + \mathbf{Q}_{\partial,e}.
+\nabla V_{h}\left( \mathbf{q}_{e} \right) + \mathbf{G}^{T}\left( \mathbf{q}_{e} \right)\bm{\lambda}_{ce} = \mathbf{Q}_{diss}^{bulk}\left( \mathbf{q}_{e},\mathbf{0} \right) + \mathbf{Q}_{contact}\left( \mathbf{q}_{e},\mathbf{0} \right) + \mathbf{Q}_{in,e} + \mathbf{Q}_{flow,e} + \mathbf{Q}_{\partial,e}.
 \end{equation}
 
-通常 \(\mathbf{Q}_{diss}\left( \mathbf{q},\mathbf{0} \right) = \mathbf{0}\)。令 \(\mathbf{q} = \mathbf{q}_{e} + \bm{\eta}\)，忽略二阶及以上扰动项。对无约束系统有
+通常 \(\mathbf{Q}_{diss}^{bulk}\left( \mathbf{q},\mathbf{0} \right) = \mathbf{0}\)；\(\mathbf{Q}_{contact}\left( \mathbf{q},\mathbf{0} \right)\) 是否为零取决于未计入势能的接触表示。令 \(\mathbf{q} = \mathbf{q}_{e} + \bm{\eta}\)，忽略二阶及以上扰动项。对无约束系统有
 
 \begin{equation}
 \label{eq:galerkin-2-110}
@@ -936,12 +936,12 @@ E_{h}\left( \mathbf{q},\dot{\mathbf{q}},t \right) = \frac{1}{2}{\dot{\mathbf{q}}
 
 \begin{equation}
 \label{eq:galerkin-2-112}
-\mathbf{C}_{e} = - \left. \ \ \ \frac{\partial\mathbf{Q}_{diss}}{\partial\dot{\mathbf{q}}} \right|_{e},
+\mathbf{C}_{e} = - \left. \ \ \ \frac{\partial\left(\mathbf{Q}_{diss}^{bulk}+\mathbf{Q}_{contact}\right)}{\partial\dot{\mathbf{q}}} \right|_{e},
 \end{equation}
 
 \begin{equation}
 \label{eq:galerkin-2-113}
-\boxed{\mathbf{K}_{e} = \left. \ \ \ \left\lbrack \nabla_{\mathbf{q}}^{2}V_{h} - \frac{\partial\mathbf{Q}_{diss}}{\partial\mathbf{q}} - \frac{\partial\left( \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} \right)}{\partial\mathbf{q}} \right\rbrack \right|_{e}.}
+\boxed{\mathbf{K}_{e} = \left. \ \ \ \left\lbrack \nabla_{\mathbf{q}}^{2}V_{h} - \frac{\partial\left(\mathbf{Q}_{diss}^{bulk}+\mathbf{Q}_{contact}\right)}{\partial\mathbf{q}} - \frac{\partial\left( \mathbf{Q}_{in} + \mathbf{Q}_{flow} + \mathbf{Q}_{\partial} \right)}{\partial\mathbf{q}} \right\rbrack \right|_{e}.}
 \end{equation}
 
 这里 \(\delta\mathbf{Q}(t)\) 收集未被状态 Jacobian 吸收的显式时间输入扰动。按上述实际耗散力约定，被动耗散在平衡点附近给出 \(\mathbf{C}_{e} \succcurlyeq \mathbf{0}\)；若载荷 Jacobian 含非对称随形项，\(\mathbf{K}_{e}\) 一般不必对称。
@@ -967,12 +967,12 @@ CHNN 和 KAM 分析必须基于固定维数的有限维系统，不能长期停�
 
 \begin{equation}
 \label{eq:galerkin-2-115}
-e_{n}^{freq} = \max_{1 \leq j \leq m}\frac{\left| \omega_{j}^{(n + 1)} - \omega_{j}^{(n)} \right|}{\left| \omega_{j}^{(n + 1)} \right|},\quad\quad e_{n}^{traj} = \frac{\parallel \mathbf{q}^{(n + 1)} - \Pi_{n + 1 \rightarrow n}\mathbf{q}^{(n + 1)} \parallel}{\parallel \mathbf{q}^{(n + 1)} \parallel},
+e_{n}^{freq} = \max_{1 \leq j \leq m}\frac{\left| \omega_{j}^{(n + 1)} - \omega_{j}^{(n)} \right|}{\left| \omega_{j}^{(n + 1)} \right|},\quad\quad e_{n}^{traj} = \frac{\parallel \mathbf{q}^{(n)} - \Pi_{n + 1 \rightarrow n}\mathbf{q}^{(n + 1)} \parallel}{\parallel \mathbf{q}^{(n)} \parallel},
 \end{equation}
 
-并以能量和扭转量定义同类指标。主计算阶数 \(n_{*}\) 取为所有指定指标首次同时低于容差的位置。正文在尚未完成该计算时只能保留 \(n_{*}\) 为待确定参数，不能把某一经验阶数写成已经证明充分。
+其中 \(\mathbf{q}^{(n)}\in\mathbb{R}^{n}\)、\(\mathbf{q}^{(n+1)}\in\mathbb{R}^{n+1}\)，\(\Pi_{n+1\rightarrow n}\in\mathbb{R}^{n\times(n+1)}\)；两条轨迹必须对应同一物理工况和同一时间网格。若分母为零，改报未归一化的绝对误差。并以能量和扭转量定义同类指标。正式生产阶数记为 \(n_{\mathrm{main}}\)，取为所有指定指标首次同时低于容差的位置。正文在尚未完成该计算时只能保留 \(n_{\mathrm{main}}\) 为待确定参数，不能把某一经验阶数写成已经证明充分。
 
-本文采用固定的 \(N=2\) 基检验 canonical 数据映射。该基取自 mesh-80 的近频簇，经有限元一致质量度量正交归一，并固定符号、归一化和自由度行序；它定义 P1 系列及后续数据一致性分析所用的 paired-coordinate contract。完整 bridge 同时保留前 12 个生产模态及 mesh-40/80 交叉比较，因此 \(N=2\) 不替代上文 \(n_{*}\) 的收敛判据，也不构成高保真充分性结论。
+本文采用固定的 \(N_{\mathrm{diag}}=2\) 诊断基检验 canonical 数据映射。该基取自 mesh-80 的近频簇，经有限元一致质量度量正交归一，并固定符号、归一化和自由度行序；它定义 P1 系列及后续数据一致性分析所用的 paired-coordinate contract。完整 bridge 同时保留前 12 个候选模态及 mesh-40/80 交叉比较，因此 \(N_{\mathrm{diag}}=2\) 不替代上文 \(n_{\mathrm{main}}\) 的收敛判据，也不构成高保真充分性结论。
 
 \subsection{数值实现与有限维模型输出}\label{sec:galerkin-2-11}
 
@@ -1033,7 +1033,7 @@ COMSOL--Galerkin bridge 比较 stationary energy/field 导出、mesh-40/80 模�
 
 \begin{equation}
 \label{eq:galerkin-2-120}
-\mathcal{O}_{h} = \left( \mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}},\mathbf{p}_{rep},{\dot{\mathbf{p}}}_{rep},\mathbf{M}\left( \mathbf{q} \right),V_{h},E_{h},\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow},\mathbf{Q}_{\partial},\mathbf{c},\mathbf{G},representation \right).
+\mathcal{O}_{h} = \left( \mathbf{q},\dot{\mathbf{q}},\ddot{\mathbf{q}},\mathbf{p}_{rep},{\dot{\mathbf{p}}}_{rep},\mathbf{M}\left( \mathbf{q} \right),V_{h},E_{h},\mathbf{Q}_{diss}^{bulk},\mathbf{Q}_{contact},\mathbf{Q}_{in},\mathbf{Q}_{flow},\mathbf{Q}_{\partial},\mathbf{c},\mathbf{G},representation \right).
 \end{equation}
 
 其中，\(\mathbf{p}_{rep}\) 和 \({\dot{\mathbf{p}}}_{rep}\) 必须与所选 Lagrangian 表示一致；\(representation\) 至少区分自治骨架表示、精确非自治表示和工程约化表示。严格 Kirchhoff 分支同时保存离散约束 \(\mathbf{c}\left( \mathbf{q} \right)\) 及其 Jacobian \(\mathbf{G}\left( \mathbf{q} \right)\)；无约束分支可将这两个分量标记为空。
@@ -1042,14 +1042,14 @@ COMSOL--Galerkin bridge 比较 stationary energy/field 导出、mesh-40/80 模�
 
 \begin{equation}
 \label{eq:galerkin-2-121}
-\mathcal{D}_{sk} = \left( \mathbf{z}_{0},{\dot{\mathbf{z}}}_{0},H_{cons},\nabla_{\mathbf{z}_{0}}H_{cons},\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{sk},\mathbf{Q}_{\partial} \right),\quad\quad\mathbf{z}_{0} = \left( \mathbf{q},\mathbf{p}_{0} \right),
+\mathcal{D}_{sk} = \left( \mathbf{z}_{0},{\dot{\mathbf{z}}}_{0},H_{cons},\nabla_{\mathbf{z}_{0}}H_{cons},\mathbf{Q}_{diss}^{bulk},\mathbf{Q}_{contact},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{sk},\mathbf{Q}_{\partial} \right),\quad\quad\mathbf{z}_{0} = \left( \mathbf{q},\mathbf{p}_{0} \right),
 \end{equation}
 
 精确非自治数据为
 
 \begin{equation}
 \label{eq:galerkin-2-122}
-\mathcal{D}_{na} = \left( \mathbf{z},\dot{\mathbf{z}},t,H,\nabla_{\mathbf{z}}H,\partial_{t}H,\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{H},\mathbf{Q}_{\partial} \right),\quad\quad\mathbf{z} = \left( \mathbf{q},\mathbf{p} \right).
+\mathcal{D}_{na} = \left( \mathbf{z},\dot{\mathbf{z}},t,H,\nabla_{\mathbf{z}}H,\partial_{t}H,\mathbf{Q}_{diss}^{bulk},\mathbf{Q}_{contact},\mathbf{Q}_{in},\mathbf{Q}_{flow}^{H},\mathbf{Q}_{\partial} \right),\quad\quad\mathbf{z} = \left( \mathbf{q},\mathbf{p} \right).
 \end{equation}
 
 若 \({\dot{\mathbf{p}}}_{rep}\) 或 \({\dot{\mathbf{z}}}_{rep}\) 由数值差分而非求解器残差、解析方程或自动微分得到，必须同时记录差分阶数、时间步长和导数误差估计。CHNN 的导数监督、能量平衡监督和后续 KAM 误差预算只能使用表示一致且误差可追踪的数据。
@@ -1076,7 +1076,7 @@ model\_ level \in \{ K,WF,T,S\},\quad\quad representation \in \{ sk,na,red\},
 
 \begin{equation}
 \label{eq:galerkin-2-125}
-\mathcal{D}_{K}^{port} = \{\left( \mathbf{z}_{rep},{\dot{\mathbf{z}}}_{rep},\mathbf{Q}_{diss},\mathbf{Q}_{in},\mathbf{Q}_{flow},\mathbf{Q}_{\partial} \right):model\_ level = K\},
+\mathcal{D}_{K}^{port} = \{\left( \mathbf{z}_{rep},{\dot{\mathbf{z}}}_{rep},\mathbf{Q}_{diss}^{bulk},\mathbf{Q}_{contact},\mathbf{Q}_{in},\mathbf{Q}_{flow},\mathbf{Q}_{\partial} \right):model\_ level = K\},
 \end{equation}
 
 高保真对照集为

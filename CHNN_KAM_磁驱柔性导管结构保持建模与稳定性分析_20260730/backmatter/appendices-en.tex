@@ -6,7 +6,7 @@ This appendix organizes the canonical data-contract diagnosis by error source an
 
 \input{tables/tab_canonical_diagnostic_chain_en}
 
-The diagnosis successively examines comparison objects, modal mixing, reduced-order truncation, the cotangent-momentum definition, solver-output semantics, and fixed-basis initialization. The false positive caused by a cross-trajectory comparison shows that closure errors must be computed on the same physical trajectory and at the same sampling times. A repeated single-mode case can still exhibit the anomaly, so the error cannot be attributed directly to modal mixing. Increasing the reduced representation did not reveal the signature of an \(N=2\)-truncation error; projected momentum closed more accurately than \(M_N\dot q_{\mathrm{native}}\).
+The diagnosis successively examines comparison objects, modal mixing, reduced-order truncation, the cotangent-momentum definition, solver-output semantics, and fixed-basis initialization. The false positive caused by a cross-trajectory comparison shows that closure errors must be computed on the same physical trajectory and at the same sampling times. A repeated single-mode case can still exhibit the anomaly, so the error cannot be attributed directly to modal mixing. Increasing the reduced representation did not reveal the signature of an \(N_{\mathrm{diag}}=2\) diagnostic-truncation error; projected momentum closed more accurately than \(M_N\dot q_{\mathrm{native}}\).
 
 Because the internal generalized-alpha stage is unavailable through the public API, exported displacement, velocity, and load cannot be guaranteed to correspond to the same internal solution stage. Order-2 BDF with \texttt{tsteps} is used to obtain states and vector-field labels at the same solver step. This choice does not imply that BDF is symplectic and does not interpret the discrete trajectory as a symplectic map.
 
@@ -16,14 +16,14 @@ Force closure and perturbation-energy drift use independent criteria. An earlier
 
 \subsection{Canonical mapping and closure quantities}
 
-For the fixed \(N=2\) basis, the mapping is
+For the fixed \(N_{\mathrm{diag}}=2\) diagnostic basis, the mapping is
 \begin{align}
-q &= \Pi_{\mathrm{conf}}(U), &
-p &= B^{T}P_{\mathrm{full}}, \\
-\dot q &= M_N^{-1}p, &
-\dot p &= B^{T}L .
+q &= \Pi_{\mathrm{conf},N}(U), &
+p &= B_N(q)^{T}P_{\mathrm{full}}, \\
+\dot q &= M_N(q)^{-1}p, &
+\dot p &= \dot B_N(q)^{T}P_{\mathrm{full}}+B_N(q)^{T}\dot P_{\mathrm{full}} .
 \end{align}
-Here \(q\) is a configuration coordinate and \(p\) is its associated cotangent coordinate. Closure errors compare the exported \(\dot q\) with \(M_N^{-1}p\) and the exported \(\dot p\) with \(B^{T}L\), while the time-discretization study also examines \(q\), \(p\), and total energy.
+Here \(q\in\mathbb{R}^{N_{\mathrm{diag}}}\) is a diagnostic configuration coordinate and \(p\in T_q^*\mathcal{Q}_{N}\) is its associated cotangent coordinate, with \(B_N,\dot B_N\in\mathbb{R}^{m_f\times N_{\mathrm{diag}}}\) and \(P_{\mathrm{full}},\dot P_{\mathrm{full}}\in\mathbb{R}^{m_f}\). If \(L_{\mathrm{full}}:=\dot P_{\mathrm{full}}\) is introduced, the final line may be written as \(\dot p=\dot B_N^{T}P_{\mathrm{full}}+B_N^{T}L_{\mathrm{full}}\), but the transport term cannot be omitted. Closure errors compare the exported \(\dot q\) with \(M_N^{-1}p\) and the exported \(\dot p\) with this transport-corrected momentum rate, while the time-discretization study also examines \(q\), \(p\), and total energy.
 
 The three-level study uses coarse, middle, and fine grids. If the errors on two adjacent levels are \(e_h\) and \(e_{h/2}\), the observed order is
 \[
@@ -42,3 +42,5 @@ P1 and P1.5 each comprise \(60/60\) completed training-and-evaluation runs, and 
 \subsection{Subsequent numerical instantiation}
 
 Multi-amplitude statistics, the full 96-trajectory data set, and the P2 model comparison will retain whole-trajectory partitioning and report cross-condition means, variances, and paired comparisons. Open-port studies additionally require power-balance, dissipation-sign, and port-leakage quantities, while high-fidelity studies must quantify the discrepancy of the Kirchhoff model relative to Timoshenko-beam and solid models. Numerical KAM analysis requires nondegeneracy and Diophantine margins, high-order errors, symplectic-map defects, and invariant-torus residuals in a common norm. Implementation code and supplementary data will be provided with the accompanying code and supplementary materials.
+
+The current clean checkout contains only the V1--V3 \texttt{verification\_skeleton.py} and its \texttt{verification\_results.json} output. They are not formal CHNN, a formal COMSOL--Galerkin bridge, formal force-v2 code, a P0/P1/P2 production experiment, a controller, an adaptive law, or a numerical KAM certificate. Removing this boundary requires formal source code, configuration, an environment lock, raw arrays, a manifest, clean-run logs, automatically generated tables and figures, and provenance-consistency records; while those materials are missing, A-17 remains PARTIAL.
