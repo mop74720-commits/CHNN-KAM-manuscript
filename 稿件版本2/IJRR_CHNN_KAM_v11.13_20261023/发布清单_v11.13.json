@@ -1,0 +1,21 @@
+{
+  "version": "v11.13",
+  "publication_date": "2026-10-23",
+  "content_frozen_utc": "2026-10-23T11:16:10.753445+00:00",
+  "format": "IJRR/SAGE",
+  "files": {
+    "main.pdf": {
+      "sha256": "2dd3641e9e5d0cf83b18f5092a28c775b4fb571bc9d6b4d8f7b9e16e475748fc",
+      "bytes": 424243,
+      "pages": 15
+    },
+    "supplement.pdf": {
+      "sha256": "23b6af2395259aec33dd488cc7edff999b8f1dbe00c7a6f6e91f23d409794c3e",
+      "bytes": 657702,
+      "pages": 47
+    }
+  },
+  "frozen_delivery_identity_sha256": "78d7205e2a83defdbb4c69a7511c01f08b6dafa8baa03ac73fe5b68c30477217",
+  "research_goal_complete": false,
+  "snapshot_scope": "Frozen manuscript PDF pair; later research excluded."
+}
