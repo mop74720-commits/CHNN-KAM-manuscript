@@ -1,0 +1,19 @@
+{
+  "version": "v11.22",
+  "created_utc": "2026-10-24T14:42:37.035169+00:00",
+  "files": {
+    "main.pdf": {
+      "sha256": "0b587520a01529b8d7e407e40bb8394b3e8d26e3638811193950d62e88c62541",
+      "bytes": 809968,
+      "pages": 33
+    },
+    "supplement.pdf": {
+      "sha256": "a591414acbdcdf734eed9621a40a148f59becc04894c9f98c5297b3ec37eda36",
+      "bytes": 1182324,
+      "pages": 113
+    }
+  },
+  "source_delivery_identity_sha256": "543a4684ed834f464d465e354eae8a28da83e2807c76700142df043b394bb9bb",
+  "checkpoint_sha256": "f51bcea12c2f2640c0ea33c3493a691d8ab240578018a6d44a9f68904a1a60a9",
+  "research_goal_complete": false
+}
