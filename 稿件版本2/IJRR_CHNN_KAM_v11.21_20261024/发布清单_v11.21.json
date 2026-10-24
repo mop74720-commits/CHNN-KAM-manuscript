@@ -1,0 +1,71 @@
+{
+  "version": "v11.21",
+  "publication_date": "2026-10-24",
+  "format": "IJRR/SAGE",
+  "files": {
+    "main.pdf": {
+      "sha256": "e3eadafdf1b7cea9ba5c927c6f56354c5c12abb9c7a9856db3cdfe8ebcf6ab0c",
+      "bytes": 794623,
+      "pages": 32
+    },
+    "supplement.pdf": {
+      "sha256": "7a67fd79de10d3d59468be20c75ab1b34425934baeabc19720320ffc575d176e",
+      "bytes": 1124339,
+      "pages": 105
+    }
+  },
+  "frozen_utc": "2026-10-24T13:14:46.889948+00:00",
+  "frozen_delivery_identity_sha256": "347ce893c909f6b6944403c45849c8187d087029459e03eb18be651f91298424",
+  "frozen_reproducibility_manifest_sha256": "1b110b3fdb643f5cd9ab773a73b94fcd98efc491dc580819023eb3e283b7669d",
+  "research_goal_complete": false,
+  "publication_scope": "Exactly two frozen manuscript PDFs, this release description, and its file manifest; no research code or raw data.",
+  "conservative_scope": "Local positive-phase-volume KAM tori for every finite real coefficient of the fixed-source-quadratic, zero-cubic, one-parameter A-squared family; no uniform numerical radius or general 42-coefficient conclusion.",
+  "joint_observation_scope": "One common c in [-1e-15,0] simultaneously satisfies the unchanged first-four-cell observation balls for all 22 signed saved-state IVPs; not a fit to all 257 raw samples.",
+  "checkpoint_sha256": "f51bcea12c2f2640c0ea33c3493a691d8ab240578018a6d44a9f68904a1a60a9",
+  "network_real_parameter_count": 918,
+  "executed_weak_row_scope": {
+    "signed_weak_windows": 88,
+    "odd_row_groups": 44,
+    "eta_arith_strict_upper": "2.672835191e-12",
+    "eta_op_strict_upper": "1.318083006e-11",
+    "eta_O_strict_upper": "1.585366525e-11",
+    "native_mathematical_LD_strict_upper": "9.473763848e-11",
+    "printed_MSE_bitwise_reproduced": true,
+    "normalization": "Original weak-row units before division by ds; not continuous residual work.",
+    "complete_continuous_work_follows_from_weak_loss_alone": false
+  },
+  "source_prefix_theorem_scope": "All-prefix residual-work bound under an explicit global scalar constitutive prior, its nonzero-force-loss-admitted parameter interval, the same native full mass and magnetic port, an independent positive viscosity lower prior, and a bound on every actual input-supply prefix. Source energy establishes the domain before candidate damping is estimated.",
+  "original_22_source_IVP_scope": {
+    "initial_conditions": "The 22 own saved numerical full64 initial states.",
+    "horizons": "Each own original binary64 saved horizon near 20 microseconds, all continuous prefixes.",
+    "input": "Whole-law exact-decimal cosine amplitude 1e-4 T, not sampled-node inference.",
+    "absolute_supply_strict_upper_over_Enet": "0.096606",
+    "P_relaxation_over_Enet": "0.1",
+    "W_strict_upper_over_Enet": "1.277474991512",
+    "candidate_storage_strict_upper_over_Enet": "2.349722602874",
+    "feedback_or_nonpositive_instantaneous_power_assumed": false,
+    "compiled_COMSOL_path_identity_received": false
+  },
+  "recorded_three_hold_source_scope": {
+    "initial_condition": "The recorded reference history own saved seed; no replacement with a training initial state.",
+    "input": "The same three actually recorded constant total fields on the same finite interval.",
+    "direct_S_prefix_upper_over_Enet": "0",
+    "instantaneous_power_sign_failed_cells_preserved": 15,
+    "original_third_sensor_contract_failure_preserved": true,
+    "W_strict_upper_over_Enet": "1.133261675220",
+    "candidate_storage_strict_upper_over_Enet": "2.133261675220",
+    "energy_cap_used_to_infer_supply": false,
+    "all_future_inputs_or_pairwise_monotonicity_received": false
+  },
+  "new_computation_scope": {
+    "new_training_runs": 0,
+    "new_ODE_integrations": 0,
+    "new_COMSOL_solves": 0
+  },
+  "not_completed": [
+    "General 42-coefficient and unknown-target KAM transfer",
+    "Compiled COMSOL and declared source-IVP equation identity",
+    "Physical initial-state, sensing and actuation errors and physical closed-loop guarantee",
+    "General complex-network advantage"
+  ]
+}
