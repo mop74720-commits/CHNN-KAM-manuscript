@@ -1,0 +1,21 @@
+{
+  "version": "v11.25",
+  "created_utc": "2026-10-24T16:22:32.259689+00:00",
+  "files": {
+    "main.pdf": {
+      "sha256": "1dbda210b1716516580d1e2d8510cfc5ed24666cee0f1906e83896d9adc6e7ea",
+      "bytes": 838864,
+      "pages": 36
+    },
+    "supplement.pdf": {
+      "sha256": "404e1f315738b2e62f4aaaf7048f3c6d3b1b02b9dc991f7b19193b04a181c84e",
+      "bytes": 1271704,
+      "pages": 124
+    }
+  },
+  "source_delivery_identity_sha256": "d0175550acd968dbd62c9a771240bd29dcd611314d852018ee69d6587b853f58",
+  "final_build": "build_attempt03",
+  "continuous_current_raw_IVP_reference_included": true,
+  "later_discrete_and_new_full42_research_included": false,
+  "research_goal_complete": false
+}
