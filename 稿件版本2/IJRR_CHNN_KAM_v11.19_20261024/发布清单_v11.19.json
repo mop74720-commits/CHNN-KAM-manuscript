@@ -1,0 +1,23 @@
+{
+  "version": "v11.19",
+  "publication_date": "2026-10-24",
+  "format": "IJRR/SAGE",
+  "files": {
+    "main.pdf": {
+      "sha256": "d8ab9a9e0ed13c397f5e26bf691f720228b45afca61a45b21f01a96e9c3a0d80",
+      "bytes": 778767,
+      "pages": 30
+    },
+    "supplement.pdf": {
+      "sha256": "ee1cefd706e47976ab0356fd3a4200cde700b0093c017b102954460bcb7ff544",
+      "bytes": 1031258,
+      "pages": 93
+    }
+  },
+  "frozen_utc": "2026-10-24T11:17:42.579006+00:00",
+  "frozen_delivery_identity_sha256": "7ab8bcb73a0abd4e64b9a0e9848c1a7ae8ed97a66e63dd7817560fe9605b5bdf",
+  "frozen_reproducibility_manifest_sha256": "8b329bf986df3a534064e883a6492a23e1a026158e69b52d3ec027cff3a35c9b",
+  "research_goal_complete": false,
+  "publication_scope": "Exactly two frozen manuscript PDFs, this release description, and its file manifest; no research code or raw data.",
+  "score_scope": "Fixed saved numerical vectors at sample times versus the declared exact mathematical source; no exact learned-model IVP, between-output, compiled-equation or physical-equivalence certification."
+}
