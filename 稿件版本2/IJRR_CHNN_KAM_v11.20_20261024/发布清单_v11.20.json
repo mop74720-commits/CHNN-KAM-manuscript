@@ -1,0 +1,37 @@
+{
+  "version": "v11.20",
+  "publication_date": "2026-10-24",
+  "format": "IJRR/SAGE",
+  "files": {
+    "main.pdf": {
+      "sha256": "1b890692816929731f9f9246e029bac45fe7560db4587fe75262fe38e0d7ee6e",
+      "bytes": 789579,
+      "pages": 31
+    },
+    "supplement.pdf": {
+      "sha256": "3b5832fce939313cfe614f97deff013e5767860d5d01ffdeb4057ef646475e2d",
+      "bytes": 1092077,
+      "pages": 101
+    }
+  },
+  "frozen_utc": "2026-10-24T12:24:51.649563+00:00",
+  "frozen_delivery_identity_sha256": "e85b87e12d6edb0edd146fe50b69a83b19644b55812a3b273217a38e9875937b",
+  "frozen_reproducibility_manifest_sha256": "98e407fac2e6fcf35922f8d02da99d46139a57cedc75e2d46c29d8b6a706e210",
+  "research_goal_complete": false,
+  "publication_scope": "Exactly two frozen manuscript PDFs, this release description, and its file manifest; no research code or raw data.",
+  "conservative_scope": "Local positive-phase-volume KAM tori for every finite real coefficient of the fixed-source-quadratic, zero-cubic, one-parameter A-squared family; no uniform numerical radius or general 42-coefficient conclusion.",
+  "joint_observation_scope": "One common c in [-1e-15,0] simultaneously satisfies the unchanged first-four-cell observation balls for all 22 signed saved-state IVPs; not a fit to all 257 raw samples.",
+  "dissipation_scope": "Exact work decomposition and separate saved-buffer/exact-source finite observation-kernel witnesses; the 88-window operator-to-real-cache odd-row norm allowance is below 1.318083006e-11, while the remaining floating execution allowance is not received.",
+  "continuous_work_scope": "All-prefix residual-work upper bounds for two specified mathematical source IVPs on their first four cells, 0 to 3.125e-7 seconds; no all-training-path, long-horizon or physical safety claim.",
+  "new_computation_scope": {
+    "new_training_runs": 0,
+    "new_ODE_integrations": 0,
+    "new_COMSOL_solves": 0
+  },
+  "not_completed": [
+    "Full executed-to-exact-source eta_O",
+    "General 42-coefficient and unknown-physical-target KAM transfer",
+    "Full trajectory-family work and actuation safety conditions",
+    "General complex-network superiority"
+  ]
+}
